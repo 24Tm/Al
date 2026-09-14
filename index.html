@@ -3,53 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة السجلات والمواعيد</title>
+    <title>نظام إدارة المعاملات والإحصاءات</title>
     <style>
         :root {
-            --bg-color: #f0f4f8;
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --primary: #3182ce;
-            --success: #38a169;
-            --warning: #dd6b20;
-            --danger: #e53e3e;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #ca8a04;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 12px; color: var(--text-main); }
-        h2 { text-align: center; color: #1a202c; margin-bottom: 15px; font-size: 22px; }
+        h2 { text-align: center; color: #0f172a; margin-bottom: 12px; font-size: 20px; }
         
-        /* لوحة العدادات العلوية */
-        .dashboard-stats { display: flex; gap: 8px; margin-bottom: 15px; }
-        .stat-card { flex: 1; background: var(--card-bg); padding: 10px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .stat-card .number { font-size: 18px; font-weight: bold; display: block; margin-top: 3px; }
+        /* شريط الصلاحيات العلوي */
+        .auth-bar { background: #e2e8f0; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; font-weight: bold; }
+        .auth-btn { background: #0f172a; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+        /* لوحة العدادات */
+        .dashboard-stats { display: flex; gap: 6px; margin-bottom: 12px; }
+        .stat-card { flex: 1; background: var(--card-bg); padding: 8px; border-radius: 6px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .stat-card .number { font-size: 16px; font-weight: bold; display: block; margin-top: 2px; }
         .stat-in-progress .number { color: var(--primary); }
         .stat-completed .number { color: var(--success); }
         .stat-delayed .number { color: var(--danger); }
 
-        .card { background: var(--card-bg); padding: 15px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        label { display: block; margin-top: 8px; font-weight: 600; font-size: 13px; color: var(--text-muted); }
-        input, textarea { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 15px; box-sizing: border-box; background: #fff; }
+        .card { background: var(--card-bg); padding: 12px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 12px; }
+        label { display: block; margin-top: 6px; font-weight: 600; font-size: 12px; color: var(--text-muted); }
+        input, select, textarea { width: 100%; padding: 8px; margin-top: 3px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 14px; box-sizing: border-box; background: #fff; }
         
-        .btn-group { display: flex; gap: 8px; margin-top: 12px; }
-        button { background: var(--primary); color: white; border: none; padding: 11px; border-radius: 6px; font-size: 15px; cursor: pointer; flex: 1; font-weight: bold; }
+        .btn-group { display: flex; gap: 6px; margin-top: 10px; }
+        button { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 5px; font-size: 14px; cursor: pointer; flex: 1; font-weight: bold; }
         button:active { opacity: 0.8; }
-        .btn-pdf { background: #2b6cb0; }
+        .btn-pdf { background: #0369a1; }
+        .btn-edit { background: var(--warning); color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-delete { background: var(--danger); color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
 
-        .record-item { background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; border-right: 4px solid #cbd5e0; }
-        .record-item.green { border-right-color: var(--success); }
-        .record-item.orange { border-right-color: var(--warning); }
-        .record-item.red { border-right-color: var(--danger); }
+        /* بطاقات المعاملات وتلوين الخلفيات بالكامل */
+        .record-item { padding: 12px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; border: 1px solid #cbd5e1; background: #fff; }
+        .record-item.bg-red { background-color: #fee2e2 !important; border-color: #fca5a5; }
+        .record-item.bg-green { background-color: #dcfce7 !important; border-color: #86efac; }
+        .record-item.bg-normal { background-color: #ffffff !important; }
 
-        .record-title { font-weight: bold; font-size: 16px; color: var(--text-main); }
-        .record-dates { font-size: 12px; color: var(--text-muted); margin: 4px 0; }
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 4px; }
-        .badge-green { background: #f0fff4; color: var(--success); }
-        .badge-orange { background: #fffaf0; color: var(--warning); }
-        .badge-red { background: #fff5f5; color: var(--danger); }
+        .record-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; margin-bottom: 4px; }
+        .record-details { font-size: 12px; color: #334155; line-height: 1.5; }
         
-        .delete-btn { background: #fed7d7; color: var(--danger); border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; float: left; cursor: pointer; font-weight: bold; }
+        .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 4px; }
+        .badge-green { background: #bbf7d0; color: #166534; }
+        .badge-red { background: #fecaca; color: #991b1b; }
+        .badge-orange { background: #fed7aa; color: #9a3412; }
 
-        /* تنسيق طباعة تقرير الـ PDF */
+        .admin-only { display: none; }
+
         @media print {
             body { background: white; color: black; }
             .no-print { display: none !important; }
@@ -59,127 +66,224 @@
 </head>
 <body>
 
-    <div class="no-print">
-        <h2>نظام إدارة السجلات</h2>
+    <h2>نظام إدارة المعاملات</h2>
 
-        <!-- العدادات العلوية -->
-        <div class="dashboard-stats">
-            <div class="stat-card stat-in-progress">
-                <span style="font-size:12px; color:var(--text-muted)">⏳ تحت الإجراء</span>
-                <span class="number" id="countInProgress">0</span>
-            </div>
-            <div class="stat-card stat-completed">
-                <span style="font-size:12px; color:var(--text-muted)">✅ المنجزة</span>
-                <span class="number" id="countCompleted">0</span>
-            </div>
-            <div class="stat-card stat-delayed">
-                <span style="font-size:12px; color:var(--text-muted)">🔴 المتاخرة</span>
-                <span class="number" id="countDelayed">0</span>
-            </div>
+    <!-- شريط الصلاحيات -->
+    <div class="auth-bar no-print">
+        <span id="userRoleText">👤 الصلاحية الحالية: زائر (اطلاع فقط)</span>
+        <button class="auth-btn" id="authToggleBtn" onclick="toggleAuth()">تسجيل دخول الأدمن</button>
+    </div>
+
+    <!-- العدادات العلوية -->
+    <div class="dashboard-stats no-print">
+        <div class="stat-card stat-in-progress">
+            <span style="font-size:11px; color:var(--text-muted)">⏳ تحت الإجراء</span>
+            <span class="number" id="countInProgress">0</span>
         </div>
-
-        <div class="card">
-            <label>اسم السجل / الجهة:</label>
-            <input type="text" id="title" placeholder="أدخل اسم السجل">
-
-            <label>تاريخ البداية:</label>
-            <input type="date" id="startDate">
-
-            <label>تاريخ النهاية:</label>
-            <input type="date" id="endDate">
-
-            <label>ملاحظات:</label>
-            <input type="text" id="notes" placeholder="ملاحظات اختيارية">
-
-            <div class="btn-group">
-                <button onclick="saveRecord()">➕ حفظ السجل</button>
-                <button onclick="exportDelayedPDF()" class="btn-pdf">📄 تقرير المتأخرة PDF</button>
-            </div>
+        <div class="stat-card stat-completed">
+            <span style="font-size:11px; color:var(--text-muted)">✅ منجزة</span>
+            <span class="number" id="countCompleted">0</span>
         </div>
-
-        <div style="margin-bottom: 12px;">
-            <input type="text" id="searchQuery" placeholder="🔍 بحث سريع..." oninput="renderRecords()">
+        <div class="stat-card stat-delayed">
+            <span style="font-size:11px; color:var(--text-muted)">🔴 متأخرة</span>
+            <span class="number" id="countDelayed">0</span>
         </div>
     </div>
 
-    <!-- منطقة عرض السجلات / والتقرير للطباعة -->
-    <div id="printArea">
-        <div class="no-print" style="font-weight: bold; margin-bottom: 8px; font-size: 14px; color: var(--text-muted);">قائمة السجلات:</div>
-        <div id="recordsList"></div>
+    <!-- نموذج الإضافة والتعديل (يظهر للأدمن فقط) -->
+    <div class="card admin-only no-print" id="adminFormCard">
+        <h3 id="formTitle" style="margin: 0 0 8px 0; font-size: 14px; color: var(--primary);">➕ إضافة معاملة جديدة</h3>
+        <input type="hidden" id="recordId">
+        
+        <div style="display: flex; gap: 6px;">
+            <div style="flex: 1;">
+                <label>رقم المعاملة:</label>
+                <input type="text" id="transNumber" placeholder="رقم المعاملة">
+            </div>
+            <div style="flex: 1;">
+                <label>تاريخ المعاملة:</label>
+                <input type="date" id="transDate">
+            </div>
+        </div>
+
+        <label>موضوع المعاملة:</label>
+        <input type="text" id="transSubject" placeholder="موضوع المعاملة">
+
+        <div style="display: flex; gap: 6px;">
+            <div style="flex: 1;">
+                <label>صادرة من:</label>
+                <input type="text" id="transFrom" placeholder="الجهة المصدرة">
+            </div>
+            <div style="flex: 1;">
+                <label>حولت لـ:</label>
+                <input type="text" id="transTo" placeholder="الجهة المحولة لها">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 6px;">
+            <div style="flex: 1;">
+                <label>الحالة:</label>
+                <select id="transStatus">
+                    <option value="لم تنجز">لم تنجز</option>
+                    <option value="أنجزت">أنجزت</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label>تاريخ الانتهاء / الاستحقاق:</label>
+                <input type="date" id="transDueDate">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button onclick="saveRecord()" id="saveBtnText">حفظ المعاملة</button>
+            <button onclick="resetForm()" style="background: #64748b;">إلغاء / مسح</button>
+            <button onclick="exportDelayedPDF()" class="btn-pdf">📄 تقرير المتأخرات PDF</button>
+        </div>
     </div>
+
+    <div class="no-print" style="margin-bottom: 10px;">
+        <input type="text" id="searchQuery" placeholder="🔍 بحث برقم المعاملة، الموضوع، أو الجهات..." oninput="renderRecords()">
+    </div>
+
+    <!-- قائمة المعاملات -->
+    <div id="recordsList"></div>
 
 <script>
-    document.getElementById('startDate').valueAsDate = new Date();
-    let defEnd = new Date();
-    defEnd.setDate(defEnd.getDate() + 30);
-    document.getElementById('endDate').valueAsDate = defEnd;
+    let isAdmin = false;
+    document.getElementById('transDate').valueAsDate = new Date();
+    let defDue = new Date();
+    defDue.setDate(defDue.getDate() + 15);
+    document.getElementById('transDueDate').valueAsDate = defDue;
 
-    function getRecords() {
-        return JSON.parse(localStorage.getItem('my_records') || '[]');
-    }
-
-    function saveRecord() {
-        let title = document.getElementById('title').value.trim();
-        let startDate = document.getElementById('startDate').value;
-        let endDate = document.getElementById('endDate').value;
-        let notes = document.getElementById('notes').value.trim();
-
-        if(!title || !startDate || !endDate) {
-            alert('الرجاء إدخال الاسم وتواريخ البداية والنهاية');
-            return;
-        }
-
-        let records = getRecords();
-        records.push({ id: Date.now(), title, startDate, endDate, notes });
-        localStorage.setItem('my_records', JSON.stringify(records));
-
-        document.getElementById('title').value = '';
-        document.getElementById('notes').value = '';
-        renderRecords();
-    }
-
-    function deleteRecord(id) {
-        if(confirm('هل أنت متأكد من الحذف؟')) {
-            let records = getRecords().filter(r => r.id !== id);
-            localStorage.setItem('my_records', JSON.stringify(records));
+    function toggleAuth() {
+        if (!isAdmin) {
+            let pass = prompt("الرجاء إدخال كلمة مرور الأدمن:");
+            if (pass === "Dd1616") {
+                isAdmin = true;
+                document.getElementById('userRoleText').innerText = "👤 الصلاحية الحالية: 🛠️ أدمن (تحكم كامل)";
+                document.getElementById('authToggleBtn').innerText = "خروج من وضع الأدمن";
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                renderRecords();
+            } else if (pass !== null) {
+                alert("كلمة المرور غير صحيحة!");
+            }
+        } else {
+            isAdmin = false;
+            document.getElementById('userRoleText').innerText = "👤 الصلاحية الحالية: زائر (اطلاع فقط)";
+            document.getElementById('authToggleBtn').innerText = "تسجيل دخول الأدمن";
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            resetForm();
             renderRecords();
         }
     }
 
+    function getRecords() {
+        return JSON.parse(localStorage.getItem('transactions_data') || '[]');
+    }
+
+    function saveRecord() {
+        if (!isAdmin) return;
+        let id = document.getElementById('recordId').value;
+        let number = document.getElementById('transNumber').value.trim();
+        let date = document.getElementById('transDate').value;
+        let subject = document.getElementById('transSubject').value.trim();
+        let from = document.getElementById('transFrom').value.trim();
+        let to = document.getElementById('transTo').value.trim();
+        let status = document.getElementById('transStatus').value;
+        let dueDate = document.getElementById('transDueDate').value;
+
+        if (!number || !subject || !date || !dueDate) {
+            alert('الرجاء إدخال الحقول الأساسية (رقم المعاملة، الموضوع، تواريخ البداية والاستحقاق)');
+            return;
+        }
+
+        let records = getRecords();
+
+        if (id) {
+            // تعديل
+            records = records.map(r => r.id == id ? { id: Number(id), number, date, subject, from, to, status, dueDate } : r);
+        } else {
+            // إضافة جديدة
+            records.push({ id: Date.now(), number, date, subject, from, to, status, dueDate });
+        }
+
+        localStorage.setItem('transactions_data', JSON.stringify(records));
+        resetForm();
+        renderRecords();
+    }
+
+    function editRecord(id) {
+        if (!isAdmin) return;
+        let records = getRecords();
+        let r = records.find(item => item.id == id);
+        if (!r) return;
+
+        document.getElementById('recordId').value = r.id;
+        document.getElementById('transNumber').value = r.number;
+        document.getElementById('transDate').value = r.date;
+        document.getElementById('transSubject').value = r.subject;
+        document.getElementById('transFrom').value = r.from;
+        document.getElementById('transTo').value = r.to;
+        document.getElementById('transStatus').value = r.status;
+        document.getElementById('transDueDate').value = r.dueDate;
+        
+        document.getElementById('formTitle').innerText = "✏️ تعديل المعاملة";
+        document.getElementById('saveBtnText').innerText = "تحديث البيانات";
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function deleteRecord(id) {
+        if (!isAdmin) return;
+        if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
+            let records = getRecords().filter(r => r.id !== id);
+            localStorage.setItem('transactions_data', JSON.stringify(records));
+            renderRecords();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('recordId').value = '';
+        document.getElementById('transNumber').value = '';
+        document.getElementById('transSubject').value = '';
+        document.getElementById('transFrom').value = '';
+        document.getElementById('transTo').value = '';
+        document.getElementById('transStatus').value = 'لم تنجز';
+        document.getElementById('formTitle').innerText = "➕ إضافة معاملة جديدة";
+        document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
+    }
+
     function exportDelayedPDF() {
-        // تجهيز صفحة للطباعة تحوي المتأخرة فقط بشكل مرتب
         let records = getRecords();
         let today = new Date();
         today.setHours(0,0,0,0);
 
         let delayed = records.filter(r => {
-            let endD = new Date(r.endDate);
-            let diffDays = Math.ceil((endD - today) / (1000 * 60 * 60 * 24));
-            return diffDays < 0;
+            let dueD = new Date(r.dueDate);
+            let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
+            return diffDays < 0 && r.status === 'لم تنجز';
         });
 
-        if(delayed.length === 0) {
-            alert('لا توجد سجلات متأخرة لتصديرها.');
+        if (delayed.length === 0) {
+            alert('لا توجد معاملات متأخرة ولم تنجز لتصديرها.');
             return;
         }
 
-        let originalContent = document.body.innerHTML;
         let printHTML = `
             <div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px;">
-                <h2 style="text-align: center; color: #e53e3e;">تقرير السجلات المتأخرة</h2>
+                <h2 style="text-align: center; color: #dc2626;">تقرير المعاملات المتأخرة (ولم تنجز)</h2>
                 <p style="text-align: center; color: #666; font-size: 12px;">تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
                 <hr style="border: 0; border-top: 1px solid #ccc; margin: 15px 0;">
         `;
 
         delayed.forEach((r, index) => {
-            let endD = new Date(r.endDate);
-            let diffDays = Math.abs(Math.ceil((endD - today) / (1000 * 60 * 60 * 24)));
+            let dueD = new Date(r.dueDate);
+            let diffDays = Math.abs(Math.ceil((dueD - today) / (1000 * 60 * 60 * 24)));
             printHTML += `
-                <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
-                    <strong>${index + 1}. ${r.title}</strong>
-                    <div style="font-size: 13px; color: #555; margin-top: 4px;">فترة المعاملة: من (${r.startDate}) إلى (${r.endDate})</div>
-                    <div style="font-size: 13px; color: #e53e3e; font-weight: bold; margin-top: 4px;">متأخرة بمقدار: ${diffDays} يوم</div>
-                    ${r.notes ? `<div style="font-size: 12px; color: #777; margin-top: 2px;">ملاحظات: ${r.notes}</div>` : ''}
+                <div style="border: 1px solid #f87171; background: #fee2e2; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                    <strong>${index + 1}. رقم المعاملة: ${r.number}</strong>
+                    <div style="font-size: 13px; margin-top: 3px;">الموضوع: ${r.subject}</div>
+                    <div style="font-size: 12px; color: #555; margin-top: 2px;">من: ${r.from || '---'} | إلى: ${r.to || '---'}</div>
+                    <div style="font-size: 13px; color: #991b1b; font-weight: bold; margin-top: 4px;">متأخرة بمقدار: ${diffDays} يوم عن تاريخ الاستحقاق (${r.dueDate})</div>
                 </div>
             `;
         });
@@ -187,7 +291,7 @@
         printHTML += `</div>`;
         document.body.innerHTML = printHTML;
         window.print();
-        window.location.reload(); // لإعادة الواجهة الأصلية بعد الطباعة
+        window.location.reload();
     }
 
     function renderRecords() {
@@ -203,55 +307,84 @@
         let completedCount = 0;
         let delayedCount = 0;
 
-        // حساب العدادات إجمالاً
         records.forEach(r => {
-            let startD = new Date(r.startDate);
-            let endD = new Date(r.endDate);
-            let diffDays = Math.ceil((endD - today) / (1000 * 60 * 60 * 24));
-            if (diffDays < 0) delayedCount++;
-            else if (today < startD) inProgressCount++;
-            else completedCount++; // أو جارية طبيعية
+            let dueD = new Date(r.dueDate);
+            let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0 && r.status === 'لم تنجز') {
+                delayedCount++;
+            } else if (r.status === 'أنجزت') {
+                completedCount++;
+            } else {
+                inProgressCount++;
+            }
         });
 
         document.getElementById('countInProgress').innerText = inProgressCount;
         document.getElementById('countCompleted').innerText = completedCount;
         document.getElementById('countDelayed').innerText = delayedCount;
 
-        let filtered = records.filter(r => r.title.toLowerCase().includes(query) || (r.notes && r.notes.toLowerCase().includes(query)));
+        let filtered = records.filter(r => 
+            r.number.toLowerCase().includes(query) || 
+            r.subject.toLowerCase().includes(query) || 
+            (r.from && r.from.toLowerCase().includes(query)) || 
+            (r.to && r.to.toLowerCase().includes(query))
+        );
 
-        if(filtered.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px;">لا توجد سجلات مطابقة</p>';
+        if (filtered.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 20px;">لا توجد معاملات مطابقة</p>';
             return;
         }
 
         filtered.reverse().forEach(r => {
-            let endD = new Date(r.endDate);
-            let diffTime = endD - today;
-            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            let dueD = new Date(r.dueDate);
+            let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
 
-            let statusHtml = '';
-            let cardClass = '';
-            
-            if(diffDays < 0) {
-                cardClass = 'red';
-                statusHtml = `<span class="badge badge-red">🔴 متأخرة (${Math.abs(diffDays)} يوم)</span>`;
-            } else if(diffDays <= 7) {
-                cardClass = 'orange';
-                statusHtml = `<span class="badge badge-orange">🟠 تنتهي قريبًا (باقي ${diffDays} يوم)</span>`;
+            let cardBgClass = 'bg-normal';
+            let statusBadge = '';
+            let remainingText = '';
+
+            if (r.status === 'أنجزت') {
+                cardBgClass = 'bg-green';
+                statusBadge = `<span class="badge badge-green">✅ منجزة</span>`;
+                remainingText = `تمت بنجاح`;
             } else {
-                cardClass = 'green';
-                statusHtml = `<span class="badge badge-green">🟢 نشطة (باقي ${diffDays} يوم)</span>`;
+                if (diffDays < 0) {
+                    cardBgClass = 'bg-red';
+                    statusBadge = `<span class="badge badge-red">🔴 متأخرة ولم تنجز</span>`;
+                    remainingText = `متأخرة بـ ${Math.abs(diffDays)} يوم`;
+                } else if (diffDays <= 5) {
+                    statusBadge = `<span class="badge badge-orange">🟠 تنتهي قريبًا</span>`;
+                    remainingText = `متبقي ${diffDays} يوم`;
+                } else {
+                    statusBadge = `<span class="badge badge-green">🟢 نشطة</span>`;
+                    remainingText = `متبقي ${diffDays} يوم`;
+                }
             }
 
             let div = document.createElement('div');
-            div.className = `record-item ${cardClass}`;
+            div.className = `record-item ${cardBgClass}`;
             div.innerHTML = `
-                <button class="no-print delete-btn" onclick="deleteRecord(${r.id})">حذف</button>
-                <div class="record-title">${r.title}</div>
-                <div class="record-dates">البداية: ${r.startDate} &nbsp;|&nbsp; النهاية: ${r.endDate}</div>
-                ${r.notes ? `<div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">ملاحظات: ${r.notes}</div>` : ''}
-                <div>${statusHtml}</div>
+                <div class="record-header">
+                    <span>📁 المعاملة رقم: ${r.number}</span>
+                    <span>${statusBadge}</span>
+                </div>
+                <div class="record-details" style="margin-top: 6px;">
+                    <div><strong>الموضوع:</strong> ${r.subject}</div>
+                    <div style="margin-top: 3px;"><strong>التاريخ:</strong> ${r.date} &nbsp;|&nbsp; <strong>الاستحقاق:</strong> ${r.dueDate}</div>
+                    <div style="margin-top: 3px;"><strong>صادرة من:</strong> ${r.from || '---'} &nbsp;|&nbsp; <strong>حولت لـ:</strong> ${r.to || '---'}</div>
+                    <div style="margin-top: 4px; font-weight: bold; color: #0f172a;">⏱️ العداد: ${remainingText}</div>
+                </div>
+                <div class="admin-only" style="margin-top: 8px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 6px;">
+                    <button class="btn-edit" onclick="editRecord(${r.id})">✏️ تعديل</button>
+                    <button class="btn-delete" onclick="deleteRecord(${r.id})" style="margin-right: 5px;">🗑️ حذف</button>
+                </div>
             `;
+            // إذا كان الأدمن مفعلاً، نظهر أزرار التعديل والحذف للبطاقة
+            let adminSection = div.querySelector('.admin-only');
+            if (isAdmin) {
+                adminSection.style.display = 'block';
+            }
+            
             listContainer.appendChild(div);
         });
     }
