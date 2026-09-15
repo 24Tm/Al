@@ -615,12 +615,15 @@
             (r.to && r.to.toLowerCase().includes(query))
         );
 
+        // --- ترتيب المعاملات تلقائياً تصاعدياً حسب تاريخ الاستحقاق (الأقرب أو المتأخرة أولاً) ---
+        filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
         if (filtered.length === 0) {
             listContainer.innerHTML = '<p style="text-align:center; color:#64748b; padding: 25px; font-size: 14px; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-light);">لا توجد معاملات مطابقة في هذا القسم</p>';
             return;
         }
 
-        filtered.reverse().forEach(r => {
+        filtered.forEach(r => {
             let dueD = new Date(r.dueDate);
             let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
 
