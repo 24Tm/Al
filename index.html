@@ -3,165 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متابعة المعاملات</title>
+    <title>نظام إدارة ومتابعة المعاملات</title>
     <style>
         :root {
-            --bg-main: #f8fafc;
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --bg-body: #f1f5f9;
             --sidebar-bg: #0f172a;
             --card-bg: #ffffff;
-            --text-main: #1e293b;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --primary: #3b82f6;
-            --primary-dark: #1d4ed8;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --border: #e2e8f0;
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --border: #cbd5e1;
+            --border-light: #e2e8f0;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-main);
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
             color: var(--text-main);
             margin: 0;
-            padding: 24px;
+            padding: 30px;
             direction: rtl;
         }
 
-        .wrapper {
-            max-width: 1000px;
+        .dashboard-container {
+            max-width: 1100px;
             margin: 0 auto;
         }
 
         /* رأس الصفحة الاحترافي */
-        .header-bar {
+        .top-navbar {
             background: var(--sidebar-bg);
-            color: #fff;
-            padding: 20px 24px;
-            border-radius: var(--radius);
+            color: #ffffff;
+            padding: 20px 28px;
+            border-radius: var(--radius-md);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+            box-shadow: var(--shadow-md);
             margin-bottom: 24px;
         }
 
-        .header-bar h2 {
+        .brand-title {
             margin: 0;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.3px;
         }
 
-        .auth-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .auth-trigger {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
-        .auth-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .auth-trigger:hover {
+            background: rgba(255, 255, 255, 0.15);
         }
 
-        /* لوحة الإحصائيات */
-        .stats-grid {
+        /* لوحة المؤشرات الإحصائية */
+        .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin-bottom: 24px;
         }
 
-        .stat-box {
+        .metric-card {
             background: var(--card-bg);
-            padding: 18px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
             text-align: center;
         }
 
-        .stat-box .title {
+        .metric-card .label {
             font-size: 13px;
             color: var(--text-muted);
             font-weight: 600;
             margin-bottom: 8px;
         }
 
-        .stat-box .value {
+        .metric-card .val {
             font-size: 28px;
             font-weight: 800;
         }
 
-        .stat-box.progress .value { color: var(--primary); }
-        .stat-box.delayed .value { color: var(--danger); }
-        .stat-box.completed .value { color: var(--success); }
+        .metric-card.in-progress .val { color: var(--primary); }
+        .metric-card.delayed .val { color: var(--danger); }
+        .metric-card.completed .val { color: var(--success); }
 
-        /* التبويبات */
-        .nav-tabs {
+        /* نظام التبويبات */
+        .nav-pills {
             display: flex;
             gap: 10px;
             margin-bottom: 24px;
         }
 
-        .tab-item {
+        .pill-btn {
             flex: 1;
             background: #e2e8f0;
             border: none;
-            padding: 14px;
-            border-radius: var(--radius);
-            font-size: 15px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             text-align: center;
         }
 
-        .tab-item.active {
+        .pill-btn.active {
             background: var(--sidebar-bg);
-            color: #fff;
-            box-shadow: var(--shadow);
+            color: #ffffff;
+            box-shadow: var(--shadow-sm);
         }
 
-        /* بطاقة النماذج والإدخال */
-        .card {
+        /* الحاويات ونماذج الإدخال */
+        .panel-box {
             background: var(--card-bg);
-            padding: 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            padding: 28px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
             margin-bottom: 24px;
         }
 
-        .card h3 {
+        .panel-box h3 {
             margin-top: 0;
-            font-size: 18px;
+            font-size: 16px;
             color: var(--sidebar-bg);
-            border-bottom: 2px solid var(--bg-main);
+            border-bottom: 2px solid var(--bg-body);
             padding-bottom: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
-        .form-row {
+        .form-grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
+        }
+
+        .form-item {
             margin-bottom: 16px;
         }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group.full {
+        .form-item.full-width {
             grid-column: span 2;
         }
 
@@ -175,24 +182,23 @@
 
         input, select {
             width: 100%;
-            padding: 12px 14px;
+            padding: 11px 14px;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 15px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
             background: #fff;
             color: var(--text-main);
-            box-sizing: border-box;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        /* الأزرار */
-        .btn-container {
+        /* الأزرار الاحترافية */
+        .actions-group {
             display: flex;
             gap: 12px;
             margin-top: 20px;
@@ -202,165 +208,168 @@
             background: var(--primary);
             color: #fff;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 15px;
+            padding: 11px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             flex: 1;
             transition: background 0.2s;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
         }
 
-        .btn:hover { background: var(--primary-dark); }
-        .btn-secondary { background: #64748b; }
+        .btn:hover { background: var(--primary-hover); }
+        .btn-alt { background: #64748b; }
+        .btn-alt:hover { background: #475569; }
         .btn-pdf { background: #0284c7; }
-        .btn-edit { background: var(--warning); padding: 6px 12px; font-size: 13px; border-radius: 6px; }
-        .btn-delete { background: var(--danger); padding: 6px 12px; font-size: 13px; border-radius: 6px; }
+        .btn-pdf:hover { background: #0369a1; }
+        
+        .btn-edit-item { background: var(--warning); padding: 5px 12px; font-size: 12px; border-radius: 6px; color: #fff; border:none; cursor:pointer;}
+        .btn-del-item { background: var(--danger); padding: 5px 12px; font-size: 12px; border-radius: 6px; color: #fff; border:none; cursor:pointer;}
 
-        /* شريط البحث */
-        .search-container {
+        /* شريط البحث المتقدم */
+        .search-box-wrapper {
             margin-bottom: 24px;
         }
 
-        /* قائمة المعاملات */
-        .record-card {
+        /* بطاقات المعاملات الفردية */
+        .record-item-card {
             background: var(--card-bg);
-            border-radius: var(--radius);
+            border-radius: var(--radius-md);
             padding: 20px;
             margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            position: relative;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
             border-right: 5px solid var(--primary);
+            position: relative;
         }
 
-        .record-card.status-delayed { border-right-color: var(--danger); background: #fef2f2; }
-        .record-card.status-completed { border-right-color: var(--success); background: #f0fdf4; }
+        .record-item-card.state-delayed { border-right-color: var(--danger); background-color: #fef2f2; }
+        .record-item-card.state-completed { border-right-color: var(--success); background-color: #f0fdf4; }
 
-        .record-header {
+        .record-item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--border-light);
             padding-bottom: 8px;
         }
 
-        .record-title {
-            font-size: 16px;
+        .record-item-title {
+            font-size: 15px;
             font-weight: 700;
             color: var(--sidebar-bg);
         }
 
-        .badge {
+        .status-tag {
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
         }
-        .badge-green { background: #dcfce7; color: #166534; }
-        .badge-red { background: #fee2e2; color: #991b1b; }
-        .badge-orange { background: #ffedd5; color: #9a3412; }
+        .tag-green { background: #dcfce7; color: #166534; }
+        .tag-red { background: #fee2e2; color: #991b1b; }
+        .tag-orange { background: #ffedd5; color: #9a3412; }
 
-        .record-body {
-            font-size: 14px;
+        .record-item-details {
+            font-size: 13px;
             color: var(--text-muted);
             line-height: 1.8;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
 
-        .record-body div strong {
+        .record-item-details strong {
             color: var(--text-main);
         }
 
-        .record-footer {
+        .record-item-footer {
             margin-top: 14px;
             padding-top: 10px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid var(--border-light);
             display: flex;
             justify-content: flex-end;
             gap: 8px;
         }
 
-        .admin-only { display: none; }
+        .restricted-admin { display: none; }
 
         @media print {
             body { background: #fff; padding: 0; }
-            .no-print { display: none !important; }
-            .print-container { display: block !important; }
-            .record-card { border: 1px solid #ccc !important; break-inside: avoid; }
+            .no-print-zone { display: none !important; }
+            .print-zone { display: block !important; }
+            .record-item-card { border: 1px solid #ccc !important; break-inside: avoid; }
         }
-        .print-container { display: none; }
+        .print-zone { display: none; }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
+<div class="dashboard-container">
     <!-- رأس الصفحة -->
-    <div class="header-bar no-print">
-        <h2>متابعة المعاملات</h2>
-        <button class="auth-btn" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
+    <div class="top-navbar no-print-zone">
+        <h1 class="brand-title">نظام إدارة ومتابعة المعاملات</h1>
+        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
     </div>
 
-    <!-- لوحة الإحصائيات -->
-    <div class="stats-grid no-print">
-        <div class="stat-box progress">
-            <div class="title">تحت الإجراء</div>
-            <div class="value" id="countInProgress">0</div>
+    <!-- لوحة المؤشرات -->
+    <div class="metrics-grid no-print-zone">
+        <div class="metric-card in-progress">
+            <div class="label">تحت الإجراء</div>
+            <div class="val" id="countInProgress">0</div>
         </div>
-        <div class="stat-box delayed">
-            <div class="title">متأخرة</div>
-            <div class="value" id="countDelayed">0</div>
+        <div class="metric-card delayed">
+            <div class="label">متأخرة</div>
+            <div class="val" id="countDelayed">0</div>
         </div>
-        <div class="stat-box completed">
-            <div class="title">المنجزة</div>
-            <div class="value" id="countCompleted">0</div>
+        <div class="metric-card completed">
+            <div class="label">المنجزة</div>
+            <div class="val" id="countCompleted">0</div>
         </div>
     </div>
 
     <!-- التبويبات -->
-    <div class="nav-tabs no-print">
-        <button class="tab-item active" id="tabActive" onclick="switchTab('active')">المعاملات النشطة والمتأخرة</button>
-        <button class="tab-item" id="tabCompleted" onclick="switchTab('completed')">المعاملات المنجزة</button>
+    <div class="nav-pills no-print-zone">
+        <button class="pill-btn active" id="tabActive" onclick="switchTab('active')">المعاملات النشطة والمتأخرة</button>
+        <button class="pill-btn" id="tabCompleted" onclick="switchTab('completed')">المعاملات المنجزة</button>
     </div>
 
-    <!-- نموذج الإدخال (للأدمن) -->
-    <div class="card admin-only no-print" id="adminFormCard">
-        <h3 id="formTitle">➕ إضافة معاملة جديدة</h3>
+    <!-- نموذج الادخال المخصص للأدمن -->
+    <div class="panel-box restricted-admin no-print-zone" id="adminFormCard">
+        <h3 id="formTitleText">➕ تسجيل معاملة جديدة</h3>
         <input type="hidden" id="recordId">
         
-        <div class="form-row">
-            <div class="form-group">
+        <div class="form-grid-2">
+            <div class="form-item">
                 <label>رقم المعاملة:</label>
                 <input type="text" id="transNumber" placeholder="أدخل رقم المعاملة">
             </div>
-            <div class="form-group">
-                <label>تاريخ المعاملة (هجري / ميلادي):</label>
+            <div class="form-item">
+                <label>تاريخ المعاملة:</label>
                 <input type="date" id="transDate">
             </div>
         </div>
 
-        <div class="form-group full">
+        <div class="form-item full-width">
             <label>موضوع المعاملة:</label>
-            <input type="text" id="transSubject" placeholder="أدخل موضوع المعاملة">
+            <input type="text" id="transSubject" placeholder="أدخل موضوع المعاملة بالتفصيل">
         </div>
 
-        <div class="form-row">
-            <div class="form-group">
+        <div class="form-grid-2">
+            <div class="form-item">
                 <label>صادرة من:</label>
                 <input type="text" id="transFrom" placeholder="الجهة المصدرة">
             </div>
-            <div class="form-group">
+            <div class="form-item">
                 <label>حولت لـ:</label>
                 <input type="text" id="transTo" placeholder="الجهة المحولة لها">
             </div>
         </div>
 
-        <div class="form-row">
-            <div class="form-group">
+        <div class="form-grid-2">
+            <div class="form-item">
                 <label>الوحدة:</label>
                 <select id="transUnit">
                     <option value="العموم">العموم</option>
@@ -372,7 +381,7 @@
                     <option value="الاسناد">الاسناد</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-item">
                 <label>الحالة:</label>
                 <select id="transStatus">
                     <option value="لم تنجز">لم تنجز</option>
@@ -381,34 +390,35 @@
             </div>
         </div>
 
-        <div class="form-group full">
+        <div class="form-item full-width">
             <label>تاريخ الاستحقاق / الانتهاء:</label>
             <input type="date" id="transDueDate">
         </div>
 
-        <div class="btn-container">
+        <div class="actions-group">
             <button class="btn" onclick="saveRecord()" id="saveBtnText">حفظ المعاملة</button>
-            <button class="btn btn-secondary" onclick="resetForm()">إلغاء</button>
+            <button class="btn btn-alt" onclick="resetForm()">إلغاء</button>
             <button class="btn btn-pdf" onclick="exportDelayedPDF()">📄 تقرير المتأخرات PDF</button>
         </div>
     </div>
 
-    <!-- شريط البحث -->
-    <div class="search-container no-print">
-        <input type="text" id="searchQuery" placeholder="🔍 ابحث برقم المعاملة، الموضوع، الوحدة، أو الجهات..." oninput="renderRecords()">
+    <!-- البحث المتقدم -->
+    <div class="search-box-wrapper no-print-zone">
+        <input type="text" id="searchQuery" placeholder="🔍 بحث سريع (برقم المعاملة، الموضوع، الوحدة، الجهات...)" oninput="renderRecords()">
     </div>
 
-    <!-- قائمة المعاملات -->
-    <div id="recordsList" class="no-print"></div>
+    <!-- قائمة عرض المعاملات -->
+    <div id="recordsList" class="no-print-zone"></div>
 
-    <!-- مساحة الطباعة -->
-    <div id="printArea" class="print-container"></div>
+    <!-- مساحة مخصصة للطباعة وتصدير الـ PDF -->
+    <div id="printArea" class="print-zone"></div>
 </div>
 
 <script>
     let isAdmin = false;
     let currentTab = 'active';
 
+    // تعيين التواريخ الافتراضية
     document.getElementById('transDate').valueAsDate = new Date();
     let defDue = new Date();
     defDue.setDate(defDue.getDate() + 15);
@@ -420,7 +430,7 @@
             if (pass === "Dd1616") {
                 isAdmin = true;
                 document.getElementById('authToggleBtn').innerText = "🔓 خروج الأدمن";
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'block');
                 renderRecords();
             } else if (pass !== null) {
                 alert("كلمة المرور غير صحيحة!");
@@ -428,7 +438,7 @@
         } else {
             isAdmin = false;
             document.getElementById('authToggleBtn').innerText = "🔒 تسجيل الدخول";
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'none');
             resetForm();
             renderRecords();
         }
@@ -458,7 +468,7 @@
         let dueDate = document.getElementById('transDueDate').value;
 
         if (!number || !subject || !date || !dueDate) {
-            alert('الرجاء إدخال الحقول الأساسية المطلوبة.');
+            alert('الرجاء التأكد من تعبئة جميع الحقول الأساسية.');
             return;
         }
 
@@ -491,7 +501,7 @@
         document.getElementById('transStatus').value = r.status;
         document.getElementById('transDueDate').value = r.dueDate;
         
-        document.getElementById('formTitle').innerText = "✏️ تعديل المعاملة";
+        document.getElementById('formTitleText').innerText = "✏️ تعديل المعاملة";
         document.getElementById('saveBtnText').innerText = "تحديث البيانات";
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
@@ -513,7 +523,7 @@
         document.getElementById('transTo').value = '';
         document.getElementById('transUnit').value = 'العموم';
         document.getElementById('transStatus').value = 'لم تنجز';
-        document.getElementById('formTitle').innerText = "➕ إضافة معاملة جديدة";
+        document.getElementById('formTitleText').innerText = "➕ تسجيل معاملة جديدة";
         document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
     }
 
@@ -529,27 +539,27 @@
         });
 
         if (delayed.length === 0) {
-            alert('لا توجد معاملات متأخرة ولم تنجز لتصديرها.');
+            alert('لا توجد معاملات متأخرة حالياً لتصديرها.');
             return;
         }
 
         let printArea = document.getElementById('printArea');
         let printHTML = `
             <div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px; color: #000;">
-                <h2 style="text-align: center; color: #ef4444; font-size: 24px;">تقرير المعاملات المتأخرة</h2>
-                <p style="text-align: center; color: #555; font-size: 14px;">تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
-                <hr style="border: 0; border-top: 2px solid #ccc; margin: 15px 0;">
+                <h2 style="text-align: center; color: #dc2626; font-size: 22px;">تقرير المعاملات المتأخرة</h2>
+                <p style="text-align: center; color: #555; font-size: 13px;">تاريخ إصدار التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
+                <hr style="border: 0; border-top: 1px solid #ccc; margin: 15px 0;">
         `;
 
         delayed.forEach((r, index) => {
             let dueD = new Date(r.dueDate);
             let diffDays = Math.abs(Math.ceil((dueD - today) / (1000 * 60 * 60 * 24)));
             printHTML += `
-                <div style="border: 1px solid #ef4444; background: #fef2f2; padding: 12px; margin-bottom: 12px; border-radius: 6px;">
-                    <strong style="font-size: 16px;">${index + 1}. رقم المعاملة: ${r.number}</strong>
-                    <div style="font-size: 14px; margin-top: 4px;"><strong>الموضوع:</strong> ${r.subject}</div>
-                    <div style="font-size: 13px; color: #444; margin-top: 3px;"><strong>الوحدة:</strong> ${r.unit || '---'} &nbsp;|&nbsp; <strong>من:</strong> ${r.from || '---'} &nbsp;|&nbsp; <strong>إلى:</strong> ${r.to || '---'}</div>
-                    <div style="font-size: 14px; color: #991b1b; font-weight: bold; margin-top: 6px;">⚠️ متأخرة بمقدار: ${diffDays} يوم عن تاريخ الاستحقاق (${r.dueDate})</div>
+                <div style="border: 1px solid #dc2626; background: #fef2f2; padding: 10px 14px; margin-bottom: 10px; border-radius: 6px;">
+                    <strong style="font-size: 15px;">${index + 1}. رقم المعاملة: ${r.number}</strong>
+                    <div style="font-size: 13px; margin-top: 3px;"><strong>الموضوع:</strong> ${r.subject}</div>
+                    <div style="font-size: 12px; color: #444; margin-top: 2px;"><strong>الوحدة:</strong> ${r.unit || '---'} &nbsp;|&nbsp; <strong>صادرة من:</strong> ${r.from || '---'} &nbsp;|&nbsp; <strong>حولت لـ:</strong> ${r.to || '---'}</div>
+                    <div style="font-size: 13px; color: #991b1b; font-weight: bold; margin-top: 5px;">⚠️ متأخرة بمدّة: ${diffDays} يوم عن تاريخ الاستحقاق (${r.dueDate})</div>
                 </div>
             `;
         });
@@ -606,7 +616,7 @@
         );
 
         if (filtered.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; color:#64748b; padding: 30px; font-size: 15px; background: #fff; border-radius: var(--radius); border: 1px solid var(--border);">لا توجد معاملات مطابقة في هذا القسم</p>';
+            listContainer.innerHTML = '<p style="text-align:center; color:#64748b; padding: 25px; font-size: 14px; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-light);">لا توجد معاملات مطابقة في هذا القسم</p>';
             return;
         }
 
@@ -614,52 +624,52 @@
             let dueD = new Date(r.dueDate);
             let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
 
-            let statusClass = '';
-            let statusBadge = '';
-            let remainingText = '';
+            let stateClass = '';
+            let statusTag = '';
+            let remainingLabel = '';
 
             if (r.status === 'أنجزت') {
-                statusClass = 'status-completed';
-                statusBadge = `<span class="badge badge-green">✅ منجزة</span>`;
-                remainingText = `تمت بنجاح`;
+                stateClass = 'state-completed';
+                statusTag = `<span class="status-tag tag-green">✅ منجزة</span>`;
+                remainingLabel = `مكتملة`;
             } else {
                 if (diffDays < 0) {
-                    statusClass = 'status-delayed';
-                    statusBadge = `<span class="badge badge-red">🔴 متأخرة</span>`;
-                    remainingText = `متأخرة بـ ${Math.abs(diffDays)} يوم`;
+                    stateClass = 'state-delayed';
+                    statusTag = `<span class="status-tag tag-red">🔴 متأخرة</span>`;
+                    remainingLabel = `متأخرة بـ ${Math.abs(diffDays)} يوم`;
                 } else if (diffDays <= 5) {
-                    statusBadge = `<span class="badge badge-orange">🟠 تنتهي قريبًا</span>`;
-                    remainingText = `متبقي ${diffDays} يوم`;
+                    statusTag = `<span class="status-tag tag-orange">🟠 قريبة الانتهاء</span>`;
+                    remainingLabel = `متبقي ${diffDays} يوم`;
                 } else {
-                    statusBadge = `<span class="badge badge-green">🟢 نشطة</span>`;
-                    remainingText = `متبقي ${diffDays} يوم`;
+                    statusTag = `<span class="status-tag tag-green">🟢 نشطة</span>`;
+                    remainingLabel = `متبقي ${diffDays} يوم`;
                 }
             }
 
-            let div = document.createElement('div');
-            div.className = `record-card ${statusClass}`;
-            div.innerHTML = `
-                <div class="record-header">
-                    <span class="record-title">📁 المعاملة رقم: ${r.number}</span>
-                    <span>${statusBadge}</span>
+            let cardDiv = document.createElement('div');
+            cardDiv.className = `record-item-card ${stateClass}`;
+            cardDiv.innerHTML = `
+                <div class="record-item-header">
+                    <span class="record-item-title">📁 المعاملة رقم: ${r.number}</span>
+                    <span>${statusTag}</span>
                 </div>
-                <div class="record-body">
+                <div class="record-item-details">
                     <div><strong>الموضوع:</strong> ${r.subject}</div>
                     <div><strong>الوحدة:</strong> ${r.unit || '---'}</div>
                     <div><strong>تاريخ المعاملة:</strong> ${r.date}</div>
                     <div><strong>تاريخ الاستحقاق:</strong> ${r.dueDate}</div>
                     <div><strong>صادرة من:</strong> ${r.from || '---'}</div>
                     <div><strong>حولت لـ:</strong> ${r.to || '---'}</div>
-                    <div style="grid-column: span 2; margin-top: 4px;"><strong>المدة المتبقية:</strong> ${remainingText}</div>
+                    <div style="grid-column: span 2; margin-top: 2px;"><strong>المدة المتبقية:</strong> ${remainingLabel}</div>
                 </div>
-                <div class="admin-action-section" style="display: ${isAdmin ? 'block' : 'none'};">
-                    <div class="record-footer">
-                        <button class="btn btn-edit" onclick="editRecord(${r.id})">✏️ تعديل</button>
-                        <button class="btn btn-delete" onclick="deleteRecord(${r.id})">🗑️ حذف</button>
+                <div style="display: ${isAdmin ? 'block' : 'none'};">
+                    <div class="record-item-footer">
+                        <button class="btn-edit-item" onclick="editRecord(${r.id})">✏️ تعديل</button>
+                        <button class="btn-del-item" onclick="deleteRecord(${r.id})">🗑️ حذف</button>
                     </div>
                 </div>
             `;
-            listContainer.appendChild(div);
+            listContainer.appendChild(cardDiv);
         });
     }
 
