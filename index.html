@@ -224,48 +224,56 @@
         .btn-pdf { background: #0284c7; }
         .btn-pdf:hover { background: #0369a1; }
         
-        .btn-edit-item { background: var(--warning); padding: 5px 12px; font-size: 12px; border-radius: 6px; color: #fff; border:none; cursor:pointer;}
-        .btn-del-item { background: var(--danger); padding: 5px 12px; font-size: 12px; border-radius: 6px; color: #fff; border:none; cursor:pointer;}
+        .btn-edit-item { background: var(--warning); padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 6px; color: #fff; border:none; cursor:pointer;}
+        .btn-del-item { background: var(--danger); padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 6px; color: #fff; border:none; cursor:pointer;}
 
         /* شريط البحث المتقدم */
         .search-box-wrapper {
             margin-bottom: 24px;
         }
 
-        /* بطاقات المعاملات الفردية */
+        /* بطاقات المعاملات الفردية المحسنة */
         .record-item-card {
             background: var(--card-bg);
             border-radius: var(--radius-md);
-            padding: 20px;
+            padding: 22px;
             margin-bottom: 16px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-light);
-            border-right: 5px solid var(--primary);
+            border-right: 6px solid var(--primary);
             position: relative;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .record-item-card.state-delayed { border-right-color: var(--danger); background-color: #fef2f2; }
-        .record-item-card.state-completed { border-right-color: var(--success); background-color: #f0fdf4; }
+        .record-item-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .record-item-card.state-delayed { border-right-color: var(--danger); background-color: #fffcfc; }
+        .record-item-card.state-completed { border-right-color: var(--success); background-color: #f8fafc; }
 
         .record-item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             border-bottom: 1px solid var(--border-light);
-            padding-bottom: 8px;
+            padding-bottom: 10px;
         }
 
         .record-item-title {
-            font-size: 15px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 800;
             color: var(--sidebar-bg);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .status-tag {
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
         }
         .tag-green { background: #dcfce7; color: #166534; }
@@ -273,12 +281,22 @@
         .tag-orange { background: #ffedd5; color: #9a3412; }
 
         .record-item-details {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-muted);
-            line-height: 1.8;
+            line-height: 1.9;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
+            gap: 10px;
+        }
+
+        .record-item-details .full-row {
+            grid-column: span 2;
+            background: #f8fafc;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            color: var(--text-main);
+            font-weight: 500;
         }
 
         .record-item-details strong {
@@ -286,12 +304,12 @@
         }
 
         .record-item-footer {
-            margin-top: 14px;
-            padding-top: 10px;
+            margin-top: 16px;
+            padding-top: 12px;
             border-top: 1px solid var(--border-light);
             display: flex;
             justify-content: flex-end;
-            gap: 8px;
+            gap: 10px;
         }
 
         .restricted-admin { display: none; }
@@ -615,7 +633,7 @@
             (r.to && r.to.toLowerCase().includes(query))
         );
 
-        // --- ترتيب المعاملات تلقائياً تصاعدياً حسب تاريخ الاستحقاق (الأقرب أو المتأخرة أولاً) ---
+        // الترتيب التلقائي حسب الأقرب وقتاً
         filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
         if (filtered.length === 0) {
@@ -651,19 +669,18 @@
 
             let cardDiv = document.createElement('div');
             cardDiv.className = `record-item-card ${stateClass}`;
+            // تم إخفاء تاريخ المعاملة وتاريخ الاستحقاق من العرض المباشر مع الحفاظ على حساب التنبيهات والترتيب بالخلفية
             cardDiv.innerHTML = `
                 <div class="record-item-header">
                     <span class="record-item-title">📁 المعاملة رقم: ${r.number}</span>
                     <span>${statusTag}</span>
                 </div>
                 <div class="record-item-details">
-                    <div><strong>الموضوع:</strong> ${r.subject}</div>
+                    <div class="full-row"><strong>الموضوع:</strong> ${r.subject}</div>
                     <div><strong>الوحدة:</strong> ${r.unit || '---'}</div>
-                    <div><strong>تاريخ المعاملة:</strong> ${r.date}</div>
-                    <div><strong>تاريخ الاستحقاق:</strong> ${r.dueDate}</div>
+                    <div><strong>حالة المدة:</strong> ${remainingLabel}</div>
                     <div><strong>صادرة من:</strong> ${r.from || '---'}</div>
                     <div><strong>حولت لـ:</strong> ${r.to || '---'}</div>
-                    <div style="grid-column: span 2; margin-top: 2px;"><strong>المدة المتبقية:</strong> ${remainingLabel}</div>
                 </div>
                 <div style="display: ${isAdmin ? 'block' : 'none'};">
                     <div class="record-item-footer">
