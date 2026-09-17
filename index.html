@@ -245,12 +245,11 @@
             white-space: nowrap;
         }
 
-        /* تحديد نسب عرض الأعمدة لملء الشاشة بانسجام تام بدون تكدس أو تمرير */
-        th:nth-child(1), td:nth-child(1) { width: 14%; } /* رقم المعاملة */
-        th:nth-child(2), td:nth-child(2) { width: 13%; } /* التاريخ */
-        th:nth-child(3), td:nth-child(3) { width: 28%; } /* موضوع المعاملة (يعطى المساحة الأكبر) */
-        th:nth-child(4), td:nth-child(4) { width: 14%; } /* حولت لـ */
-        th:nth-child(5), td:nth-child(5) { width: 16%; } /* الحالة / المتبقي */
+        /* تحديد نسب عرض الأعمدة بعد إزالة التاريخ لملء الشاشة بانسجام تام بدون تمرير */
+        th:nth-child(1), td:nth-child(1) { width: 18%; } /* رقم المعاملة */
+        th:nth-child(2), td:nth-child(2) { width: 34%; } /* موضوع المعاملة (يعطى المساحة الأكبر) */
+        th:nth-child(3), td:nth-child(3) { width: 17%; } /* حولت لـ */
+        th:nth-child(4), td:nth-child(4) { width: 16%; } /* الحالة / المتبقي */
         th.restricted-admin, td.restricted-admin { width: 15%; text-align: center; } /* الإجراءات */
 
         tr:last-child td { border-bottom: none; }
@@ -317,23 +316,6 @@
                 <input type="text" id="transNumber" placeholder="رقم المعاملة">
             </div>
             <div class="form-item">
-                <label>تاريخ المعاملة (هجري YYYY-MM-DD):</label>
-                <input type="text" id="transDate" placeholder="1447-05-01">
-            </div>
-        </div>
-
-        <div class="form-item full-width">
-            <label>موضوع المعاملة:</label>
-            <input type="text" id="transSubject" placeholder="موضوع المعاملة بالتفصيل">
-        </div>
-
-        <div class="form-grid-2">
-            <!-- تم إزالة حقلي "صادرة من" و "الوحدة" بناءً على طلبك -->
-            <div class="form-item full-width">
-                <label>حولت لـ:</label>
-                <input type="text" id="transTo" placeholder="الجهة المحولة لها">
-            </div>
-            <div class="form-item">
                 <label>الحالة:</label>
                 <select id="transStatus">
                     <option value="لم تنجز">لم تنجز</option>
@@ -343,9 +325,23 @@
         </div>
 
         <div class="form-item full-width">
-            <label>تاريخ الاستحقاق (هجري YYYY-MM-DD):</label>
-            <input type="text" id="transDueDate" placeholder="1448-07-01">
+            <label>موضوع المعاملة:</label>
+            <input type="text" id="transSubject" placeholder="موضوع المعاملة بالتفصيل">
         </div>
+
+        <div class="form-grid-2">
+            <div class="form-item">
+                <label>حولت لـ:</label>
+                <input type="text" id="transTo" placeholder="الجهة المحولة لها">
+            </div>
+            <div class="form-item">
+                <label>تاريخ الاستحقاق (هجري YYYY-MM-DD):</label>
+                <input type="text" id="transDueDate" placeholder="1448-07-01">
+            </div>
+        </div>
+
+        <!-- حقل التاريخ مخفي برمجياً للحفاظ على التوافقية عند الحفظ -->
+        <input type="hidden" id="transDate" value="1447-04-01">
 
         <div class="actions-group">
             <button class="btn" onclick="saveRecord()" id="saveBtnText">حفظ المعاملة</button>
@@ -359,13 +355,12 @@
         <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
     </div>
 
-    <!-- جدول المعاملات الكلاسيكي الاحترافي المتناسق تماماً بدون تمرير أفقي -->
+    <!-- جدول المعاملات الكلاسيكي الاحترافي بدون عمود التاريخ تماماً وبدون شريط تمرير أفقي -->
     <div class="table-responsive no-print-zone">
         <table>
             <thead>
                 <tr>
                     <th>رقم المعاملة</th>
-                    <th>التاريخ</th>
                     <th>موضوع المعاملة</th>
                     <th>حولت لـ</th>
                     <th>الحالة / المتبقي</th>
@@ -488,7 +483,7 @@
                     docId: docSnap.id,
                     id: data.id || Date.now(),
                     number: data.number,
-                    date: data.date,
+                    date: data.date || getTodayHijriString(),
                     subject: data.subject,
                     to: data.to,
                     status: data.status,
@@ -511,8 +506,8 @@
         let status = document.getElementById('transStatus').value;
         let dueDate = document.getElementById('transDueDate').value.trim();
 
-        if (!number || !subject || !date || !dueDate) {
-            alert('الرجاء التأكد من تعبئة الحقول الأساسية وتواريخ بصيغة YYYY-MM-DD.');
+        if (!number || !subject || !dueDate) {
+            alert('الرجاء التأكد من تعبئة الحقول الأساسية وتاريخ الاستحقاق.');
             return;
         }
 
@@ -551,7 +546,7 @@
 
         document.getElementById('recordId').value = r.id;
         document.getElementById('transNumber').value = r.number;
-        document.getElementById('transDate').value = r.date;
+        document.getElementById('transDate').value = r.date || getTodayHijriString();
         document.getElementById('transSubject').value = r.subject;
         document.getElementById('transTo').value = r.to || '';
         document.getElementById('transStatus').value = r.status;
@@ -677,7 +672,7 @@
         tbody.innerHTML = '';
 
         if (filtered.length === 0) {
-            let colSpanCount = isAdmin ? 6 : 5;
+            let colSpanCount = isAdmin ? 5 : 4;
             tbody.innerHTML = `<tr><td colspan="${colSpanCount}" style="text-align: center; color: var(--text-muted); padding: 25px;">لا توجد سجلات مطابقة للعرض</td></tr>`;
             return;
         }
@@ -704,7 +699,6 @@
             tr.className = rowClass;
             tr.innerHTML = `
                 <td style="font-weight: 700;" title="${r.number}">${r.number}</td>
-                <td title="${r.date}">${r.date}</td>
                 <td title="${r.subject}">${r.subject}</td>
                 <td title="${r.to || '---'}">${r.to || '---'}</td>
                 <td>${statusBadge}</td>
