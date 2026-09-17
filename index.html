@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متابعة المعاملات - التصميم التفاعلي الذكي</title>
+    <title>متابعة المعاملات </title>
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -93,7 +93,6 @@
         }
         .auth-trigger:hover { background: rgba(59, 130, 246, 0.3); transform: scale(1.05); }
 
-        /* شريط نسبة الإنجاز التفاعلي */
         .progress-container {
             background: var(--sidebar-bg);
             padding: 14px 20px;
@@ -233,7 +232,6 @@
         }
         .reset-filter-btn:hover { background: #374151; color: #fff; }
 
-        /* تصميم بطاقات المعاملات التفاعلية بدلاً من الجدول التقليدي */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -277,7 +275,14 @@
             padding-bottom: 10px;
         }
 
+        .trans-number-date-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
         .trans-number { font-weight: 800; font-size: 15px; color: #60a5fa; }
+        .trans-date { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
         
         .card-body { margin-bottom: 14px; }
         .card-subject { font-size: 14px; font-weight: 700; color: #f3f4f6; margin-bottom: 8px; line-height: 1.5; }
@@ -317,10 +322,9 @@
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
         <h1 class="brand-title">نظـام متابعة المعاملات الذكي</h1>
-        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">الدخول كأدمن</button>
+        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">الدخول </button>
     </div>
 
-    <!-- مؤشر نسبة الإنجاز التفاعلي -->
     <div class="progress-container no-print-zone">
         <div class="progress-info">
             <span>معدل إنجاز المعاملات العام</span>
@@ -385,7 +389,10 @@
             </div>
         </div>
 
-        <input type="hidden" id="transDate" value="1447-04-01">
+        <div class="form-item full-width">
+            <label>تاريخ المعاملة (هجري YYYY-MM-DD):</label>
+            <input type="text" id="transDate" placeholder="1447-04-01">
+        </div>
 
         <div class="actions-group">
             <button class="btn" onclick="saveRecord()" id="saveBtnText">حفظ المعاملة</button>
@@ -399,10 +406,7 @@
         <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
     </div>
 
-    <!-- شبكة البطاقات التفاعلية -->
-    <div class="cards-grid no-print-zone" id="recordsCardsContainer">
-        <!-- تدرج البطاقات برمجياً -->
-    </div>
+    <div class="cards-grid no-print-zone" id="recordsCardsContainer"></div>
 
     <div id="printArea" class="print-zone"></div>
 </div>
@@ -557,8 +561,8 @@
         let status = document.getElementById('transStatus').value;
         let dueDate = document.getElementById('transDueDate').value.trim();
 
-        if (!number || !subject || !dueDate) {
-            alert('الرجاء التأكد من تعبئة الحقول الأساسية وتاريخ الاستحقاق.');
+        if (!number || !subject || !dueDate || !date) {
+            alert('الرجاء التأكد من تعبئة جميع الحقول الأساسية وتواريخ المعاملة.');
             return;
         }
 
@@ -657,7 +661,7 @@
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.abs(Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24)));
-            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b><br>الموضوع: ${r.subject}<br>تاريخ الاستحقاق الهجري: ${r.dueDate}<br>متأخرة بـ ${diffDays} يوم</p><hr>`;
+            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b> (تاريخها: ${r.date || '---'})<br>الموضوع: ${r.subject}<br>تاريخ الاستحقاق الهجري: ${r.dueDate}<br>متأخرة بـ ${diffDays} يوم</p><hr>`;
         });
         printHTML += `</div>`;
         printArea.innerHTML = printHTML;
@@ -723,7 +727,8 @@
         filtered = filtered.filter(r => 
             r.number.toLowerCase().includes(query) || 
             r.subject.toLowerCase().includes(query) || 
-            (r.to && r.to.toLowerCase().includes(query))
+            (r.to && r.to.toLowerCase().includes(query)) ||
+            (r.date && r.date.toLowerCase().includes(query))
         );
 
         filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
@@ -757,7 +762,10 @@
             card.className = `transaction-card ${cardClass}`;
             card.innerHTML = `
                 <div class="card-header">
-                    <span class="trans-number"># ${r.number}</span>
+                    <div class="trans-number-date-group">
+                        <span class="trans-number"># ${r.number}</span>
+                        <span class="trans-date">📅 ${r.date || 'غير محدد'}</span>
+                    </div>
                     ${statusBadge}
                 </div>
                 <div class="card-body">
