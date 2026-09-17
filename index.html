@@ -71,7 +71,7 @@
             padding: 16px 24px;
             border-radius: var(--radius);
             display: flex;
-            justify-content: center; /* جعل المحتوى في المنتصف تماماً */
+            justify-content: center;
             align-items: center;
             margin-bottom: 20px;
             border: 1px solid var(--border);
@@ -86,7 +86,6 @@
             user-select: none;
         }
 
-        /* تصميم وأنيميشن الترس النصي المتحرك (حجم صغير) */
         .gear-emoji {
             font-size: 20px;
             display: inline-block;
@@ -100,10 +99,9 @@
         }
 
         .navbar-brand-wrapper:hover .gear-emoji {
-            animation-duration: 1.5s; /* يسرع الدوران عند المرور بالماوس */
+            animation-duration: 1.5s;
         }
 
-        /* عنوان قابل للنقر المزدوج الخفي للإدارة */
         .brand-title { 
             margin: 0; 
             font-size: 19px; 
@@ -341,7 +339,6 @@
 
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
-        <!-- النقر المزدوج (DoubleClick) هنا يفتح لوحة الإدارة سراً -->
         <div class="navbar-brand-wrapper" ondblclick="toggleAuth()" title="النظام يعمل بكفاءة">
             <span class="gear-emoji">⚙️</span>
             <h1 class="brand-title">متابعة المعاملات</h1>
@@ -397,14 +394,34 @@
                 <input type="text" id="transTo" placeholder="الجهة المحولة لها">
             </div>
             <div class="form-item">
-                <label>تاريخ الإنجاز (هجري YYYY-MM-DD):</label>
-                <input type="text" id="transDueDate" placeholder="1448-07-01">
+                <label>مدة الإنجاز المطلوبة:</label>
+                <select id="durationDays" class="form-control" onchange="calculateDueDate()">
+                    <option value="1">يوم واحد (24 ساعة)</option>
+                    <option value="3" selected>3 أيام</option>
+                    <option value="5">5 أيام</option>
+                    <option value="7">أسبوع (7 أيام)</option>
+                    <option value="14">أسبوعين (14 يوماً)</option>
+                    <option value="30">شهر كامل (30 يوماً)</option>
+                    <option value="custom">تحديد عدد أيام آخر...</option>
+                </select>
             </div>
         </div>
 
-        <div class="form-item full-width">
-            <label>تاريخ المعاملة (هجري YYYY-MM-DD):</label>
-            <input type="text" id="transDate" placeholder="1447-04-01">
+        <!-- حقل مخفي يظهر فقط لو اختار المستخدم مدة مخصصة -->
+        <div class="form-item full-width" id="customDaysGroup" style="display: none;">
+            <label>أدخل عدد الأيام يدوياً:</label>
+            <input type="number" id="customDaysInput" class="form-control" min="1" value="3" oninput="calculateDueDate()">
+        </div>
+
+        <div class="form-grid-2">
+            <div class="form-item">
+                <label>تاريخ الاستحقاق المحسوب (هجري YYYY-MM-DD):</label>
+                <input type="text" id="transDueDate" readonly style="background-color: #0b1329; font-weight: bold; color: #38bdf8;">
+            </div>
+            <div class="form-item">
+                <label>تاريخ المعاملة (هجري YYYY-MM-DD):</label>
+                <input type="text" id="transDate" placeholder="1447-04-01" oninput="calculateDueDate()">
+            </div>
         </div>
 
         <div class="actions-group">
@@ -460,8 +477,51 @@
         return d;
     }
 
+    // دالة لحساب تاريخ الاستحقاق تلقائياً بناءً على تاريخ المعاملة + عدد الأيام
+    function calculateDueDate() {
+        let selectElement = document.getElementById('durationDays');
+        let customGroup = document.getElementById('customDaysGroup');
+        let daysToAdd = 3;
+
+        if (selectElement.value === 'custom') {
+            customGroup.style.display = 'block';
+            daysToAdd = parseInt(document.getElementById('customDaysInput').value) || 1;
+        } else {
+            customGroup.style.display = 'none';
+            daysToAdd = parseInt(selectElement.value);
+        }
+
+        let baseDateStr = document.getElementById('transDate').value.trim();
+        let baseDate = parseHijriToDate(baseDateStr);
+        if (isNaN(baseDate.getTime())) {
+            baseDate = new Date();
+        }
+
+        // إضافة عدد الأيام
+        baseDate.setDate(baseDate.getDate() + daysToAdd);
+
+        // محاولة إعادة صياغتها كـ تاريخ هجري تقريبي متناسق
+        try {
+            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            let parts = formatter.formatToParts(baseDate);
+            let y = parts.find(p => p.type === 'year').value;
+            let m = parts.find(p => p.type === 'month').value;
+            let d = parts.find(p => p.type === 'day').value;
+            document.getElementById('transDueDate').value = `${y}-${m}-${d}`;
+        } catch (e) {
+            let year = baseDate.getFullYear();
+            let month = String(baseDate.getMonth() + 1).padStart(2, '0');
+            let day = String(baseDate.getDate()).padStart(2, '0');
+            document.getElementById('transDueDate').value = `${year}-${month}-${day}`;
+        }
+    }
+
     document.getElementById('transDate').value = getTodayHijriString();
-    document.getElementById('transDueDate').value = "1448-07-01";
+    calculateDueDate();
 
     function animateValue(id, start, end, duration) {
         let obj = document.getElementById(id);
@@ -645,7 +705,9 @@
         document.getElementById('transTo').value = '';
         document.getElementById('transStatus').value = 'لم تنجز';
         document.getElementById('transDate').value = getTodayHijriString();
-        document.getElementById('transDueDate').value = "1448-07-01";
+        document.getElementById('durationDays').value = "3";
+        document.getElementById('customDaysGroup').style.display = 'none';
+        calculateDueDate();
         document.getElementById('formTitleText').innerText = "➕ تسجيل معاملة جديدة";
         document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
     }
