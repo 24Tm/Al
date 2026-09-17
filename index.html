@@ -78,6 +78,25 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
+        .navbar-brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .infographic-icon {
+            width: 38px;
+            height: 38px;
+            filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand-wrapper:hover .infographic-icon {
+            transform: scale(1.08) rotate(3deg);
+        }
+
         /* عنوان قابل للنقر المزدوج الخفي للإدارة */
         .brand-title { 
             margin: 0; 
@@ -86,8 +105,6 @@
             background: linear-gradient(to left, #60a5fa, #38bdf8); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
-            cursor: pointer;
-            user-select: none;
         }
 
         .metrics-grid {
@@ -257,7 +274,6 @@
             animation: pulseBorder 2s infinite ease-in-out, cardFadeIn 0.4s ease-out forwards;
         }
 
-        /* تأثير إطار متحرك تحذيري باللون الأصفر للمعاملات التي اقترب موعدها (4 أيام فأقل) */
         @keyframes pulseYellowBorder {
             0% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
             50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 15px 3px rgba(245, 158, 11, 0.5); }
@@ -319,8 +335,16 @@
 
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
-        <!-- النقر المزدوج (DoubleClick) على هذا العنوان يفتح لوحة الإدارة سراُ -->
-        <h1 class="brand-title" ondblclick="toggleAuth()" title="النظام يعمل بكفاءة">متابعة المعاملات</h1>
+        <!-- النقر المزدوج (DoubleClick) هنا يفتح لوحة الإدارة سراً -->
+        <div class="navbar-brand-wrapper" ondblclick="toggleAuth()" title="النظام يعمل بكفاءة">
+            <svg class="infographic-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 16V8C21 6.89543 20.1046 6 19 6H5C3.89543 6 3 6.89543 3 8V16C3 17.1046 3.89543 18 5 18H19C20.1046 18 21 17.1046 21 16Z" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M7 10H11" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"/>
+                <path d="M7 14H15" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="17" cy="10" r="1.5" fill="#34d399"/>
+            </svg>
+            <h1 class="brand-title">متابعة المعاملات</h1>
+        </div>
     </div>
 
     <div class="metrics-grid no-print-zone">
@@ -736,7 +760,7 @@
                 cardClass = 'card-delayed';
                 statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diffDays)} يوم)</span>`;
             } else if (diffDays <= 4) {
-                cardClass = 'card-approaching'; // إطار وإضاءة صفراء متحركة عند اقتراب الموعد (4 أيام فأقل)
+                cardClass = 'card-approaching';
                 statusBadge = `<span class="status-badge badge-orange">متبقي ${diffDays} يوم (قريب)</span>`;
             } else {
                 statusBadge = `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
