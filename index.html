@@ -86,32 +86,35 @@
             border-radius: 6px;
             font-size: 13px;
             cursor: pointer;
+            transition: background 0.2s;
         }
+        .auth-trigger:hover { background: rgba(255, 255, 255, 0.2); }
 
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 15px;
             margin-bottom: 20px;
         }
 
         .metric-card {
             background: var(--card-bg);
-            padding: 14px 18px;
+            padding: 16px 20px;
             border-radius: var(--radius);
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
-        .metric-card:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .metric-card.active-filter { border-color: var(--primary); background: #eff6ff; }
+        .metric-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+        .metric-card.active-filter { border-color: var(--primary); background: #eff6ff; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
 
         .metric-card .label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-        .metric-card .val { font-size: 20px; font-weight: 800; }
+        .metric-card .val { font-size: 22px; font-weight: 800; }
         .metric-card.in-progress .val { color: var(--primary); }
         .metric-card.delayed .val { color: var(--danger); }
         .metric-card.completed .val { color: var(--success); }
@@ -129,6 +132,7 @@
             color: var(--text-muted);
             cursor: pointer;
             text-align: center;
+            transition: all 0.2s;
         }
 
         .pill-btn.active { background: var(--sidebar-bg); color: #ffffff; }
@@ -139,6 +143,7 @@
             border-radius: var(--radius);
             border: 1px solid var(--border);
             margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
         .panel-box h3 {
@@ -167,7 +172,7 @@
             text-align: right;
         }
 
-        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
 
         .actions-group { display: flex; gap: 10px; margin-top: 15px; }
 
@@ -181,12 +186,14 @@
             font-weight: 700;
             cursor: pointer;
             flex: 1;
+            transition: opacity 0.2s;
         }
+        .btn:hover { opacity: 0.9; }
         .btn-alt { background: #64748b; }
         .btn-pdf { background: #0284c7; }
 
         .search-box-wrapper { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
-        .search-box-wrapper input { padding: 11px 16px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 14px; }
+        .search-box-wrapper input { padding: 11px 16px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 14px; background: #fff; }
         
         .reset-filter-btn {
             background: #e2e8f0;
@@ -200,93 +207,51 @@
             white-space: nowrap;
         }
 
-        /* تخطيط لوحة كانبان (Kanban Pipeline View) */
-        .kanban-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .kanban-column {
-            background: #f1f5f9;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            min-height: 450px;
-        }
-
-        .kanban-column-header {
-            font-size: 14px;
-            font-weight: 700;
-            padding-bottom: 10px;
-            margin-bottom: 12px;
-            border-bottom: 2px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .kanban-cards-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-            flex: 1;
-            max-height: 550px;
-        }
-
-        .kanban-card {
+        /* الجدول الكلاسيكي الاحترافي */
+        .table-responsive {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: transform 0.15s ease;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
-        .kanban-card:hover { transform: translateY(-2px); border-color: var(--primary); }
-
-        .kanban-card.card-delayed { border-right: 4px solid var(--danger); background: #fef2f2; }
-        .kanban-card.card-inprogress { border-right: 4px solid var(--primary); }
-        .kanban-card.card-completed { border-right: 4px solid var(--success); background: #f8fafc; opacity: 0.85; }
-
-        .kanban-card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .kanban-card-subject {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
             font-size: 13px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--sidebar-bg);
+            font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
             color: var(--text-main);
-            margin-bottom: 8px;
-            line-height: 1.4;
         }
 
-        .kanban-card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border);
-            padding-top: 6px;
-            margin-top: 6px;
-        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8fafc; }
 
-        .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-block; }
+        .row-delayed td { background: #fef2f2 !important; }
+        .row-completed td { opacity: 0.8; background: #f8fafc; }
+
+        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; display: inline-block; }
         .badge-green { background: #dcfce7; color: #166534; }
         .badge-red { background: #fee2e2; color: #991b1b; }
         .badge-orange { background: #ffedd5; color: #9a3412; }
 
-        .action-btns { display: flex; gap: 4px; }
-        .btn-mini { padding: 3px 6px; font-size: 10px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
+        .table-actions { display: flex; gap: 6px; }
+        .btn-mini { padding: 4px 8px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
         .btn-mini-edit { background: #fef3c7; color: #b45309; }
         .btn-mini-del { background: #fee2e2; color: #b91c1c; }
 
@@ -305,7 +270,7 @@
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
         <h1 class="brand-title">متابعة المعاملات</h1>
-        <!-- تم تعديل نص زر الدخول بناءً على طلبك -->
+        <!-- تم تعديل زر الدخول ليكون "الدخول" فقط بدون أي أقفال أو رموز -->
         <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">الدخول</button>
     </div>
 
@@ -395,38 +360,29 @@
     </div>
 
     <div class="search-box-wrapper no-print-zone">
-        <input type="text" id="searchQuery" placeholder="🔍 بحث سريع في السجلات..." oninput="renderRecords()">
+        <input type="text" id="searchQuery" placeholder="🔍 بحث سريع في السجلات (برقم المعاملة، الموضوع، الجهة...)" oninput="renderRecords()">
         <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
     </div>
 
-    <!-- عرض خط سير المعاملات (Kanban Board Columns) -->
-    <div class="kanban-container no-print-zone" id="kanbanBoard">
-        <!-- عمود تحت الإجراء -->
-        <div class="kanban-column">
-            <div class="kanban-column-header" style="color: var(--primary);">
-                <span>تحت الإجراء</span>
-                <span id="kanbanCountInProgress" style="background: #e0f2fe; padding: 2px 8px; border-radius: 12px; font-size: 12px;">0</span>
-            </div>
-            <div class="kanban-cards-wrapper" id="colInProgress"></div>
-        </div>
-
-        <!-- عمود المتأخرة -->
-        <div class="kanban-column">
-            <div class="kanban-column-header" style="color: var(--danger);">
-                <span>متأخرة</span>
-                <span id="kanbanCountDelayed" style="background: #fee2e2; padding: 2px 8px; border-radius: 12px; font-size: 12px;">0</span>
-            </div>
-            <div class="kanban-cards-wrapper" id="colDelayed"></div>
-        </div>
-
-        <!-- عمود المنجزة -->
-        <div class="kanban-column">
-            <div class="kanban-column-header" style="color: var(--success);">
-                <span>المنجزة</span>
-                <span id="kanbanCountCompleted" style="background: #dcfce7; padding: 2px 8px; border-radius: 12px; font-size: 12px;">0</span>
-            </div>
-            <div class="kanban-cards-wrapper" id="colCompleted"></div>
-        </div>
+    <!-- جدول المعاملات الكلاسيكي الاحترافي -->
+    <div class="table-responsive no-print-zone">
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم المعاملة</th>
+                    <th>التاريخ</th>
+                    <th>موضوع المعاملة</th>
+                    <th>صادرة من</th>
+                    <th>حولت لـ</th>
+                    <th>الوحدة</th>
+                    <th>الحالة / المتبقي</th>
+                    <th class="restricted-admin" style="text-align: center;">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="recordsTableBody">
+                <!-- تدرج السجلات برمجياً -->
+            </tbody>
+        </table>
     </div>
 
     <div id="printArea" class="print-zone"></div>
@@ -478,7 +434,13 @@
                 if (pass.trim() === "Dd1616") {
                     isAdmin = true;
                     document.getElementById('authToggleBtn').innerText = "خروج الأدمن";
-                    document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'block');
+                    document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'table-cell' || 'block');
+                    // معالجة خاصة لعنوان عمود الإجراءات في الجدول
+                    let adminCols = document.querySelectorAll('.restricted-admin');
+                    adminCols.forEach(el => {
+                        if(el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
+                        else el.style.display = 'block';
+                    });
                     renderRecords();
                 } else {
                     alert("كلمة المرور غير صحيحة!");
@@ -733,65 +695,52 @@
 
         filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
 
-        // تفريغ أعمدة كانبان
-        let colInProgress = document.getElementById('colInProgress');
-        let colDelayed = document.getElementById('colDelayed');
-        let colCompleted = document.getElementById('colCompleted');
+        let tbody = document.getElementById('recordsTableBody');
+        tbody.innerHTML = '';
 
-        colInProgress.innerHTML = '';
-        colDelayed.innerHTML = '';
-        colCompleted.innerHTML = '';
-
-        let countIP = 0, countD = 0, countC = 0;
+        if (filtered.length === 0) {
+            let colSpanCount = isAdmin ? 8 : 7;
+            tbody.innerHTML = `<tr><td colspan="${colSpanCount}" style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد سجلات مطابقة للعرض</td></tr>`;
+            return;
+        }
 
         filtered.forEach(r => {
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
 
-            let cardClass = 'kanban-card';
+            let rowClass = '';
             let statusBadge = '';
-            let targetColumn = colInProgress;
 
             if (r.status === 'أنجزت') {
-                cardClass += ' card-completed';
+                rowClass = 'row-completed';
                 statusBadge = `<span class="status-badge badge-green">منجزة</span>`;
-                targetColumn = colCompleted;
-                countC++;
             } else if (diffDays < 0) {
-                cardClass += ' card-delayed';
+                rowClass = 'row-delayed';
                 statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diffDays)} يوم)</span>`;
-                targetColumn = colDelayed;
-                countD++;
             } else {
-                cardClass += ' card-inprogress';
                 statusBadge = diffDays <= 5 ? `<span class="status-badge badge-orange">متبقي ${diffDays} يوم</span>` : `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
-                targetColumn = colInProgress;
-                countIP++;
             }
 
-            let cardDiv = document.createElement('div');
-            cardDiv.className = cardClass;
-            cardDiv.innerHTML = `
-                <div class="kanban-card-top">
-                    <span style="font-weight: 700;">رقم: ${r.number}</span>
-                    ${statusBadge}
-                </div>
-                <div class="kanban-card-subject">${r.subject}</div>
-                <div class="kanban-card-footer">
-                    <span>إلى: ${r.to || '---'}</span>
-                    <div class="action-btns restricted-admin" style="display: ${isAdmin ? 'flex' : 'none'};">
+            let tr = document.createElement('tr');
+            tr.className = rowClass;
+            tr.innerHTML = `
+                <td style="font-weight: 700;">${r.number}</td>
+                <td>${r.date}</td>
+                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;" title="${r.subject}">${r.subject}</td>
+                <td>${r.from || '---'}</td>
+                <td>${r.to || '---'}</td>
+                <td><span style="background: #f1f5f9; padding: 3px 8px; border-radius: 4px; font-size: 11px;">${r.unit || 'العموم'}</span></td>
+                <td>${statusBadge}</td>
+                <td class="restricted-admin" style="display: ${isAdmin ? 'table-cell' : 'none'}; text-align: center;">
+                    <div class="table-actions" style="justify-content: center;">
                         <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
                         <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
                     </div>
-                </div>
+                </td>
             `;
-            targetColumn.appendChild(cardDiv);
+            tbody.appendChild(tr);
         });
-
-        document.getElementById('kanbanCountInProgress').innerText = countIP;
-        document.getElementById('kanbanCountDelayed').innerText = countD;
-        document.getElementById('kanbanCountCompleted').innerText = countC;
     }
 </script>
 
