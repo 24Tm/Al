@@ -324,7 +324,7 @@
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
         <h1 class="brand-title"> متابعة المعاملات  </h1>
-        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">  الدخول</button>
+        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
     </div>
 
     <!-- المؤشرات التفاعلية -->
@@ -358,7 +358,7 @@
                 <input type="text" id="transNumber" placeholder="رقم المعاملة">
             </div>
             <div class="form-item">
-                <label>تاريخ المعاملة:</label>
+                <label>تاريخ المعاملة (هجري):</label>
                 <input type="date" id="transDate">
             </div>
         </div>
@@ -402,7 +402,7 @@
         </div>
 
         <div class="form-item full-width">
-            <label>تاريخ الاستحقاق / الانتهاء:</label>
+            <label>تاريخ الاستحقاق / الانتهاء (هجري):</label>
             <input type="date" id="transDueDate">
         </div>
 
@@ -425,12 +425,13 @@
                     <th>رقم المعاملة</th>
                     <th>موضوع المعاملة</th>
                     <th>حولت لـ</th>
+                    <th>تاريخ الاستحقاق</th>
                     <th>الحالة</th>
                     <th class="restricted-admin" style="width: 90px; text-align: center;">الإجراءات</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="5" style="text-align:center; padding: 20px;">الاتـصـال</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding: 20px;">الاتـصـال</td></tr>
             </tbody>
         </table>
     </div>
@@ -444,19 +445,72 @@
     let activeMetricFilter = null;
     let cachedRecords = []; 
 
-    document.getElementById('transDate').valueAsDate = new Date();
-    let defDue = new Date();
-    defDue.setDate(defDue.getDate() + 15);
-    document.getElementById('transDueDate').valueAsDate = defDue;
+    // ضبط التقويم الافتراضي ليكون هجرياً (أم القرى) لعرض الحقول تلقائياً
+    const hijriOptions = { calendar: 'islamic-umalqura', numberingSystem: 'arab' };
+
+    function getTodayHijriInputString() {
+        let now = new Date();
+        try {
+            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            let parts = formatter.formatToParts(now);
+            let y = parts.find(p => p.type === 'year').value;
+            let m = parts.find(p => p.type === 'month').value;
+            let d = parts.find(p => p.type === 'day').value;
+            return `${y}-${m}-${d}`;
+        } catch (e) {
+            return new Date().toISOString().split('T')[0];
+        }
+    }
+
+    function addDaysHijri(days) {
+        let d = new Date();
+        d.setDate(d.getDate() + days);
+        try {
+            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            let parts = formatter.formatToParts(d);
+            let y = parts.find(p => p.type === 'year').value;
+            let m = parts.find(p => p.type === 'month').value;
+            let day = parts.find(p => p.type === 'day').value;
+            return `${y}-${m}-${day}`;
+        } catch (e) {
+            return d.toISOString().split('T')[0];
+        }
+    }
+
+    document.getElementById('transDate').value = getTodayHijriInputString();
+    document.getElementById('transDueDate').value = addDaysHijri(15);
+
+    function formatHijriDisplay(dateStr) {
+        if (!dateStr) return '---';
+        try {
+            let d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            let formatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            });
+            return formatter.format(d);
+        } catch (e) {
+            return dateStr;
+        }
+    }
 
     function toggleAuth() {
         if (!isAdmin) {
             let pass = prompt("الرجاء إدخال كلمة المرور:");
             if (pass !== null) {
-                // التحقق المباشر والآمن والمضمون
                 if (pass.trim() === "Dd1616") {
                     isAdmin = true;
-                    document.getElementById('authToggleBtn').innerText = " خروج الأدمن";
+                    document.getElementById('authToggleBtn').innerText = "🔓 خروج الأدمن";
                     document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = el.tagName === 'TH' || el.tagName === 'TD' ? 'table-cell' : 'block');
                     renderRecords();
                 } else {
@@ -527,7 +581,7 @@
             renderRecords();
         } catch (error) {
             console.error("خطأ في جلب البيانات:", error);
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">تعذر الاتصال بقاعدة البيانات السحابية. تأكد من الإنترنت.</td></tr>`;
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red; padding:20px;">تعذر الاتصال بقاعدة البيانات السحابية. تأكد من الإنترنت.</td></tr>`;
         }
     }
 
@@ -621,6 +675,8 @@
         document.getElementById('transTo').value = '';
         document.getElementById('transUnit').value = 'العموم';
         document.getElementById('transStatus').value = 'لم تنجز';
+        document.getElementById('transDate').value = getTodayHijriInputString();
+        document.getElementById('transDueDate').value = addDaysHijri(15);
         document.getElementById('formTitleText').innerText = "➕ تسجيل معاملة جديدة";
         document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
     }
@@ -645,7 +701,7 @@
         delayed.forEach((r, index) => {
             let dueD = new Date(r.dueDate);
             let diffDays = Math.abs(Math.ceil((dueD - today) / (1000 * 60 * 60 * 24)));
-            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b><br>الموضوع: ${r.subject}<br>متأخرة بـ ${diffDays} يوم</p><hr>`;
+            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b><br>الموضوع: ${r.subject}<br>تاريخ الاستحقاق الهجري: ${formatHijriDisplay(r.dueDate)}<br>متأخرة بـ ${diffDays} يوم</p><hr>`;
         });
         printHTML += `</div>`;
         printArea.innerHTML = printHTML;
@@ -707,7 +763,7 @@
         filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${isAdmin ? 5 : 4}" style="text-align:center; padding: 20px; color: var(--text-muted);">لا توجد بيانات مطابقة</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}" style="text-align:center; padding: 20px; color: var(--text-muted);">لا توجد بيانات مطابقة</td></tr>`;
             return;
         }
 
@@ -736,6 +792,7 @@
                 <td style="font-weight: 700;">${r.number}</td>
                 <td>${r.subject}</td>
                 <td>${r.to || '---'}</td>
+                <td style="direction: ltr; text-align: right;">${formatHijriDisplay(r.dueDate)}</td>
                 <td>${statusBadge}</td>
                 <td class="restricted-admin" style="display: ${isAdmin ? 'table-cell' : 'none'}; text-align: center;">
                     <div class="action-btns">
