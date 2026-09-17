@@ -59,7 +59,7 @@
             background-color: var(--bg-body);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             direction: rtl;
         }
 
@@ -163,7 +163,7 @@
 
         input, select {
             width: 100%;
-            padding: 8px 10px;
+            padding: 9px 12px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 13px;
@@ -174,26 +174,27 @@
 
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
 
-        .actions-group { display: flex; gap: 10px; margin-top: 12px; }
+        .actions-group { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
 
         .btn {
             background: var(--primary);
             color: #fff;
             border: none;
-            padding: 8px 16px;
+            padding: 9px 16px;
             border-radius: 6px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             flex: 1;
+            min-width: 120px;
             transition: opacity 0.2s;
         }
         .btn:hover { opacity: 0.9; }
         .btn-alt { background: #64748b; }
         .btn-pdf { background: #0284c7; }
 
-        .search-box-wrapper { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; }
-        .search-box-wrapper input { padding: 10px 14px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; background: #fff; }
+        .search-box-wrapper { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .search-box-wrapper input { flex: 1; min-width: 200px; padding: 10px 14px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; background: #fff; }
         
         .reset-filter-btn {
             background: #e2e8f0;
@@ -207,12 +208,13 @@
             white-space: nowrap;
         }
 
-        /* الشكل الكلاسيكي الأصلي للجدول مع إتاحة التمرير الأفقي الطبيعي عند الحاجة */
+        /* الجدول الكلاسيكي مع إتاحة التمرير المتجاوب للأجهزة الصغيرة */
         .table-responsive {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             margin-bottom: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
@@ -222,6 +224,7 @@
             border-collapse: collapse;
             text-align: right;
             font-size: 13px;
+            min-width: 600px; /* ضمان عدم تداخل الأعمدة على الشاشات الصغيرة وتفعيل التمرير الأفقي بسلاسة */
         }
 
         th {
@@ -245,7 +248,7 @@
         .row-delayed td { background: #fef2f2 !important; }
         .row-completed td { opacity: 0.8; background: #f8fafc; }
 
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 700; display: inline-block; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 700; display: inline-block; white-space: nowrap; }
         .badge-green { background: #dcfce7; color: #166534; }
         .badge-red { background: #fee2e2; color: #991b1b; }
         .badge-orange { background: #ffedd5; color: #9a3412; }
@@ -256,6 +259,16 @@
         .btn-mini-del { background: #fee2e2; color: #b91c1c; }
 
         .restricted-admin { display: none; }
+
+        /* تعديلات التجاوب للشاشات المتوسطة والصغيرة (الجوالات) */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .metrics-grid { grid-template-columns: 1fr; gap: 8px; }
+            .form-grid-2 { grid-template-columns: 1fr; gap: 0; }
+            .nav-pills { flex-direction: column; }
+            .actions-group { flex-direction: column; }
+            .btn { width: 100%; }
+        }
 
         @media print {
             body { background: #fff; padding: 0; }
@@ -341,7 +354,7 @@
         <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
     </div>
 
-    <!-- جدول المعاملات بالشكل الكلاسيكي الأصلي -->
+    <!-- جدول المعاملات الكلاسيكي مع دعم التجاوب الكامل للأجهزة الذكية -->
     <div class="table-responsive no-print-zone">
         <table>
             <thead>
