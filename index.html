@@ -4,6 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة ومتابعة المعاملات</title>
+    <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // إعدادات Firebase الخاصة بك
+        const firebaseConfig = {
+          apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
+          authDomain: "project-3958113961260211077.firebaseapp.com",
+          projectId: "project-3958113961260211077",
+          storageBucket: "project-3958113961260211077.firebasestorage.app",
+          messagingSenderId: "889377835896",
+          appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
+        };
+
+        // تهيئة الفايربيس وقاعدة البيانات
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // جعل الدوال متوفرة في النطاق العام (Global) لتعمل مع الأزرار
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+
+        // تشغيل تحميل البيانات أول ما يفتح التطبيق
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof loadRecordsFromCloud === 'function') {
+                loadRecordsFromCloud();
+            }
+        });
+    </script>
+
     <style>
         :root {
             --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -287,7 +323,7 @@
 
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
-        <h1 class="brand-title">نظام إدارة ومتابعة المعاملات</h1>
+        <h1 class="brand-title">نظام إدارة ومتابعة المعاملات (سحابي)</h1>
         <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
     </div>
 
@@ -394,6 +430,7 @@
                 </tr>
             </thead>
             <tbody id="tableBody">
+                <tr><td colspan="5" style="text-align:center; padding: 20px;">جاري الاتصال بالسحابة وتحميل البيانات...</td></tr>
             </tbody>
         </table>
     </div>
@@ -404,7 +441,8 @@
 <script>
     let isAdmin = false;
     let currentTab = 'active';
-    let activeMetricFilter = null; // تخزين نوع الفلتر الإحصائي المختار
+    let activeMetricFilter = null;
+    let cachedRecords = []; // مصفوفة لتخزين السجلات المسترجعة من السحابة
 
     document.getElementById('transDate').valueAsDate = new Date();
     let defDue = new Date();
@@ -433,7 +471,7 @@
 
     function switchTab(tab) {
         currentTab = tab;
-        activeMetricFilter = null; // إلغاء الفلتر الإحصائي عند تغيير التبويب الرئيسي
+        activeMetricFilter = null;
         document.getElementById('resetFilterBtn').style.display = 'none';
         document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
 
@@ -445,7 +483,6 @@
     function filterByMetric(metricType) {
         activeMetricFilter = activeMetricFilter === metricType ? null : metricType;
         
-        // تحديث المظهر البصري للمربعات
         document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
         if (activeMetricFilter) {
             document.getElementById('resetFilterBtn').style.display = 'block';
@@ -465,13 +502,36 @@
         renderRecords();
     }
 
-    function getRecords() {
-        return JSON.parse(localStorage.getItem('persistent_transactions_v2') || '[]');
+    // جلب البيانات من سحابة Firestore
+    async function loadRecordsFromCloud() {
+        try {
+            const querySnapshot = await window.getDocs(window.collection(window.db, "transactions"));
+            cachedRecords = [];
+            querySnapshot.forEach((docSnap) => {
+                let data = docSnap.data();
+                cachedRecords.push({
+                    docId: docSnap.id, // معرف المستند الحقيقي في فايربيس
+                    id: data.id || Date.now(),
+                    number: data.number,
+                    date: data.date,
+                    subject: data.subject,
+                    from: data.from,
+                    to: data.to,
+                    unit: data.unit,
+                    status: data.status,
+                    dueDate: data.dueDate
+                });
+            });
+            renderRecords();
+        } catch (error) {
+            console.error("خطأ في جلب البيانات:", error);
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">تعذر الاتصال بقاعدة البيانات السحابية. تأكد من الإنترنت.</td></tr>`;
+        }
     }
 
-    function saveRecord() {
+    async function saveRecord() {
         if (!isAdmin) return;
-        let id = document.getElementById('recordId').value;
+        let docId = document.getElementById('recordId').value; // إذا كان موجوداً يعني تعديل
         let number = document.getElementById('transNumber').value.trim();
         let date = document.getElementById('transDate').value;
         let subject = document.getElementById('transSubject').value.trim();
@@ -486,22 +546,41 @@
             return;
         }
 
-        let records = getRecords();
-        if (id) {
-            records = records.map(r => r.id == id ? { id: Number(id), number, date, subject, from, to, unit, status, dueDate } : r);
-        } else {
-            records.push({ id: Date.now(), number, date, subject, from, to, unit, status, dueDate });
-        }
+        let recordData = {
+            id: Date.now(),
+            number,
+            date,
+            subject,
+            from,
+            to,
+            unit,
+            status,
+            dueDate
+        };
 
-        localStorage.setItem('persistent_transactions_v2', JSON.stringify(records));
-        resetForm();
-        renderRecords();
+        try {
+            if (docId) {
+                // تحديث مستند موجود في السحابة
+                let targetDoc = cachedRecords.find(r => r.id == docId);
+                if (targetDoc) {
+                    recordData.id = Number(docId);
+                    await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), recordData);
+                }
+            } else {
+                // إضافة معاملة جديدة للسحابة
+                await window.addDoc(window.collection(window.db, "transactions"), recordData);
+            }
+
+            resetForm();
+            loadRecordsFromCloud(); // إعادة تحميل القائمة من السحابة
+        } catch (error) {
+            alert("حدث خطأ أثناء حفظ المعاملة: " + error.message);
+        }
     }
 
     function editRecord(id) {
         if (!isAdmin) return;
-        let records = getRecords();
-        let r = records.find(item => item.id == id);
+        let r = cachedRecords.find(item => item.id == id);
         if (!r) return;
 
         document.getElementById('recordId').value = r.id;
@@ -519,12 +598,18 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-    function deleteRecord(id) {
+    async function deleteRecord(id) {
         if (!isAdmin) return;
-        if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
-            let records = getRecords().filter(r => r.id !== id);
-            localStorage.setItem('persistent_transactions_v2', JSON.stringify(records));
-            renderRecords();
+        if (confirm('هل أنت متأكد من حذف هذه المعاملة نهائياً من السحابة؟')) {
+            let r = cachedRecords.find(item => item.id == id);
+            if (r && r.docId) {
+                try {
+                    await window.deleteDoc(window.doc(window.db, "transactions", r.docId));
+                    loadRecordsFromCloud();
+                } catch (error) {
+                    alert("تعذر الحذف: " + error.message);
+                }
+            }
         }
     }
 
@@ -541,11 +626,10 @@
     }
 
     function exportDelayedPDF() {
-        let records = getRecords();
         let today = new Date();
         today.setHours(0,0,0,0);
 
-        let delayed = records.filter(r => {
+        let delayed = cachedRecords.filter(r => {
             let dueD = new Date(r.dueDate);
             let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
             return diffDays < 0 && r.status === 'لم تنجز';
@@ -572,7 +656,6 @@
     function renderRecords() {
         let tbody = document.getElementById('tableBody');
         let query = document.getElementById('searchQuery').value.toLowerCase();
-        let records = getRecords();
         let today = new Date();
         today.setHours(0,0,0,0);
 
@@ -582,7 +665,7 @@
         let completedCount = 0;
         let delayedCount = 0;
 
-        records.forEach(r => {
+        cachedRecords.forEach(r => {
             let dueD = new Date(r.dueDate);
             let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
             if (diffDays < 0 && r.status === 'لم تنجز') delayedCount++;
@@ -594,19 +677,17 @@
         document.getElementById('countDelayed').innerText = delayedCount;
         document.getElementById('countCompleted').innerText = completedCount;
 
-        let filtered = records.filter(r => {
+        let filtered = cachedRecords.filter(r => {
             let dueD = new Date(r.dueDate);
             let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
             let isDelayed = diffDays < 0 && r.status === 'لم تنجز';
             let isCompleted = r.status === 'أنجزت';
             let isInProgress = !isDelayed && !isCompleted;
 
-            // تطبيق فلتر المربع الإحصائي إذا كان مفعلاً
             if (activeMetricFilter === 'in-progress' && !isInProgress) return false;
             if (activeMetricFilter === 'delayed' && !isDelayed) return false;
             if (activeMetricFilter === 'completed' && !isCompleted) return false;
 
-            // تطبيق التبويبات الرئيسية إذا لم يتم اختيار مربع إحصائي
             if (!activeMetricFilter) {
                 if (currentTab === 'active' && isCompleted) return false;
                 if (currentTab === 'completed' && !isCompleted) return false;
@@ -666,8 +747,6 @@
             tbody.appendChild(tr);
         });
     }
-
-    renderRecords();
 </script>
 
 </body>
