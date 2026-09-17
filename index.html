@@ -257,6 +257,18 @@
             animation: pulseBorder 2s infinite ease-in-out, cardFadeIn 0.4s ease-out forwards;
         }
 
+        /* تأثير إطار متحرك تحذيري باللون الأصفر للمعاملات التي اقترب موعدها (4 أيام فأقل) */
+        @keyframes pulseYellowBorder {
+            0% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 15px 3px rgba(245, 158, 11, 0.5); }
+            100% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+        }
+
+        .transaction-card.card-approaching {
+            background: linear-gradient(135deg, var(--sidebar-bg), rgba(245, 158, 11, 0.08));
+            animation: pulseYellowBorder 2s infinite ease-in-out, cardFadeIn 0.4s ease-out forwards;
+        }
+
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -309,10 +321,7 @@
     <div class="top-navbar no-print-zone">
         <!-- النقر المزدوج (DoubleClick) على هذا العنوان يفتح لوحة الإدارة سراُ -->
         <h1 class="brand-title" ondblclick="toggleAuth()" title="النظام يعمل بكفاءة">متابعة المعاملات</h1>
-        <div style="font-size: 12px; color: var(--text-muted);" id="adminStatusText"> </div>
     </div>
-
-    <!-- تم حذف شريط الإنجاز نهائياً بناءً على طلبك -->
 
     <div class="metrics-grid no-print-zone">
         <div class="metric-card in-progress" id="cardInProgress" onclick="filterByMetric('in-progress')">
@@ -456,8 +465,6 @@
             if (pass !== null) {
                 if (pass.trim() === "Dd1616") {
                     isAdmin = true;
-                    document.getElementById('adminStatusText').innerText = "🔓 وضع الإدارة مفعل";
-                    document.getElementById('adminStatusText').style.color = "#34d399";
                     document.querySelectorAll('.restricted-admin').forEach(el => {
                         el.style.display = el.tagName === 'DIV' && el.id === 'adminFormCard' ? 'block' : 'flex';
                     });
@@ -468,8 +475,6 @@
             }
         } else {
             isAdmin = false;
-            document.getElementById('adminStatusText').innerText = "وضع الموظفين";
-            document.getElementById('adminStatusText').style.color = "var(--text-muted)";
             document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'none');
             resetForm();
             renderRecords();
@@ -730,8 +735,11 @@
             } else if (diffDays < 0) {
                 cardClass = 'card-delayed';
                 statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diffDays)} يوم)</span>`;
+            } else if (diffDays <= 4) {
+                cardClass = 'card-approaching'; // إطار وإضاءة صفراء متحركة عند اقتراب الموعد (4 أيام فأقل)
+                statusBadge = `<span class="status-badge badge-orange">متبقي ${diffDays} يوم (قريب)</span>`;
             } else {
-                statusBadge = diffDays <= 5 ? `<span class="status-badge badge-orange">متبقي ${diffDays} يوم</span>` : `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
+                statusBadge = `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
             }
 
             let card = document.createElement('div');
