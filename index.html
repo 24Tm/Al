@@ -477,7 +477,7 @@
         return d;
     }
 
-    // دالة لحساب تاريخ الاستحقاق تلقائياً بناءً على تاريخ المعاملة + عدد الأيام
+    // دالة محسنة ومصححة لحساب تاريخ الاستحقاق الهجري بدقة بناءً على النص المدخل
     function calculateDueDate() {
         let selectElement = document.getElementById('durationDays');
         let customGroup = document.getElementById('customDaysGroup');
@@ -492,31 +492,35 @@
         }
 
         let baseDateStr = document.getElementById('transDate').value.trim();
-        let baseDate = parseHijriToDate(baseDateStr);
-        if (isNaN(baseDate.getTime())) {
-            baseDate = new Date();
-        }
+        let parts = baseDateStr.split(/[-/]/);
+        
+        if (parts.length === 3) {
+            let hy = parseInt(parts[0], 10);
+            let hm = parseInt(parts[1], 10);
+            let hd = parseInt(parts[2], 10) + daysToAdd;
 
-        // إضافة عدد الأيام
-        baseDate.setDate(baseDate.getDate() + daysToAdd);
+            while (hd > 30) {
+                hd -= 30;
+                hm += 1;
+            }
+            while (hm > 12) {
+                hm -= 12;
+                hy += 1;
+            }
+            while (hd < 1) {
+                hd += 30;
+                hm -= 1;
+            }
+            while (hm < 1) {
+                hm += 12;
+                hy -= 1;
+            }
 
-        // محاولة إعادة صياغتها كـ تاريخ هجري تقريبي متناسق
-        try {
-            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            let parts = formatter.formatToParts(baseDate);
-            let y = parts.find(p => p.type === 'year').value;
-            let m = parts.find(p => p.type === 'month').value;
-            let d = parts.find(p => p.type === 'day').value;
-            document.getElementById('transDueDate').value = `${y}-${m}-${d}`;
-        } catch (e) {
-            let year = baseDate.getFullYear();
-            let month = String(baseDate.getMonth() + 1).padStart(2, '0');
-            let day = String(baseDate.getDate()).padStart(2, '0');
-            document.getElementById('transDueDate').value = `${year}-${month}-${day}`;
+            let mFormatted = String(hm).padStart(2, '0');
+            let dFormatted = String(hd).padStart(2, '0');
+            document.getElementById('transDueDate').value = `${hy}-${mFormatted}-${dFormatted}`;
+        } else {
+            document.getElementById('transDueDate').value = baseDateStr;
         }
     }
 
