@@ -65,6 +65,7 @@
 
         .auth-trigger:hover { background: rgba(255, 255, 255, 0.2); }
 
+        /* المؤشرات التفاعلية */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -76,10 +77,22 @@
             background: var(--card-bg);
             padding: 14px 18px;
             border-radius: var(--radius);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .metric-card.active-filter {
+            border-color: var(--primary);
+            background: #eff6ff;
         }
 
         .metric-card .label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
@@ -183,8 +196,21 @@
         .btn-alt { background: #64748b; }
         .btn-pdf { background: #0284c7; }
 
-        .search-box-wrapper { margin-bottom: 20px; }
+        .search-box-wrapper { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
         .search-box-wrapper input { padding: 11px 16px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 14px; }
+        
+        .reset-filter-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 11px 16px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .reset-filter-btn:hover { background: #cbd5e1; }
 
         .table-container {
             background: var(--card-bg);
@@ -265,17 +291,18 @@
         <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
     </div>
 
+    <!-- المؤشرات التفاعلية -->
     <div class="metrics-grid no-print-zone">
-        <div class="metric-card in-progress">
-            <div class="label">تحت الإجراء</div>
+        <div class="metric-card in-progress" id="cardInProgress" onclick="filterByMetric('in-progress')">
+            <div class="label">تحت الإجراء 📊</div>
             <div class="val" id="countInProgress">0</div>
         </div>
-        <div class="metric-card delayed">
-            <div class="label">متأخرة</div>
+        <div class="metric-card delayed" id="cardDelayed" onclick="filterByMetric('delayed')">
+            <div class="label">متأخرة ⚠️</div>
             <div class="val" id="countDelayed">0</div>
         </div>
-        <div class="metric-card completed">
-            <div class="label">المنجزة</div>
+        <div class="metric-card completed" id="cardCompleted" onclick="filterByMetric('completed')">
+            <div class="label">المنجزة ✅</div>
             <div class="val" id="countCompleted">0</div>
         </div>
     </div>
@@ -352,6 +379,7 @@
 
     <div class="search-box-wrapper no-print-zone">
         <input type="text" id="searchQuery" placeholder="🔍 بحث سريع في السجلات (رقم المعاملة، الموضوع، الجهة المحول لها...)" oninput="renderRecords()">
+        <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر الإحصائي ✖</button>
     </div>
 
     <div class="table-container no-print-zone">
@@ -376,6 +404,7 @@
 <script>
     let isAdmin = false;
     let currentTab = 'active';
+    let activeMetricFilter = null; // تخزين نوع الفلتر الإحصائي المختار
 
     document.getElementById('transDate').valueAsDate = new Date();
     let defDue = new Date();
@@ -404,8 +433,35 @@
 
     function switchTab(tab) {
         currentTab = tab;
+        activeMetricFilter = null; // إلغاء الفلتر الإحصائي عند تغيير التبويب الرئيسي
+        document.getElementById('resetFilterBtn').style.display = 'none';
+        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
+
         document.getElementById('tabActive').classList.toggle('active', tab === 'active');
         document.getElementById('tabCompleted').classList.toggle('active', tab === 'completed');
+        renderRecords();
+    }
+
+    function filterByMetric(metricType) {
+        activeMetricFilter = activeMetricFilter === metricType ? null : metricType;
+        
+        // تحديث المظهر البصري للمربعات
+        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
+        if (activeMetricFilter) {
+            document.getElementById('resetFilterBtn').style.display = 'block';
+            if (metricType === 'in-progress') document.getElementById('cardInProgress').classList.add('active-filter');
+            if (metricType === 'delayed') document.getElementById('cardDelayed').classList.add('active-filter');
+            if (metricType === 'completed') document.getElementById('cardCompleted').classList.add('active-filter');
+        } else {
+            document.getElementById('resetFilterBtn').style.display = 'none';
+        }
+        renderRecords();
+    }
+
+    function clearMetricFilter() {
+        activeMetricFilter = null;
+        document.getElementById('resetFilterBtn').style.display = 'none';
+        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
         renderRecords();
     }
 
@@ -538,7 +594,26 @@
         document.getElementById('countDelayed').innerText = delayedCount;
         document.getElementById('countCompleted').innerText = completedCount;
 
-        let filtered = records.filter(r => currentTab === 'active' ? r.status !== 'أنجزت' : r.status === 'أنجزت');
+        let filtered = records.filter(r => {
+            let dueD = new Date(r.dueDate);
+            let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
+            let isDelayed = diffDays < 0 && r.status === 'لم تنجز';
+            let isCompleted = r.status === 'أنجزت';
+            let isInProgress = !isDelayed && !isCompleted;
+
+            // تطبيق فلتر المربع الإحصائي إذا كان مفعلاً
+            if (activeMetricFilter === 'in-progress' && !isInProgress) return false;
+            if (activeMetricFilter === 'delayed' && !isDelayed) return false;
+            if (activeMetricFilter === 'completed' && !isCompleted) return false;
+
+            // تطبيق التبويبات الرئيسية إذا لم يتم اختيار مربع إحصائي
+            if (!activeMetricFilter) {
+                if (currentTab === 'active' && isCompleted) return false;
+                if (currentTab === 'completed' && !isCompleted) return false;
+            }
+
+            return true;
+        });
         
         filtered = filtered.filter(r => 
             r.number.toLowerCase().includes(query) || 
