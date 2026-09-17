@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متابعة المعاملات</title>
+    <title>متابعة المعاملات - التصميم التفاعلي الذكي</title>
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -39,17 +39,17 @@
     <style>
         :root {
             --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --bg-body: #f8fafc;
-            --sidebar-bg: #0f172a;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --primary: #2563eb;
-            --success: #059669;
-            --danger: #dc2626;
-            --warning: #d97706;
-            --border: #e2e8f0;
-            --radius: 8px;
+            --bg-body: #090d16;
+            --sidebar-bg: #111827;
+            --card-bg: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #374151;
+            --radius: 12px;
         }
 
         * { box-sizing: border-box; }
@@ -59,72 +59,62 @@
             background-color: var(--bg-body);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 24px;
             direction: rtl;
         }
 
-        .dashboard-container { max-width: 1200px; margin: 0 auto; }
+        .dashboard-container { max-width: 1300px; margin: 0 auto; }
 
         .top-navbar {
             background: var(--sidebar-bg);
             color: #ffffff;
-            padding: 14px 20px;
+            padding: 16px 24px;
             border-radius: var(--radius);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
-        .brand-title { margin: 0; font-size: 17px; font-weight: 700; }
+        .brand-title { margin: 0; font-size: 19px; font-weight: 800; background: linear-gradient(to left, #60a5fa, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .auth-trigger {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 5px 12px;
-            border-radius: 6px;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 6px 16px;
+            border-radius: 8px;
             font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .auth-trigger:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.05); }
+        .auth-trigger:hover { background: rgba(59, 130, 246, 0.3); transform: scale(1.05); }
 
-        /* شريط التنبيهات المتحرك الجديد */
-        .ticker-wrapper {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            color: #38bdf8;
-            padding: 10px 15px;
+        /* شريط نسبة الإنجاز التفاعلي */
+        .progress-container {
+            background: var(--sidebar-bg);
+            padding: 14px 20px;
             border-radius: var(--radius);
-            margin-bottom: 16px;
-            font-size: 13px;
-            font-weight: 600;
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
         }
-        .ticker-content {
-            display: inline-block;
-            animation: marquee 25s linear infinite;
-        }
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+        .progress-info { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); }
+        .progress-bar-bg { width: 100%; height: 8px; background: #374151; border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(to left, #10b981, #3b82f6); width: 0%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
 
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .metric-card {
-            background: var(--card-bg);
-            padding: 14px 18px;
+            background: var(--sidebar-bg);
+            padding: 18px 22px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
             display: flex;
@@ -132,44 +122,26 @@
             align-items: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
             position: relative;
             overflow: hidden;
         }
 
-        .metric-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 0;
-            height: 3px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-        .metric-card:hover::after { width: 100%; }
-        .metric-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 6px 12px -2px rgba(37,99,235,0.1); }
-        .metric-card.active-filter { border-color: var(--primary); background: #eff6ff; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+        .metric-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.2); }
+        .metric-card.active-filter { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 0 2px rgba(59,130,246,0.3); }
 
         .metric-card .label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-        .metric-card .val { font-size: 20px; font-weight: 800; transition: transform 0.2s ease; }
-        .metric-card.in-progress .val { color: var(--primary); }
-        .metric-card.delayed .val { color: var(--danger); animation: pulse-slow 2s infinite; }
-        .metric-card.completed .val { color: var(--success); }
+        .metric-card .val { font-size: 24px; font-weight: 900; }
+        .metric-card.in-progress .val { color: #60a5fa; }
+        .metric-card.delayed .val { color: #f87171; }
+        .metric-card.completed .val { color: #34d399; }
 
-        @keyframes pulse-slow {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-
-        .nav-pills { display: flex; gap: 8px; margin-bottom: 16px; }
+        .nav-pills { display: flex; gap: 10px; margin-bottom: 20px; }
 
         .pill-btn {
             flex: 1;
-            background: #e2e8f0;
-            border: none;
-            padding: 9px;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border);
+            padding: 11px;
             border-radius: var(--radius);
             font-size: 13px;
             font-weight: 700;
@@ -179,157 +151,161 @@
             transition: all 0.25s ease;
         }
 
-        .pill-btn:hover { background: #cbd5e1; transform: translateY(-1px); }
-        .pill-btn.active { background: var(--sidebar-bg); color: #ffffff; box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.2); }
+        .pill-btn:hover { background: #374151; color: #fff; }
+        .pill-btn.active { background: var(--primary); border-color: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
 
         .panel-box {
-            background: var(--card-bg);
-            padding: 20px;
+            background: var(--sidebar-bg);
+            padding: 24px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
             animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .panel-box h3 {
             margin-top: 0;
-            font-size: 14px;
-            color: var(--sidebar-bg);
+            font-size: 15px;
+            color: #ffffff;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 8px;
-            margin-bottom: 14px;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
         }
 
-        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .form-item { margin-bottom: 12px; }
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-item { margin-bottom: 14px; }
         .form-item.full-width { grid-column: span 2; }
 
-        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 12px; color: var(--text-muted); }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 12px; color: var(--text-muted); }
 
         input, select {
             width: 100%;
-            padding: 8px 10px;
+            padding: 10px 14px;
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 13px;
-            background: #fff;
+            background: #0f172a;
             color: var(--text-main);
             text-align: right;
             transition: all 0.2s;
         }
 
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
-        .actions-group { display: flex; gap: 10px; margin-top: 12px; }
+        .actions-group { display: flex; gap: 10px; margin-top: 16px; }
 
         .btn {
             background: var(--primary);
             color: #fff;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             flex: 1;
             transition: all 0.2s ease;
         }
-        .btn:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(37,99,235,0.2); }
-        .btn-alt { background: #64748b; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-alt { background: #4b5563; }
         .btn-pdf { background: #0284c7; }
 
-        .search-box-wrapper { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; }
-        .search-box-wrapper input { padding: 10px 14px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; background: #fff; }
+        .search-box-wrapper { margin-bottom: 20px; display: flex; gap: 12px; align-items: center; }
+        .search-box-wrapper input { padding: 12px 18px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; background: var(--sidebar-bg); }
         
         .reset-filter-btn {
-            background: #e2e8f0;
-            border: none;
-            padding: 10px 14px;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border);
+            padding: 12px 18px;
             border-radius: var(--radius);
             font-size: 13px;
             font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
             white-space: nowrap;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
-        .reset-filter-btn:hover { background: #cbd5e1; }
+        .reset-filter-btn:hover { background: #374151; color: #fff; }
 
-        /* الشكل الكلاسيكي الأصلي للجدول مع حركة تدرج الظهور لصفوف الجدول */
-        .table-responsive {
-            background: var(--card-bg);
+        /* تصميم بطاقات المعاملات التفاعلية بدلاً من الجدول التقليدي */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .transaction-card {
+            background: var(--sidebar-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            overflow-x: auto;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            padding: 18px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: cardFadeIn 0.4s ease-out forwards;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-            font-size: 13px;
-        }
-
-        th {
-            background: #f1f5f9;
-            color: var(--sidebar-bg);
-            font-weight: 700;
-            padding: 12px 14px;
-            border-bottom: 2px solid var(--border);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-main);
-            transition: background 0.2s;
-        }
-
-        tr {
-            animation: rowFadeIn 0.3s ease-out forwards;
-        }
-
-        @keyframes rowFadeIn {
-            from { opacity: 0; transform: translateY(4px); }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: #f8fafc; }
-
-        .row-delayed td { background: #fef2f2 !important; animation: subtlePulse 2s infinite alternate; }
-        .row-completed td { opacity: 0.8; background: #f8fafc; }
-
-        @keyframes subtlePulse {
-            from { background-color: #fef2f2; }
-            to { background-color: #fee2e2; }
+        .transaction-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.4);
         }
 
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 700; display: inline-block; transition: transform 0.2s; }
-        .status-badge:hover { transform: scale(1.05); }
-        .badge-green { background: #dcfce7; color: #166534; }
-        .badge-red { background: #fee2e2; color: #991b1b; }
-        .badge-orange { background: #ffedd5; color: #9a3412; }
+        .transaction-card.card-delayed {
+            border-color: rgba(239, 68, 68, 0.5);
+            background: linear-gradient(135deg, var(--sidebar-bg), rgba(239, 68, 68, 0.05));
+        }
 
-        .table-actions { display: flex; gap: 6px; }
-        .btn-mini { padding: 4px 8px; font-size: 11.5px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; transition: transform 0.2s; }
-        .btn-mini:hover { transform: scale(1.1); }
-        .btn-mini-edit { background: #fef3c7; color: #b45309; }
-        .btn-mini-del { background: #fee2e2; color: #b91c1c; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .trans-number { font-weight: 800; font-size: 15px; color: #60a5fa; }
+        
+        .card-body { margin-bottom: 14px; }
+        .card-subject { font-size: 14px; font-weight: 700; color: #f3f4f6; margin-bottom: 8px; line-height: 1.5; }
+        .card-meta { font-size: 12.5px; color: var(--text-muted); display: flex; justify-content: space-between; }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(55, 65, 81, 0.5);
+            padding-top: 12px;
+        }
+
+        .status-badge { padding: 5px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; display: inline-block; }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-red { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge-orange { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        .table-actions { display: flex; gap: 8px; }
+        .btn-mini { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: transform 0.2s; }
+        .btn-mini:hover { transform: scale(1.08); }
+        .btn-mini-edit { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .btn-mini-del { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
         .restricted-admin { display: none; }
 
         @media print {
-            body { background: #fff; padding: 0; }
+            body { background: #fff; color: #000; padding: 0; }
             .no-print-zone { display: none !important; }
             .print-zone { display: block !important; }
         }
@@ -340,14 +316,18 @@
 
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
-        <h1 class="brand-title">متابعة المعاملات</h1>
-        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">الدخول</button>
+        <h1 class="brand-title">نظـام متابعة المعاملات الذكي</h1>
+        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">الدخول كأدمن</button>
     </div>
 
-    <!-- شريط تنبيهات متحرك -->
-    <div class="ticker-wrapper no-print-zone">
-        <div class="ticker-content">
-            ⚡ نظام متابعة المعاملات النشطة والمتأخرة • يتم تحديث البيانات سحابياً بشكل مباشر عبر منصة Firebase • يرجى مراجعة المعاملات المتأخرة أولاً بأول لتفادي أي تأخير إداري.
+    <!-- مؤشر نسبة الإنجاز التفاعلي -->
+    <div class="progress-container no-print-zone">
+        <div class="progress-info">
+            <span>معدل إنجاز المعاملات العام</span>
+            <span id="progressPercentText">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
         </div>
     </div>
 
@@ -415,26 +395,13 @@
     </div>
 
     <div class="search-box-wrapper no-print-zone">
-        <input type="text" id="searchQuery" placeholder="🔍 بحث سريع في السجلات (برقم المعاملة، الموضوع، الجهة المحولة...)" oninput="renderRecords()">
+        <input type="text" id="searchQuery" placeholder="🔍 بحث فوري تفاعلي (برقم المعاملة، الموضوع، الجهة المحولة...)" oninput="renderRecords()">
         <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
     </div>
 
-    <!-- جدول المعاملات بالشكل الكلاسيكي الأصلي -->
-    <div class="table-responsive no-print-zone">
-        <table>
-            <thead>
-                <tr>
-                    <th>رقم المعاملة</th>
-                    <th>موضوع المعاملة</th>
-                    <th>حولت لـ</th>
-                    <th>الحالة / المتبقي</th>
-                    <th class="restricted-admin">الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody id="recordsTableBody">
-                <!-- تدرج السجلات برمجياً -->
-            </tbody>
-        </table>
+    <!-- شبكة البطاقات التفاعلية -->
+    <div class="cards-grid no-print-zone" id="recordsCardsContainer">
+        <!-- تدرج البطاقات برمجياً -->
     </div>
 
     <div id="printArea" class="print-zone"></div>
@@ -479,7 +446,6 @@
     document.getElementById('transDate').value = getTodayHijriString();
     document.getElementById('transDueDate').value = "1448-07-01";
 
-    // دالة لتأثير العدّ التدرجي المتحرك للأرقام
     function animateValue(id, start, end, duration) {
         let obj = document.getElementById(id);
         if (!obj) return;
@@ -509,8 +475,7 @@
                     isAdmin = true;
                     document.getElementById('authToggleBtn').innerText = "خروج الأدمن";
                     document.querySelectorAll('.restricted-admin').forEach(el => {
-                        if(el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
-                        else el.style.display = 'block';
+                        el.style.display = el.tagName === 'DIV' && el.id === 'adminFormCard' ? 'block' : 'flex';
                     });
                     renderRecords();
                 } else {
@@ -519,7 +484,7 @@
             }
         } else {
             isAdmin = false;
-            document.getElementById('authToggleBtn').innerText = "الدخول";
+            document.getElementById('authToggleBtn').innerText = "الدخول كأدمن";
             document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'none');
             resetForm();
             renderRecords();
@@ -722,7 +687,11 @@
             }
         });
 
-        // قراءة القديم وتطبيق حركة العداد المتحرك
+        let totalRecords = cachedRecords.length;
+        let completionRate = totalRecords > 0 ? Math.round((completedCount / totalRecords) * 100) : 0;
+        document.getElementById('progressPercentText').innerText = completionRate + '%';
+        document.getElementById('progressBarFill').style.width = completionRate + '%';
+
         let oldInProgress = parseInt(document.getElementById('countInProgress').innerText) || 0;
         let oldDelayed = parseInt(document.getElementById('countDelayed').innerText) || 0;
         let oldCompleted = parseInt(document.getElementById('countCompleted').innerText) || 0;
@@ -759,12 +728,11 @@
 
         filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
 
-        let tbody = document.getElementById('recordsTableBody');
-        tbody.innerHTML = '';
+        let container = document.getElementById('recordsCardsContainer');
+        container.innerHTML = '';
 
         if (filtered.length === 0) {
-            let colSpanCount = isAdmin ? 5 : 4;
-            tbody.innerHTML = `<tr><td colspan="${colSpanCount}" style="text-align: center; color: var(--text-muted); padding: 25px;">لا توجد سجلات مطابقة للعرض</td></tr>`;
+            container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px; background: var(--sidebar-bg); border-radius: var(--radius); border: 1px solid var(--border);">لا توجد سجلات مطابقة للعرض</div>`;
             return;
         }
 
@@ -773,34 +741,41 @@
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
 
-            let rowClass = '';
+            let cardClass = '';
             let statusBadge = '';
 
             if (r.status === 'أنجزت') {
-                rowClass = 'row-completed';
                 statusBadge = `<span class="status-badge badge-green">منجزة</span>`;
             } else if (diffDays < 0) {
-                rowClass = 'row-delayed';
+                cardClass = 'card-delayed';
                 statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diffDays)} يوم)</span>`;
             } else {
                 statusBadge = diffDays <= 5 ? `<span class="status-badge badge-orange">متبقي ${diffDays} يوم</span>` : `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
             }
 
-            let tr = document.createElement('tr');
-            tr.className = rowClass;
-            tr.innerHTML = `
-                <td style="font-weight: 700;">${r.number}</td>
-                <td>${r.subject}</td>
-                <td>${r.to || '---'}</td>
-                <td>${statusBadge}</td>
-                <td class="restricted-admin" style="display: ${isAdmin ? 'table-cell' : 'none'};">
+            let card = document.createElement('div');
+            card.className = `transaction-card ${cardClass}`;
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="trans-number"># ${r.number}</span>
+                    ${statusBadge}
+                </div>
+                <div class="card-body">
+                    <div class="card-subject">${r.subject}</div>
+                    <div class="card-meta">
+                        <span>الجهة: <b>${r.to || '---'}</b></span>
+                        <span>الاستحقاق: ${r.dueDate}</span>
+                    </div>
+                </div>
+                <div class="card-footer restricted-admin" style="display: ${isAdmin ? 'flex' : 'none'};">
+                    <span style="font-size: 11px; color: var(--text-muted);">إدارة السجل</span>
                     <div class="table-actions">
                         <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
                         <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
                     </div>
-                </td>
+                </div>
             `;
-            tbody.appendChild(tr);
+            container.appendChild(card);
         });
     }
 </script>
