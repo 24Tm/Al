@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> متابعة المعاملات  </title>
+    <title> متابعة المعاملات </title>
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
           apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
           authDomain: "project-3958113961260211077.firebaseapp.com",
@@ -19,11 +18,9 @@
           appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
         };
 
-        // تهيئة الفايربيس وقاعدة البيانات
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // جعل الدوال متوفرة في النطاق العام (Global) لتعمل مع الأزرار
         window.db = db;
         window.collection = collection;
         window.addDoc = addDoc;
@@ -32,7 +29,6 @@
         window.deleteDoc = deleteDoc;
         window.doc = doc;
 
-        // تشغيل تحميل البيانات أول ما يفتح التطبيق
         window.addEventListener('DOMContentLoaded', () => {
             if (typeof loadRecordsFromCloud === 'function') {
                 loadRecordsFromCloud();
@@ -67,10 +63,7 @@
             direction: rtl;
         }
 
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .dashboard-container { max-width: 1200px; margin: 0 auto; }
 
         .top-navbar {
             background: var(--sidebar-bg);
@@ -83,11 +76,7 @@
             margin-bottom: 20px;
         }
 
-        .brand-title {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-        }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 700; }
 
         .auth-trigger {
             background: rgba(255, 255, 255, 0.1);
@@ -99,9 +88,6 @@
             cursor: pointer;
         }
 
-        .auth-trigger:hover { background: rgba(255, 255, 255, 0.2); }
-
-        /* المؤشرات التفاعلية */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -121,15 +107,8 @@
             transition: all 0.2s ease;
         }
 
-        .metric-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .metric-card.active-filter {
-            border-color: var(--primary);
-            background: #eff6ff;
-        }
+        .metric-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .metric-card.active-filter { border-color: var(--primary); background: #eff6ff; }
 
         .metric-card .label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
         .metric-card .val { font-size: 20px; font-weight: 800; }
@@ -137,11 +116,7 @@
         .metric-card.delayed .val { color: var(--danger); }
         .metric-card.completed .val { color: var(--success); }
 
-        .nav-pills {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
+        .nav-pills { display: flex; gap: 8px; margin-bottom: 20px; }
 
         .pill-btn {
             flex: 1;
@@ -156,10 +131,7 @@
             text-align: center;
         }
 
-        .pill-btn.active {
-            background: var(--sidebar-bg);
-            color: #ffffff;
-        }
+        .pill-btn.active { background: var(--sidebar-bg); color: #ffffff; }
 
         .panel-box {
             background: var(--card-bg);
@@ -178,22 +150,11 @@
             margin-bottom: 16px;
         }
 
-        .form-grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .form-item { margin-bottom: 14px; }
         .form-item.full-width { grid-column: span 2; }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px; color: var(--text-muted); }
 
         input, select {
             width: 100%;
@@ -203,18 +164,12 @@
             font-size: 13px;
             background: #fff;
             color: var(--text-main);
+            text-align: right;
         }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
 
-        .actions-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
+        .actions-group { display: flex; gap: 10px; margin-top: 15px; }
 
         .btn {
             background: var(--primary);
@@ -227,8 +182,6 @@
             cursor: pointer;
             flex: 1;
         }
-
-        .btn:hover { opacity: 0.9; }
         .btn-alt { background: #64748b; }
         .btn-pdf { background: #0284c7; }
 
@@ -246,66 +199,25 @@
             cursor: pointer;
             white-space: nowrap;
         }
-        .reset-filter-btn:hover { background: #cbd5e1; }
 
-        .table-container {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow-x: auto;
-        }
+        .table-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-            font-size: 13px;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 13px; }
 
-        th {
-            background: #f1f5f9;
-            color: var(--sidebar-bg);
-            padding: 12px 14px;
-            font-weight: 700;
-            border-bottom: 2px solid var(--border);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-main);
-        }
-
-        tr:last-child td { border-bottom: none; }
+        th { background: #f1f5f9; color: var(--sidebar-bg); padding: 12px 14px; font-weight: 700; border-bottom: 2px solid var(--border); white-space: nowrap; }
+        td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text-main); }
         tr:hover td { background: #f8fafc; }
 
         tr.row-delayed td { background-color: #fef2f2; }
         tr.row-completed td { background-color: #f8fafc; color: #64748b; }
 
-        .status-badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 700;
-            display: inline-block;
-        }
+        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; display: inline-block; }
         .badge-green { background: #dcfce7; color: #166534; }
         .badge-red { background: #fee2e2; color: #991b1b; }
         .badge-orange { background: #ffedd5; color: #9a3412; }
 
-        .action-btns {
-            display: flex;
-            gap: 6px;
-        }
-        .btn-mini {
-            padding: 4px 8px;
-            font-size: 11px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-        }
+        .action-btns { display: flex; gap: 6px; }
+        .btn-mini { padding: 4px 8px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
         .btn-mini-edit { background: #fef3c7; color: #b45309; }
         .btn-mini-del { background: #fee2e2; color: #b91c1c; }
 
@@ -323,11 +235,10 @@
 
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
-        <h1 class="brand-title"> متابعة المعاملات  </h1>
+        <h1 class="brand-title"> متابعة المعاملات </h1>
         <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
     </div>
 
-    <!-- المؤشرات التفاعلية -->
     <div class="metrics-grid no-print-zone">
         <div class="metric-card in-progress" id="cardInProgress" onclick="filterByMetric('in-progress')">
             <div class="label"> تحت الإجراء </div>
@@ -358,8 +269,8 @@
                 <input type="text" id="transNumber" placeholder="رقم المعاملة">
             </div>
             <div class="form-item">
-                <label>تاريخ المعاملة (هجري):</label>
-                <input type="date" id="transDate">
+                <label>تاريخ المعاملة (هجري YYYY/MM/DD):</label>
+                <input type="text" id="transDate" placeholder="1447/04/15">
             </div>
         </div>
 
@@ -402,8 +313,8 @@
         </div>
 
         <div class="form-item full-width">
-            <label>تاريخ الاستحقاق / الانتهاء (هجري):</label>
-            <input type="date" id="transDueDate">
+            <label>تاريخ الاستحقاق (هجري YYYY/MM/DD):</label>
+            <input type="text" id="transDueDate" placeholder="1447/05/01">
         </div>
 
         <div class="actions-group">
@@ -414,8 +325,8 @@
     </div>
 
     <div class="search-box-wrapper no-print-zone">
-        <input type="text" id="searchQuery" placeholder="🔍 بحث سريع في السجلات (رقم المعاملة، الموضوع، الجهة المحول لها...)" oninput="renderRecords()">
-        <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر الإحصائي ✖</button>
+        <input type="text" id="searchQuery" placeholder="🔍 بحث سريع في السجلات..." oninput="renderRecords()">
+        <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
     </div>
 
     <div class="table-container no-print-zone">
@@ -425,13 +336,13 @@
                     <th>رقم المعاملة</th>
                     <th>موضوع المعاملة</th>
                     <th>حولت لـ</th>
-                    <th>تاريخ الاستحقاق</th>
+                    <th>تاريخ الاستحقاق (هجري)</th>
                     <th>الحالة</th>
                     <th class="restricted-admin" style="width: 90px; text-align: center;">الإجراءات</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="6" style="text-align:center; padding: 20px;">الاتـصـال</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding: 20px;">جارِ الاتصال...</td></tr>
             </tbody>
         </table>
     </div>
@@ -445,63 +356,38 @@
     let activeMetricFilter = null;
     let cachedRecords = []; 
 
-    // ضبط التقويم الافتراضي ليكون هجرياً (أم القرى) لعرض الحقول تلقائياً
-    const hijriOptions = { calendar: 'islamic-umalqura', numberingSystem: 'arab' };
-
-    function getTodayHijriInputString() {
-        let now = new Date();
+    // جلب التاريخ الهجري الحالي بصيغة يسرية صحيحة
+    function getTodayHijriString() {
         try {
             let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit'
             });
-            let parts = formatter.formatToParts(now);
+            let parts = formatter.formatToParts(new Date());
             let y = parts.find(p => p.type === 'year').value;
             let m = parts.find(p => p.type === 'month').value;
             let d = parts.find(p => p.type === 'day').value;
-            return `${y}-${m}-${d}`;
+            return `${y}/${m}/${d}`;
         } catch (e) {
-            return new Date().toISOString().split('T')[0];
+            return "1447/04/01";
         }
     }
 
-    function addDaysHijri(days) {
-        let d = new Date();
-        d.setDate(d.getDate() + days);
-        try {
-            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            let parts = formatter.formatToParts(d);
-            let y = parts.find(p => p.type === 'year').value;
-            let m = parts.find(p => p.type === 'month').value;
-            let day = parts.find(p => p.type === 'day').value;
-            return `${y}-${m}-${day}`;
-        } catch (e) {
-            return d.toISOString().split('T')[0];
-        }
-    }
+    // تعيين القيم الافتراضية
+    document.getElementById('transDate').value = getTodayHijriString();
+    document.getElementById('transDueDate').value = "1447/05/01";
 
-    document.getElementById('transDate').value = getTodayHijriInputString();
-    document.getElementById('transDueDate').value = addDaysHijri(15);
-
-    function formatHijriDisplay(dateStr) {
-        if (!dateStr) return '---';
-        try {
-            let d = new Date(dateStr);
-            if (isNaN(d)) return dateStr;
-            let formatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric'
-            });
-            return formatter.format(d);
-        } catch (e) {
-            return dateStr;
-        }
+    // تحويل التاريخ الهجري (1447/05/01) إلى رقم زمني للمقارنة الدقيقة وحساب الأيام
+    function hijriToTimestamp(hDateStr) {
+        if (!hDateStr) return 0;
+        let parts = hDateStr.split('/');
+        if (parts.length !== 3) return 0;
+        let y = parseInt(parts[0], 10);
+        let m = parseInt(parts[1], 10);
+        let d = parseInt(parts[2], 10);
+        // تقريب تحويلي للأيام الهجرية للمقارنة السليمة
+        return (y * 354) + (m * 29.5) + d;
     }
 
     function toggleAuth() {
@@ -519,7 +405,7 @@
             }
         } else {
             isAdmin = false;
-            document.getElementById('authToggleBtn').innerText = "  الدخول";
+            document.getElementById('authToggleBtn').innerText = "🔒 تسجيل الدخول";
             document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'none');
             resetForm();
             renderRecords();
@@ -581,7 +467,7 @@
             renderRecords();
         } catch (error) {
             console.error("خطأ في جلب البيانات:", error);
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red; padding:20px;">تعذر الاتصال بقاعدة البيانات السحابية. تأكد من الإنترنت.</td></tr>`;
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red; padding:20px;">تعذر الاتصال بقاعدة البيانات.</td></tr>`;
         }
     }
 
@@ -589,16 +475,16 @@
         if (!isAdmin) return;
         let docId = document.getElementById('recordId').value;
         let number = document.getElementById('transNumber').value.trim();
-        let date = document.getElementById('transDate').value;
+        let date = document.getElementById('transDate').value.trim();
         let subject = document.getElementById('transSubject').value.trim();
         let from = document.getElementById('transFrom').value.trim();
         let to = document.getElementById('transTo').value.trim();
         let unit = document.getElementById('transUnit').value;
         let status = document.getElementById('transStatus').value;
-        let dueDate = document.getElementById('transDueDate').value;
+        let dueDate = document.getElementById('transDueDate').value.trim();
 
         if (!number || !subject || !date || !dueDate) {
-            alert('الرجاء التأكد من تعبئة الحقول الأساسية.');
+            alert('الرجاء التأكد من تعبئة الحقول الأساسية وتواريخ بصيغة YYYY/MM/DD.');
             return;
         }
 
@@ -654,7 +540,7 @@
 
     async function deleteRecord(id) {
         if (!isAdmin) return;
-        if (confirm('هل أنت متأكد من حذف هذه المعاملة نهائياً من السحابة؟')) {
+        if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
             let r = cachedRecords.find(item => item.id == id);
             if (r && r.docId) {
                 try {
@@ -675,20 +561,18 @@
         document.getElementById('transTo').value = '';
         document.getElementById('transUnit').value = 'العموم';
         document.getElementById('transStatus').value = 'لم تنجز';
-        document.getElementById('transDate').value = getTodayHijriInputString();
-        document.getElementById('transDueDate').value = addDaysHijri(15);
+        document.getElementById('transDate').value = getTodayHijriString();
+        document.getElementById('transDueDate').value = "1447/05/01";
         document.getElementById('formTitleText').innerText = "➕ تسجيل معاملة جديدة";
         document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
     }
 
     function exportDelayedPDF() {
-        let today = new Date();
-        today.setHours(0,0,0,0);
-
+        let todayVal = hijriToTimestamp(getTodayHijriString());
         let delayed = cachedRecords.filter(r => {
-            let dueD = new Date(r.dueDate);
-            let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
-            return diffDays < 0 && r.status === 'لم تنجز';
+            let dueVal = hijriToTimestamp(r.dueDate);
+            let diff = dueVal - todayVal;
+            return diff < 0 && r.status === 'لم تنجز';
         });
 
         if (delayed.length === 0) {
@@ -699,9 +583,8 @@
         let printArea = document.getElementById('printArea');
         let printHTML = `<div style="direction: rtl; font-family: Tahoma; padding: 20px;"><h2>تقرير المعاملات المتأخرة</h2><hr>`;
         delayed.forEach((r, index) => {
-            let dueD = new Date(r.dueDate);
-            let diffDays = Math.abs(Math.ceil((dueD - today) / (1000 * 60 * 60 * 24)));
-            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b><br>الموضوع: ${r.subject}<br>تاريخ الاستحقاق الهجري: ${formatHijriDisplay(r.dueDate)}<br>متأخرة بـ ${diffDays} يوم</p><hr>`;
+            let diff = Math.round(Math.abs(hijriToTimestamp(r.dueDate) - todayVal));
+            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b><br>الموضوع: ${r.subject}<br>تاريخ الاستحقاق الهجري: ${r.dueDate}<br>متأخرة بـ تقريباً ${diff} يوم</p><hr>`;
         });
         printHTML += `</div>`;
         printArea.innerHTML = printHTML;
@@ -712,8 +595,7 @@
     function renderRecords() {
         let tbody = document.getElementById('tableBody');
         let query = document.getElementById('searchQuery').value.toLowerCase();
-        let today = new Date();
-        today.setHours(0,0,0,0);
+        let todayVal = hijriToTimestamp(getTodayHijriString());
 
         tbody.innerHTML = '';
 
@@ -722,9 +604,9 @@
         let delayedCount = 0;
 
         cachedRecords.forEach(r => {
-            let dueD = new Date(r.dueDate);
-            let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
-            if (diffDays < 0 && r.status === 'لم تنجز') delayedCount++;
+            let dueVal = hijriToTimestamp(r.dueDate);
+            let diff = dueVal - todayVal;
+            if (diff < 0 && r.status === 'لم تنجز') delayedCount++;
             else if (r.status === 'أنجزت') completedCount++;
             else inProgressCount++;
         });
@@ -734,9 +616,9 @@
         document.getElementById('countCompleted').innerText = completedCount;
 
         let filtered = cachedRecords.filter(r => {
-            let dueD = new Date(r.dueDate);
-            let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
-            let isDelayed = diffDays < 0 && r.status === 'لم تنجز';
+            let dueVal = hijriToTimestamp(r.dueDate);
+            let diff = dueVal - todayVal;
+            let isDelayed = diff < 0 && r.status === 'لم تنجز';
             let isCompleted = r.status === 'أنجزت';
             let isInProgress = !isDelayed && !isCompleted;
 
@@ -760,7 +642,7 @@
             (r.to && r.to.toLowerCase().includes(query))
         );
 
-        filtered.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+        filtered.sort((a, b) => hijriToTimestamp(a.dueDate) - hijriToTimestamp(b.dueDate));
 
         if (filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}" style="text-align:center; padding: 20px; color: var(--text-muted);">لا توجد بيانات مطابقة</td></tr>`;
@@ -768,8 +650,8 @@
         }
 
         filtered.forEach(r => {
-            let dueD = new Date(r.dueDate);
-            let diffDays = Math.ceil((dueD - today) / (1000 * 60 * 60 * 24));
+            let dueVal = hijriToTimestamp(r.dueDate);
+            let diff = Math.round(dueVal - todayVal);
 
             let rowClass = '';
             let statusBadge = '';
@@ -777,13 +659,13 @@
             if (r.status === 'أنجزت') {
                 rowClass = 'row-completed';
                 statusBadge = `<span class="status-badge badge-green">منجزة</span>`;
-            } else if (diffDays < 0) {
+            } else if (diff < 0) {
                 rowClass = 'row-delayed';
-                statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diffDays)} يوم)</span>`;
-            } else if (diffDays <= 5) {
-                statusBadge = `<span class="status-badge badge-orange">متبقي ${diffDays} يوم</span>`;
+                statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diff)} يوم)</span>`;
+            } else if (diff <= 5) {
+                statusBadge = `<span class="status-badge badge-orange">متبقي ${diff} يوم</span>`;
             } else {
-                statusBadge = `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
+                statusBadge = `<span class="status-badge badge-green">متبقي ${diff} يوم</span>`;
             }
 
             let tr = document.createElement('tr');
@@ -792,7 +674,7 @@
                 <td style="font-weight: 700;">${r.number}</td>
                 <td>${r.subject}</td>
                 <td>${r.to || '---'}</td>
-                <td style="direction: ltr; text-align: right;">${formatHijriDisplay(r.dueDate)}</td>
+                <td style="direction: ltr; text-align: right;">${r.dueDate} هـ</td>
                 <td>${statusBadge}</td>
                 <td class="restricted-admin" style="display: ${isAdmin ? 'table-cell' : 'none'}; text-align: center;">
                     <div class="action-btns">
