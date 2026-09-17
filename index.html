@@ -336,13 +336,12 @@
                     <th>رقم المعاملة</th>
                     <th>موضوع المعاملة</th>
                     <th>حولت لـ</th>
-                    <th>تاريخ الاستحقاق (هجري)</th>
                     <th>الحالة</th>
                     <th class="restricted-admin" style="width: 90px; text-align: center;">الإجراءات</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="6" style="text-align:center; padding: 20px;">جارِ الاتصال...</td></tr>
+                <tr><td colspan="5" style="text-align:center; padding: 20px;">جارِ الاتصال...</td></tr>
             </tbody>
         </table>
     </div>
@@ -356,7 +355,6 @@
     let activeMetricFilter = null;
     let cachedRecords = []; 
 
-    // جلب التاريخ الهجري الحالي بصيغة YYYY-MM-DD دقيقة
     function getTodayHijriString() {
         try {
             let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
@@ -374,7 +372,6 @@
         }
     }
 
-    // تحويل أي تاريخ هجري (مثل 1448-07-01) إلى كائن تاريخ ميلادي حقيقي للمقارنة وحساب الأيام بدقة
     function parseHijriToDate(hijriStr) {
         if (!hijriStr) return new Date();
         let parts = hijriStr.split(/[-/]/);
@@ -383,21 +380,11 @@
         let hm = parseInt(parts[1], 10);
         let hd = parseInt(parts[2], 10);
 
-        // تقريب تحويلي دقيق من الهجري للميلادي (السنة الهجرية تقابل تقريباً 354.36 يوم)
-        // وبداية تقريبية للحقبة الهجرية مقابل الميلادية
         let estimatedGregorianYear = Math.round(hy * 0.9702 + 621.56);
         let d = new Date(estimatedGregorianYear, hm - 1, hd);
-        
-        // تعديل دقيق لتوافق تقويم أم القرى
-        let testFormatter;
-        try {
-            testFormatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { year: 'numeric', month: 'numeric', day: 'numeric' });
-        } catch(err) {}
-
         return d;
     }
 
-    // تعيين القيم الافتراضية
     document.getElementById('transDate').value = getTodayHijriString();
     document.getElementById('transDueDate').value = "1448-07-01";
 
@@ -416,7 +403,7 @@
             }
         } else {
             isAdmin = false;
-            document.getElementById('authToggleBtn').innerText = "🔒 تسجيل الدخول";
+            document.getElementById('authToggleBtn').innerText = " الدخول";
             document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'none');
             resetForm();
             renderRecords();
@@ -478,7 +465,7 @@
             renderRecords();
         } catch (error) {
             console.error("خطأ في جلب البيانات:", error);
-            document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" style="text-align:center; color:red; padding:20px;">تعذر الاتصال بقاعدة البيانات.</td></tr>`;
+            document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" style="text-align:center; color:red; padding:20px;">تعذر الاتصال بقاعدة البيانات.</td></tr>`;
         }
     }
 
@@ -664,7 +651,7 @@
         filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}" style="text-align:center; padding: 20px; color: var(--text-muted);">لا توجد بيانات مطابقة</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${isAdmin ? 5 : 4}" style="text-align:center; padding: 20px; color: var(--text-muted);">لا توجد بيانات مطابقة</td></tr>`;
             return;
         }
 
@@ -694,7 +681,6 @@
                 <td style="font-weight: 700;">${r.number}</td>
                 <td>${r.subject}</td>
                 <td>${r.to || '---'}</td>
-                <td style="direction: ltr; text-align: right;">${r.dueDate} هـ</td>
                 <td>${statusBadge}</td>
                 <td class="restricted-admin" style="display: ${isAdmin ? 'table-cell' : 'none'}; text-align: center;">
                     <div class="action-btns">
