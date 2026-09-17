@@ -207,12 +207,12 @@
             white-space: nowrap;
         }
 
-        /* الجدول الكلاسيكي الاحترافي بدون شريط تمرير وباحتواء تام للشاشة */
+        /* الشكل الكلاسيكي الأصلي للجدول مع إتاحة التمرير الأفقي الطبيعي عند الحاجة */
         .table-responsive {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            overflow: hidden; /* منع التمرير نهائياً واحتواء العناصر بداخله */
+            overflow-x: auto;
             margin-bottom: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
@@ -221,36 +221,23 @@
             width: 100%;
             border-collapse: collapse;
             text-align: right;
-            font-size: 12.5px;
-            table-layout: fixed; /* يفرض توزيع الأعمدة بنسب ثابتة ومدروسة لتناسب عرض الشاشة تماماً */
+            font-size: 13px;
         }
 
         th {
             background: #f1f5f9;
             color: var(--sidebar-bg);
             font-weight: 700;
-            padding: 10px 12px;
+            padding: 12px 14px;
             border-bottom: 2px solid var(--border);
-            overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         td {
-            padding: 10px 12px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border);
             color: var(--text-main);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
-
-        /* تحديد نسب عرض الأعمدة بعد إزالة التاريخ لملء الشاشة بانسجام تام بدون تمرير */
-        th:nth-child(1), td:nth-child(1) { width: 18%; } /* رقم المعاملة */
-        th:nth-child(2), td:nth-child(2) { width: 34%; } /* موضوع المعاملة (يعطى المساحة الأكبر) */
-        th:nth-child(3), td:nth-child(3) { width: 17%; } /* حولت لـ */
-        th:nth-child(4), td:nth-child(4) { width: 16%; } /* الحالة / المتبقي */
-        th.restricted-admin, td.restricted-admin { width: 15%; text-align: center; } /* الإجراءات */
 
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #f8fafc; }
@@ -258,13 +245,13 @@
         .row-delayed td { background: #fef2f2 !important; }
         .row-completed td { opacity: 0.8; background: #f8fafc; }
 
-        .status-badge { padding: 3px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 700; display: inline-block; }
         .badge-green { background: #dcfce7; color: #166534; }
         .badge-red { background: #fee2e2; color: #991b1b; }
         .badge-orange { background: #ffedd5; color: #9a3412; }
 
-        .table-actions { display: flex; gap: 4px; justify-content: center; }
-        .btn-mini { padding: 3px 7px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
+        .table-actions { display: flex; gap: 6px; }
+        .btn-mini { padding: 4px 8px; font-size: 11.5px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
         .btn-mini-edit { background: #fef3c7; color: #b45309; }
         .btn-mini-del { background: #fee2e2; color: #b91c1c; }
 
@@ -340,7 +327,6 @@
             </div>
         </div>
 
-        <!-- حقل التاريخ مخفي برمجياً للحفاظ على التوافقية عند الحفظ -->
         <input type="hidden" id="transDate" value="1447-04-01">
 
         <div class="actions-group">
@@ -355,7 +341,7 @@
         <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
     </div>
 
-    <!-- جدول المعاملات الكلاسيكي الاحترافي بدون عمود التاريخ تماماً وبدون شريط تمرير أفقي -->
+    <!-- جدول المعاملات بالشكل الكلاسيكي الأصلي -->
     <div class="table-responsive no-print-zone">
         <table>
             <thead>
@@ -364,7 +350,7 @@
                     <th>موضوع المعاملة</th>
                     <th>حولت لـ</th>
                     <th>الحالة / المتبقي</th>
-                    <th class="restricted-admin" style="text-align: center;">الإجراءات</th>
+                    <th class="restricted-admin">الإجراءات</th>
                 </tr>
             </thead>
             <tbody id="recordsTableBody">
@@ -698,11 +684,11 @@
             let tr = document.createElement('tr');
             tr.className = rowClass;
             tr.innerHTML = `
-                <td style="font-weight: 700;" title="${r.number}">${r.number}</td>
-                <td title="${r.subject}">${r.subject}</td>
-                <td title="${r.to || '---'}">${r.to || '---'}</td>
+                <td style="font-weight: 700;">${r.number}</td>
+                <td>${r.subject}</td>
+                <td>${r.to || '---'}</td>
                 <td>${statusBadge}</td>
-                <td class="restricted-admin" style="display: ${isAdmin ? 'table-cell' : 'none'}; text-align: center;">
+                <td class="restricted-admin" style="display: ${isAdmin ? 'table-cell' : 'none'};">
                     <div class="table-actions">
                         <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
                         <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
