@@ -80,18 +80,24 @@
 
         .brand-title { margin: 0; font-size: 19px; font-weight: 800; background: linear-gradient(to left, #60a5fa, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .auth-trigger {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            padding: 6px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
+        /* زر دخول مخفي بذكاء (يبدو كأنه جزء من الشاشة أو نقطة خفية في الزاوية) */
+        .hidden-auth-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px dashed transparent;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
             cursor: pointer;
+            opacity: 0.15; /* شبه شفافة جداً لا تلفت الانتباه */
             transition: all 0.3s ease;
         }
-        .auth-trigger:hover { background: rgba(59, 130, 246, 0.3); transform: scale(1.05); }
+        .hidden-auth-btn:hover {
+            opacity: 1; /* تظهر فقط إذا مرر الماوس فوقها بالخطأ أو قصدتها أنت */
+            border-color: var(--border);
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+        }
 
         .progress-container {
             background: var(--sidebar-bg);
@@ -260,7 +266,7 @@
             box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.4);
         }
 
-        /* تأثير إطار متحرك متتابع (نبض أحمر للحواف) */
+        /* تأثير إطار متحرك متتابع (نبض أحمر للحواف) للمعاملات المتأخرة */
         @keyframes pulseBorder {
             0% {
                 border-color: rgba(239, 68, 68, 0.4);
@@ -337,7 +343,8 @@
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
         <h1 class="brand-title">متابعة المعاملات</h1>
-        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">دخول</button>
+        <!-- الزر موجود ولكن تم جعله شفافاً وخافتاً جداً في الزاوية، لا يلتفت له الموظفون ولكنه بانتظارك -->
+        <button class="hidden-auth-btn" id="authToggleBtn" onclick="toggleAuth()" title="إدارة النظام">⚙️</button>
     </div>
 
     <div class="progress-container no-print-zone">
@@ -492,7 +499,8 @@
             if (pass !== null) {
                 if (pass.trim() === "Dd1616") {
                     isAdmin = true;
-                    document.getElementById('authToggleBtn').innerText = "خروج";
+                    document.getElementById('authToggleBtn').innerText = "خروج (مسؤول)";
+                    document.getElementById('authToggleBtn').style.opacity = "1";
                     document.querySelectorAll('.restricted-admin').forEach(el => {
                         el.style.display = el.tagName === 'DIV' && el.id === 'adminFormCard' ? 'block' : 'flex';
                     });
@@ -503,7 +511,8 @@
             }
         } else {
             isAdmin = false;
-            document.getElementById('authToggleBtn').innerText = "دخول";
+            document.getElementById('authToggleBtn').innerText = "⚙️";
+            document.getElementById('authToggleBtn').style.opacity = "0.15";
             document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'none');
             resetForm();
             renderRecords();
@@ -779,7 +788,7 @@
                 <div class="card-header">
                     <div class="trans-number-date-group">
                         <span class="trans-number"># ${r.number}</span>
-                        <span class="trans-date">📅 ${r.date || 'غير محدد'}</span>
+                        <span class="trans-date">📅 ${r.date || 'غير محددة'}</span>
                     </div>
                     ${statusBadge}
                 </div>
