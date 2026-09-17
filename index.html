@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة ومتابعة المعاملات</title>
+    <title> متابعة المعاملات  </title>
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -323,22 +323,22 @@
 
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
-        <h1 class="brand-title">نظام إدارة ومتابعة المعاملات (سحابي)</h1>
+        <h1 class="brand-title">  متابعة المعاملات ()</h1>
         <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
     </div>
 
     <!-- المؤشرات التفاعلية -->
     <div class="metrics-grid no-print-zone">
         <div class="metric-card in-progress" id="cardInProgress" onclick="filterByMetric('in-progress')">
-            <div class="label">تحت الإجراء 📊</div>
+            <div class="label">تحت الإجراء </div>
             <div class="val" id="countInProgress">0</div>
         </div>
         <div class="metric-card delayed" id="cardDelayed" onclick="filterByMetric('delayed')">
-            <div class="label">متأخرة ⚠️</div>
+            <div class="label">متأخرة </div>
             <div class="val" id="countDelayed">0</div>
         </div>
         <div class="metric-card completed" id="cardCompleted" onclick="filterByMetric('completed')">
-            <div class="label">المنجزة ✅</div>
+            <div class="label">المنجزة </div>
             <div class="val" id="countCompleted">0</div>
         </div>
     </div>
@@ -454,7 +454,7 @@
             let pass = prompt("الرجاء إدخال كلمة المرور:");
             if (pass === "Dd1616") {
                 isAdmin = true;
-                document.getElementById('authToggleBtn').innerText = "🔓 خروج الأدمن";
+                document.getElementById('authToggleBtn').innerText = " خروج الأدمن";
                 document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = el.tagName === 'TH' || el.tagName === 'TD' ? 'table-cell' : 'block');
                 renderRecords();
             } else if (pass !== null) {
@@ -462,7 +462,7 @@
             }
         } else {
             isAdmin = false;
-            document.getElementById('authToggleBtn').innerText = "🔒 تسجيل الدخول";
+            document.getElementById('authToggleBtn').innerText = "  الدخول";
             document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'none');
             resetForm();
             renderRecords();
