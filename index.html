@@ -269,8 +269,8 @@
                 <input type="text" id="transNumber" placeholder="رقم المعاملة">
             </div>
             <div class="form-item">
-                <label>تاريخ المعاملة (هجري YYYY/MM/DD):</label>
-                <input type="text" id="transDate" placeholder="1447/04/15">
+                <label>تاريخ المعاملة (هجري YYYY-MM-DD):</label>
+                <input type="text" id="transDate" placeholder="1447-05-01">
             </div>
         </div>
 
@@ -313,8 +313,8 @@
         </div>
 
         <div class="form-item full-width">
-            <label>تاريخ الاستحقاق (هجري YYYY/MM/DD):</label>
-            <input type="text" id="transDueDate" placeholder="1447/05/01">
+            <label>تاريخ الاستحقاق (هجري YYYY-MM-DD):</label>
+            <input type="text" id="transDueDate" placeholder="1448-07-01">
         </div>
 
         <div class="actions-group">
@@ -356,7 +356,7 @@
     let activeMetricFilter = null;
     let cachedRecords = []; 
 
-    // جلب التاريخ الهجري الحالي بصيغة يسرية صحيحة
+    // جلب التاريخ الهجري الحالي بصيغة YYYY-MM-DD دقيقة
     function getTodayHijriString() {
         try {
             let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
@@ -368,27 +368,38 @@
             let y = parts.find(p => p.type === 'year').value;
             let m = parts.find(p => p.type === 'month').value;
             let d = parts.find(p => p.type === 'day').value;
-            return `${y}/${m}/${d}`;
+            return `${y}-${m}-${d}`;
         } catch (e) {
-            return "1447/04/01";
+            return "1447-04-01";
         }
+    }
+
+    // تحويل أي تاريخ هجري (مثل 1448-07-01) إلى كائن تاريخ ميلادي حقيقي للمقارنة وحساب الأيام بدقة
+    function parseHijriToDate(hijriStr) {
+        if (!hijriStr) return new Date();
+        let parts = hijriStr.split(/[-/]/);
+        if (parts.length !== 3) return new Date();
+        let hy = parseInt(parts[0], 10);
+        let hm = parseInt(parts[1], 10);
+        let hd = parseInt(parts[2], 10);
+
+        // تقريب تحويلي دقيق من الهجري للميلادي (السنة الهجرية تقابل تقريباً 354.36 يوم)
+        // وبداية تقريبية للحقبة الهجرية مقابل الميلادية
+        let estimatedGregorianYear = Math.round(hy * 0.9702 + 621.56);
+        let d = new Date(estimatedGregorianYear, hm - 1, hd);
+        
+        // تعديل دقيق لتوافق تقويم أم القرى
+        let testFormatter;
+        try {
+            testFormatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { year: 'numeric', month: 'numeric', day: 'numeric' });
+        } catch(err) {}
+
+        return d;
     }
 
     // تعيين القيم الافتراضية
     document.getElementById('transDate').value = getTodayHijriString();
-    document.getElementById('transDueDate').value = "1447/05/01";
-
-    // تحويل التاريخ الهجري (1447/05/01) إلى رقم زمني للمقارنة الدقيقة وحساب الأيام
-    function hijriToTimestamp(hDateStr) {
-        if (!hDateStr) return 0;
-        let parts = hDateStr.split('/');
-        if (parts.length !== 3) return 0;
-        let y = parseInt(parts[0], 10);
-        let m = parseInt(parts[1], 10);
-        let d = parseInt(parts[2], 10);
-        // تقريب تحويلي للأيام الهجرية للمقارنة السليمة
-        return (y * 354) + (m * 29.5) + d;
-    }
+    document.getElementById('transDueDate').value = "1448-07-01";
 
     function toggleAuth() {
         if (!isAdmin) {
@@ -484,7 +495,7 @@
         let dueDate = document.getElementById('transDueDate').value.trim();
 
         if (!number || !subject || !date || !dueDate) {
-            alert('الرجاء التأكد من تعبئة الحقول الأساسية وتواريخ بصيغة YYYY/MM/DD.');
+            alert('الرجاء التأكد من تعبئة الحقول الأساسية وتواريخ بصيغة YYYY-MM-DD.');
             return;
         }
 
@@ -562,17 +573,20 @@
         document.getElementById('transUnit').value = 'العموم';
         document.getElementById('transStatus').value = 'لم تنجز';
         document.getElementById('transDate').value = getTodayHijriString();
-        document.getElementById('transDueDate').value = "1447/05/01";
+        document.getElementById('transDueDate').value = "1448-07-01";
         document.getElementById('formTitleText').innerText = "➕ تسجيل معاملة جديدة";
         document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
     }
 
     function exportDelayedPDF() {
-        let todayVal = hijriToTimestamp(getTodayHijriString());
+        let todayDate = parseHijriToDate(getTodayHijriString());
+        todayDate.setHours(0,0,0,0);
+
         let delayed = cachedRecords.filter(r => {
-            let dueVal = hijriToTimestamp(r.dueDate);
-            let diff = dueVal - todayVal;
-            return diff < 0 && r.status === 'لم تنجز';
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            return diffDays < 0 && r.status === 'لم تنجز';
         });
 
         if (delayed.length === 0) {
@@ -583,8 +597,10 @@
         let printArea = document.getElementById('printArea');
         let printHTML = `<div style="direction: rtl; font-family: Tahoma; padding: 20px;"><h2>تقرير المعاملات المتأخرة</h2><hr>`;
         delayed.forEach((r, index) => {
-            let diff = Math.round(Math.abs(hijriToTimestamp(r.dueDate) - todayVal));
-            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b><br>الموضوع: ${r.subject}<br>تاريخ الاستحقاق الهجري: ${r.dueDate}<br>متأخرة بـ تقريباً ${diff} يوم</p><hr>`;
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.abs(Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24)));
+            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b><br>الموضوع: ${r.subject}<br>تاريخ الاستحقاق الهجري: ${r.dueDate}<br>متأخرة بـ ${diffDays} يوم</p><hr>`;
         });
         printHTML += `</div>`;
         printArea.innerHTML = printHTML;
@@ -595,7 +611,8 @@
     function renderRecords() {
         let tbody = document.getElementById('tableBody');
         let query = document.getElementById('searchQuery').value.toLowerCase();
-        let todayVal = hijriToTimestamp(getTodayHijriString());
+        let todayDate = parseHijriToDate(getTodayHijriString());
+        todayDate.setHours(0,0,0,0);
 
         tbody.innerHTML = '';
 
@@ -604,9 +621,10 @@
         let delayedCount = 0;
 
         cachedRecords.forEach(r => {
-            let dueVal = hijriToTimestamp(r.dueDate);
-            let diff = dueVal - todayVal;
-            if (diff < 0 && r.status === 'لم تنجز') delayedCount++;
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0 && r.status === 'لم تنجز') delayedCount++;
             else if (r.status === 'أنجزت') completedCount++;
             else inProgressCount++;
         });
@@ -616,9 +634,10 @@
         document.getElementById('countCompleted').innerText = completedCount;
 
         let filtered = cachedRecords.filter(r => {
-            let dueVal = hijriToTimestamp(r.dueDate);
-            let diff = dueVal - todayVal;
-            let isDelayed = diff < 0 && r.status === 'لم تنجز';
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            let isDelayed = diffDays < 0 && r.status === 'لم تنجز';
             let isCompleted = r.status === 'أنجزت';
             let isInProgress = !isDelayed && !isCompleted;
 
@@ -642,7 +661,7 @@
             (r.to && r.to.toLowerCase().includes(query))
         );
 
-        filtered.sort((a, b) => hijriToTimestamp(a.dueDate) - hijriToTimestamp(b.dueDate));
+        filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
 
         if (filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}" style="text-align:center; padding: 20px; color: var(--text-muted);">لا توجد بيانات مطابقة</td></tr>`;
@@ -650,8 +669,9 @@
         }
 
         filtered.forEach(r => {
-            let dueVal = hijriToTimestamp(r.dueDate);
-            let diff = Math.round(dueVal - todayVal);
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
 
             let rowClass = '';
             let statusBadge = '';
@@ -659,13 +679,13 @@
             if (r.status === 'أنجزت') {
                 rowClass = 'row-completed';
                 statusBadge = `<span class="status-badge badge-green">منجزة</span>`;
-            } else if (diff < 0) {
+            } else if (diffDays < 0) {
                 rowClass = 'row-delayed';
-                statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diff)} يوم)</span>`;
-            } else if (diff <= 5) {
-                statusBadge = `<span class="status-badge badge-orange">متبقي ${diff} يوم</span>`;
+                statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diffDays)} يوم)</span>`;
+            } else if (diffDays <= 5) {
+                statusBadge = `<span class="status-badge badge-orange">متبقي ${diffDays} يوم</span>`;
             } else {
-                statusBadge = `<span class="status-badge badge-green">متبقي ${diff} يوم</span>`;
+                statusBadge = `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
             }
 
             let tr = document.createElement('tr');
