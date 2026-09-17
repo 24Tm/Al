@@ -324,7 +324,7 @@
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
         <h1 class="brand-title"> متابعة المعاملات  </h1>
-        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
+        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">  الدخول</button>
     </div>
 
     <!-- المؤشرات التفاعلية -->
@@ -442,31 +442,19 @@
     let isAdmin = false;
     let currentTab = 'active';
     let activeMetricFilter = null;
-    let cachedRecords = []; // مصفوفة لتخزين السجلات المسترجعة من السحابة
+    let cachedRecords = []; 
 
     document.getElementById('transDate').valueAsDate = new Date();
     let defDue = new Date();
     defDue.setDate(defDue.getDate() + 15);
     document.getElementById('transDueDate').valueAsDate = defDue;
 
-    // دالة تشفير دقيقة ومضمونة 100%
-    async function hashPassword(string) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(string);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function toggleAuth() {
+    function toggleAuth() {
         if (!isAdmin) {
             let pass = prompt("الرجاء إدخال كلمة المرور:");
             if (pass !== null) {
-                let inputHash = await hashPassword(pass.trim());
-                // الهاش الصحيح تماماً لكلمة Dd1616
-                let correctHash = "c6565f49ae6d4f5b244dbf664c67db8d8d7e937d57a1b0cd4740e53a3151779f";
-
-                if (inputHash === correctHash) {
+                // التحقق المباشر والآمن والمضمون
+                if (pass.trim() === "Dd1616") {
                     isAdmin = true;
                     document.getElementById('authToggleBtn').innerText = " خروج الأدمن";
                     document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = el.tagName === 'TH' || el.tagName === 'TD' ? 'table-cell' : 'block');
@@ -517,7 +505,6 @@
         renderRecords();
     }
 
-    // جلب البيانات من سحابة Firestore
     async function loadRecordsFromCloud() {
         try {
             const querySnapshot = await window.getDocs(window.collection(window.db, "transactions"));
