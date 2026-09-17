@@ -116,6 +116,57 @@
         .metric-card.delayed .val { color: var(--danger); }
         .metric-card.completed .val { color: var(--success); }
 
+        /* لوحة التنبيهات الفورية السريعة */
+        .quick-alerts-panel {
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .quick-alerts-panel h4 {
+            margin: 0 0 10px 0;
+            color: #991b1b;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .alerts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        .alert-item {
+            background: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #fca5a5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+        .alert-item-info {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .btn-quick-done {
+            background: #059669;
+            color: #fff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-quick-done:hover { background: #047857; }
+
         .nav-pills { display: flex; gap: 8px; margin-bottom: 20px; }
 
         .pill-btn {
@@ -236,7 +287,7 @@
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
         <h1 class="brand-title"> متابعة المعاملات </h1>
-        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
+        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()"> الدخول</button>
     </div>
 
     <div class="metrics-grid no-print-zone">
@@ -252,6 +303,12 @@
             <div class="label">المنجزة </div>
             <div class="val" id="countCompleted">0</div>
         </div>
+    </div>
+
+    <!-- لوحة التنبيهات الفورية السريعة للمعاملات المتأخرة -->
+    <div class="quick-alerts-panel no-print-zone" id="quickAlertsContainer" style="display: none;">
+        <h4>⚠️ تنبيهات عاجلة: معاملات متأخرة تتطلب الإجراء</h4>
+        <div class="alerts-list" id="quickAlertsList"></div>
     </div>
 
     <div class="nav-pills no-print-zone">
@@ -403,7 +460,7 @@
             }
         } else {
             isAdmin = false;
-            document.getElementById('authToggleBtn').innerText = " الدخول";
+            document.getElementById('authToggleBtn').innerText = "🔒 تسجيل الدخول";
             document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'none');
             resetForm();
             renderRecords();
@@ -516,6 +573,24 @@
         }
     }
 
+    // دالة سريعة لإنجاز المعاملة بضغطة زر مباشرة من لوحة التنبيهات
+    async function quickCompleteRecord(id) {
+        if (!isAdmin) {
+            alert("عذراً، يجب تسجيل دخول الأدمن أولاً لإنجاز المعاملات.");
+            return;
+        }
+        let r = cachedRecords.find(item => item.id == id);
+        if (!r || !r.docId) return;
+
+        try {
+            r.status = "أنجزت";
+            await window.updateDoc(window.doc(window.db, "transactions", r.docId), { status: "أنجزت" });
+            loadRecordsFromCloud();
+        } catch (error) {
+            alert("تعذر تحديث الحالة: " + error.message);
+        }
+    }
+
     function editRecord(id) {
         if (!isAdmin) return;
         let r = cachedRecords.find(item => item.id == id);
@@ -606,19 +681,48 @@
         let inProgressCount = 0;
         let completedCount = 0;
         let delayedCount = 0;
+        let delayedList = [];
 
         cachedRecords.forEach(r => {
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            if (diffDays < 0 && r.status === 'لم تنجز') delayedCount++;
-            else if (r.status === 'أنجزت') completedCount++;
-            else inProgressCount++;
+            if (diffDays < 0 && r.status === 'لم تنجز') {
+                delayedCount++;
+                delayedList.push({ ...r, diffDays: Math.abs(diffDays) });
+            } else if (r.status === 'أنجزت') {
+                completedCount++;
+            } else {
+                inProgressCount++;
+            }
         });
 
         document.getElementById('countInProgress').innerText = inProgressCount;
         document.getElementById('countDelayed').innerText = delayedCount;
         document.getElementById('countCompleted').innerText = completedCount;
+
+        // تحديث وعرض لوحة التنبيهات الفورية العاجلة
+        let alertsContainer = document.getElementById('quickAlertsContainer');
+        let alertsList = document.getElementById('quickAlertsList');
+        if (delayedList.length > 0 && currentTab === 'active') {
+            alertsContainer.style.display = 'block';
+            alertsList.innerHTML = '';
+            delayedList.forEach(item => {
+                let alertDiv = document.createElement('div');
+                alertDiv.className = 'alert-item';
+                alertDiv.innerHTML = `
+                    <div class="alert-item-info">
+                        <strong>رقم: ${item.number}</strong>
+                        <span>${item.subject}</span>
+                        <span style="color: #dc2626; font-weight: bold;">(متأخرة ${item.diffDays} يوم)</span>
+                    </div>
+                    <button class="btn-quick-done" onclick="quickCompleteRecord(${item.id})">✓ إنجاز فوراً</button>
+                `;
+                alertsList.appendChild(alertDiv);
+            });
+        } else {
+            alertsContainer.style.display = 'none';
+        }
 
         let filtered = cachedRecords.filter(r => {
             let dueD = parseHijriToDate(r.dueDate);
