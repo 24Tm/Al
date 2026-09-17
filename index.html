@@ -59,30 +59,30 @@
             background-color: var(--bg-body);
             color: var(--text-main);
             margin: 0;
-            padding: 25px;
+            padding: 20px;
             direction: rtl;
         }
 
-        .dashboard-container { max-width: 1300px; margin: 0 auto; }
+        .dashboard-container { max-width: 1200px; margin: 0 auto; }
 
         .top-navbar {
             background: var(--sidebar-bg);
             color: #ffffff;
-            padding: 16px 24px;
+            padding: 14px 20px;
             border-radius: var(--radius);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
-        .brand-title { margin: 0; font-size: 18px; font-weight: 700; }
+        .brand-title { margin: 0; font-size: 17px; font-weight: 700; }
 
         .auth-trigger {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 6px;
             font-size: 13px;
             cursor: pointer;
@@ -93,13 +93,13 @@
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .metric-card {
             background: var(--card-bg);
-            padding: 16px 20px;
+            padding: 14px 18px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
             display: flex;
@@ -114,18 +114,18 @@
         .metric-card.active-filter { border-color: var(--primary); background: #eff6ff; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
 
         .metric-card .label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-        .metric-card .val { font-size: 22px; font-weight: 800; }
+        .metric-card .val { font-size: 20px; font-weight: 800; }
         .metric-card.in-progress .val { color: var(--primary); }
         .metric-card.delayed .val { color: var(--danger); }
         .metric-card.completed .val { color: var(--success); }
 
-        .nav-pills { display: flex; gap: 8px; margin-bottom: 20px; }
+        .nav-pills { display: flex; gap: 8px; margin-bottom: 16px; }
 
         .pill-btn {
             flex: 1;
             background: #e2e8f0;
             border: none;
-            padding: 10px;
+            padding: 9px;
             border-radius: var(--radius);
             font-size: 13px;
             font-weight: 700;
@@ -139,31 +139,31 @@
 
         .panel-box {
             background: var(--card-bg);
-            padding: 24px;
+            padding: 20px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
         .panel-box h3 {
             margin-top: 0;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--sidebar-bg);
             border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-            margin-bottom: 16px;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
         }
 
-        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .form-item { margin-bottom: 14px; }
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-item { margin-bottom: 12px; }
         .form-item.full-width { grid-column: span 2; }
 
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 12px; color: var(--text-muted); }
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 12px; color: var(--text-muted); }
 
         input, select {
             width: 100%;
-            padding: 9px 12px;
+            padding: 8px 10px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 13px;
@@ -174,13 +174,13 @@
 
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
 
-        .actions-group { display: flex; gap: 10px; margin-top: 15px; }
+        .actions-group { display: flex; gap: 10px; margin-top: 12px; }
 
         .btn {
             background: var(--primary);
             color: #fff;
             border: none;
-            padding: 9px 18px;
+            padding: 8px 16px;
             border-radius: 6px;
             font-size: 13px;
             font-weight: 700;
@@ -192,13 +192,13 @@
         .btn-alt { background: #64748b; }
         .btn-pdf { background: #0284c7; }
 
-        .search-box-wrapper { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
-        .search-box-wrapper input { padding: 11px 16px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 14px; background: #fff; }
+        .search-box-wrapper { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; }
+        .search-box-wrapper input { padding: 10px 14px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; background: #fff; }
         
         .reset-filter-btn {
             background: #e2e8f0;
             border: none;
-            padding: 11px 16px;
+            padding: 10px 14px;
             border-radius: var(--radius);
             font-size: 13px;
             font-weight: 700;
@@ -207,13 +207,13 @@
             white-space: nowrap;
         }
 
-        /* الجدول الكلاسيكي الاحترافي */
+        /* الجدول الكلاسيكي الاحترافي بدون شريط تمرير وباحتواء تام للشاشة */
         .table-responsive {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            overflow-x: auto;
-            margin-bottom: 20px;
+            overflow: hidden; /* منع التمرير نهائياً واحتواء العناصر بداخله */
+            margin-bottom: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
@@ -221,23 +221,37 @@
             width: 100%;
             border-collapse: collapse;
             text-align: right;
-            font-size: 13px;
-            white-space: nowrap;
+            font-size: 12.5px;
+            table-layout: fixed; /* يفرض توزيع الأعمدة بنسب ثابتة ومدروسة لتناسب عرض الشاشة تماماً */
         }
 
         th {
             background: #f1f5f9;
             color: var(--sidebar-bg);
             font-weight: 700;
-            padding: 12px 14px;
+            padding: 10px 12px;
             border-bottom: 2px solid var(--border);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         td {
-            padding: 12px 14px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--border);
             color: var(--text-main);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
+
+        /* تحديد نسب عرض الأعمدة لملء الشاشة بانسجام تام بدون تكدس أو تمرير */
+        th:nth-child(1), td:nth-child(1) { width: 14%; } /* رقم المعاملة */
+        th:nth-child(2), td:nth-child(2) { width: 13%; } /* التاريخ */
+        th:nth-child(3), td:nth-child(3) { width: 28%; } /* موضوع المعاملة (يعطى المساحة الأكبر) */
+        th:nth-child(4), td:nth-child(4) { width: 14%; } /* حولت لـ */
+        th:nth-child(5), td:nth-child(5) { width: 16%; } /* الحالة / المتبقي */
+        th.restricted-admin, td.restricted-admin { width: 15%; text-align: center; } /* الإجراءات */
 
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #f8fafc; }
@@ -245,13 +259,13 @@
         .row-delayed td { background: #fef2f2 !important; }
         .row-completed td { opacity: 0.8; background: #f8fafc; }
 
-        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .status-badge { padding: 3px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; display: inline-block; }
         .badge-green { background: #dcfce7; color: #166534; }
         .badge-red { background: #fee2e2; color: #991b1b; }
         .badge-orange { background: #ffedd5; color: #9a3412; }
 
-        .table-actions { display: flex; gap: 6px; }
-        .btn-mini { padding: 4px 8px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
+        .table-actions { display: flex; gap: 4px; justify-content: center; }
+        .btn-mini { padding: 3px 7px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
         .btn-mini-edit { background: #fef3c7; color: #b45309; }
         .btn-mini-del { background: #fee2e2; color: #b91c1c; }
 
@@ -270,7 +284,6 @@
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
         <h1 class="brand-title">متابعة المعاملات</h1>
-        <!-- تم تعديل زر الدخول ليكون "الدخول" فقط بدون أي أقفال أو رموز -->
         <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">الدخول</button>
     </div>
 
@@ -315,28 +328,10 @@
         </div>
 
         <div class="form-grid-2">
-            <div class="form-item">
-                <label>صادرة من:</label>
-                <input type="text" id="transFrom" placeholder="الجهة المصدرة">
-            </div>
-            <div class="form-item">
+            <!-- تم إزالة حقلي "صادرة من" و "الوحدة" بناءً على طلبك -->
+            <div class="form-item full-width">
                 <label>حولت لـ:</label>
                 <input type="text" id="transTo" placeholder="الجهة المحولة لها">
-            </div>
-        </div>
-
-        <div class="form-grid-2">
-            <div class="form-item">
-                <label>الوحدة:</label>
-                <select id="transUnit">
-                    <option value="العموم">العموم</option>
-                    <option value="الادارية">الادارية</option>
-                    <option value="العمليات">العمليات</option>
-                    <option value="التموين">التموين</option>
-                    <option value="الاولى">الاولى</option>
-                    <option value="الثانية">الثانية</option>
-                    <option value="الاسناد">الاسناد</option>
-                </select>
             </div>
             <div class="form-item">
                 <label>الحالة:</label>
@@ -360,11 +355,11 @@
     </div>
 
     <div class="search-box-wrapper no-print-zone">
-        <input type="text" id="searchQuery" placeholder="🔍 بحث سريع في السجلات (برقم المعاملة، الموضوع، الجهة...)" oninput="renderRecords()">
+        <input type="text" id="searchQuery" placeholder="🔍 بحث سريع في السجلات (برقم المعاملة، الموضوع، الجهة المحولة...)" oninput="renderRecords()">
         <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
     </div>
 
-    <!-- جدول المعاملات الكلاسيكي الاحترافي -->
+    <!-- جدول المعاملات الكلاسيكي الاحترافي المتناسق تماماً بدون تمرير أفقي -->
     <div class="table-responsive no-print-zone">
         <table>
             <thead>
@@ -372,9 +367,7 @@
                     <th>رقم المعاملة</th>
                     <th>التاريخ</th>
                     <th>موضوع المعاملة</th>
-                    <th>صادرة من</th>
                     <th>حولت لـ</th>
-                    <th>الوحدة</th>
                     <th>الحالة / المتبقي</th>
                     <th class="restricted-admin" style="text-align: center;">الإجراءات</th>
                 </tr>
@@ -434,10 +427,7 @@
                 if (pass.trim() === "Dd1616") {
                     isAdmin = true;
                     document.getElementById('authToggleBtn').innerText = "خروج الأدمن";
-                    document.querySelectorAll('.restricted-admin').forEach(el => el.style.display = 'table-cell' || 'block');
-                    // معالجة خاصة لعنوان عمود الإجراءات في الجدول
-                    let adminCols = document.querySelectorAll('.restricted-admin');
-                    adminCols.forEach(el => {
+                    document.querySelectorAll('.restricted-admin').forEach(el => {
                         if(el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
                         else el.style.display = 'block';
                     });
@@ -500,9 +490,7 @@
                     number: data.number,
                     date: data.date,
                     subject: data.subject,
-                    from: data.from,
                     to: data.to,
-                    unit: data.unit,
                     status: data.status,
                     dueDate: data.dueDate
                 });
@@ -519,9 +507,7 @@
         let number = document.getElementById('transNumber').value.trim();
         let date = document.getElementById('transDate').value.trim();
         let subject = document.getElementById('transSubject').value.trim();
-        let from = document.getElementById('transFrom').value.trim();
         let to = document.getElementById('transTo').value.trim();
-        let unit = document.getElementById('transUnit').value;
         let status = document.getElementById('transStatus').value;
         let dueDate = document.getElementById('transDueDate').value.trim();
 
@@ -535,9 +521,7 @@
             number,
             date,
             subject,
-            from,
             to,
-            unit,
             status,
             dueDate
         };
@@ -569,9 +553,7 @@
         document.getElementById('transNumber').value = r.number;
         document.getElementById('transDate').value = r.date;
         document.getElementById('transSubject').value = r.subject;
-        document.getElementById('transFrom').value = r.from || '';
         document.getElementById('transTo').value = r.to || '';
-        document.getElementById('transUnit').value = r.unit || 'العموم';
         document.getElementById('transStatus').value = r.status;
         document.getElementById('transDueDate').value = r.dueDate;
         
@@ -599,9 +581,7 @@
         document.getElementById('recordId').value = '';
         document.getElementById('transNumber').value = '';
         document.getElementById('transSubject').value = '';
-        document.getElementById('transFrom').value = '';
         document.getElementById('transTo').value = '';
-        document.getElementById('transUnit').value = 'العموم';
         document.getElementById('transStatus').value = 'لم تنجز';
         document.getElementById('transDate').value = getTodayHijriString();
         document.getElementById('transDueDate').value = "1448-07-01";
@@ -688,8 +668,6 @@
         filtered = filtered.filter(r => 
             r.number.toLowerCase().includes(query) || 
             r.subject.toLowerCase().includes(query) || 
-            (r.unit && r.unit.toLowerCase().includes(query)) || 
-            (r.from && r.from.toLowerCase().includes(query)) || 
             (r.to && r.to.toLowerCase().includes(query))
         );
 
@@ -699,8 +677,8 @@
         tbody.innerHTML = '';
 
         if (filtered.length === 0) {
-            let colSpanCount = isAdmin ? 8 : 7;
-            tbody.innerHTML = `<tr><td colspan="${colSpanCount}" style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد سجلات مطابقة للعرض</td></tr>`;
+            let colSpanCount = isAdmin ? 6 : 5;
+            tbody.innerHTML = `<tr><td colspan="${colSpanCount}" style="text-align: center; color: var(--text-muted); padding: 25px;">لا توجد سجلات مطابقة للعرض</td></tr>`;
             return;
         }
 
@@ -725,15 +703,13 @@
             let tr = document.createElement('tr');
             tr.className = rowClass;
             tr.innerHTML = `
-                <td style="font-weight: 700;">${r.number}</td>
-                <td>${r.date}</td>
-                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;" title="${r.subject}">${r.subject}</td>
-                <td>${r.from || '---'}</td>
-                <td>${r.to || '---'}</td>
-                <td><span style="background: #f1f5f9; padding: 3px 8px; border-radius: 4px; font-size: 11px;">${r.unit || 'العموم'}</span></td>
+                <td style="font-weight: 700;" title="${r.number}">${r.number}</td>
+                <td title="${r.date}">${r.date}</td>
+                <td title="${r.subject}">${r.subject}</td>
+                <td title="${r.to || '---'}">${r.to || '---'}</td>
                 <td>${statusBadge}</td>
                 <td class="restricted-admin" style="display: ${isAdmin ? 'table-cell' : 'none'}; text-align: center;">
-                    <div class="table-actions" style="justify-content: center;">
+                    <div class="table-actions">
                         <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
                         <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
                     </div>
