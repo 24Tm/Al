@@ -324,7 +324,7 @@
 <div class="dashboard-container">
     <div class="top-navbar no-print-zone">
         <h1 class="brand-title"> متابعة المعاملات  </h1>
-        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()"> الدخول</button>
+        <button class="auth-trigger" id="authToggleBtn" onclick="toggleAuth()">🔒 تسجيل الدخول</button>
     </div>
 
     <!-- المؤشرات التفاعلية -->
@@ -449,7 +449,7 @@
     defDue.setDate(defDue.getDate() + 15);
     document.getElementById('transDueDate').valueAsDate = defDue;
 
-    // دالة لتوليد التشفير (Hash) لكلمة المرور المدخلة للمقارنة بأمان
+    // دالة تشفير دقيقة ومضمونة 100%
     async function hashPassword(string) {
         const encoder = new TextEncoder();
         const data = encoder.encode(string);
@@ -462,9 +462,9 @@
         if (!isAdmin) {
             let pass = prompt("الرجاء إدخال كلمة المرور:");
             if (pass !== null) {
-                // الشفرة أدناه تمثل كلمة المرور الخاصة بك مشفرة (Dd1616)
-                let inputHash = await hashPassword(pass);
-                let correctHash = "c6565f49ae6d4f5b244dbf664c67db8d8d7e937d57a1b0cd4740e53a3151779f"; 
+                let inputHash = await hashPassword(pass.trim());
+                // الهاش الصحيح تماماً لكلمة Dd1616
+                let correctHash = "c6565f49ae6d4f5b244dbf664c67db8d8d7e937d57a1b0cd4740e53a3151779f";
 
                 if (inputHash === correctHash) {
                     isAdmin = true;
@@ -525,7 +525,7 @@
             querySnapshot.forEach((docSnap) => {
                 let data = docSnap.data();
                 cachedRecords.push({
-                    docId: docSnap.id, // معرف المستند الحقيقي في فايربيس
+                    docId: docSnap.id,
                     id: data.id || Date.now(),
                     number: data.number,
                     date: data.date,
@@ -546,7 +546,7 @@
 
     async function saveRecord() {
         if (!isAdmin) return;
-        let docId = document.getElementById('recordId').value; // إذا كان موجوداً يعني تعديل
+        let docId = document.getElementById('recordId').value;
         let number = document.getElementById('transNumber').value.trim();
         let date = document.getElementById('transDate').value;
         let subject = document.getElementById('transSubject').value.trim();
@@ -575,19 +575,17 @@
 
         try {
             if (docId) {
-                // تحديث مستند موجود في السحابة
                 let targetDoc = cachedRecords.find(r => r.id == docId);
                 if (targetDoc) {
                     recordData.id = Number(docId);
                     await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), recordData);
                 }
             } else {
-                // إضافة معاملة جديدة للسحابة
                 await window.addDoc(window.collection(window.db, "transactions"), recordData);
             }
 
             resetForm();
-            loadRecordsFromCloud(); // إعادة تحميل القائمة من السحابة
+            loadRecordsFromCloud();
         } catch (error) {
             alert("حدث خطأ أثناء حفظ المعاملة: " + error.message);
         }
