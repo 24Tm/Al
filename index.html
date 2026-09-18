@@ -65,7 +65,6 @@
 
         .dashboard-container { max-width: 1300px; margin: 0 auto; }
 
-        /* تصميم مدمج لشريط العنوان والإحصائيات لتوفير المساحة */
         .compact-header-bar {
             background: var(--sidebar-bg);
             border: 1px solid var(--border);
@@ -112,7 +111,6 @@
             -webkit-text-fill-color: transparent; 
         }
 
-        /* إحصائيات مصغرة أفقية */
         .metrics-inline {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -330,7 +328,6 @@
 <body>
 
 <div class="dashboard-container">
-    <!-- شريط علوي مدمج يجمع العنوان والإحصائيات لتوفير مساحة كبيرة جداً في الشاشة -->
     <div class="compact-header-bar no-print-zone">
         <div class="navbar-top-row">
             <div class="navbar-brand-wrapper" ondblclick="toggleAuth()" title="النظام يعمل بكفاءة">
@@ -420,7 +417,7 @@
         <div class="actions-group">
             <button class="btn" onclick="saveRecord()" id="saveBtnText">حفظ المعاملة</button>
             <button class="btn btn-alt" onclick="resetForm()">إلغاء</button>
-            <button class="btn btn-pdf" onclick="exportDelayedPDF()">📄 تقرير المتأخرات PDF</button>
+            <button class="btn btn-pdf" onclick="exportDelayedAndApproachingPDF()">📄 تقرير المتأخرات والقريبة PDF</button>
         </div>
     </div>
 
@@ -708,30 +705,66 @@
         document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
     }
 
-    function exportDelayedPDF() {
+    function exportDelayedAndApproachingPDF() {
         let todayDate = parseHijriToDate(getTodayHijriString());
         todayDate.setHours(0,0,0,0);
 
-        let delayed = cachedRecords.filter(r => {
+        let targetRecords = cachedRecords.filter(r => {
+            if (r.status === 'أنجزت') return false;
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            return diffDays < 0 && r.status === 'لم تنجز';
+            return diffDays <= 4;
         });
 
-        if (delayed.length === 0) {
-            alert('لا توجد معاملات متأخرة حالياً.');
+        if (targetRecords.length === 0) {
+            alert('لا توجد معاملات متأخرة أو قريبة من الاستحقاق حالياً.');
             return;
         }
 
+        targetRecords.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
+
         let printArea = document.getElementById('printArea');
-        let printHTML = `<div style="direction: rtl; font-family: Tahoma; padding: 20px;"><h2>تقرير المعاملات المتأخرة</h2><hr>`;
-        delayed.forEach((r, index) => {
+        let printHTML = `
+            <div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px; color: #000;">
+                <h2 style="text-align: center; margin-bottom: 5px;">تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2>
+                <p style="text-align: center; font-size: 12px; color: #555; margin-bottom: 20px;">تاريخ التقرير الهجري: ${getTodayHijriString()}</p>
+                <hr style="border: 1px solid #ccc; margin-bottom: 15px;">
+        `;
+
+        targetRecords.forEach((r, index) => {
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
-            let diffDays = Math.abs(Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24)));
-            printHTML += `<p><b>${index+1}. معاملة رقم: ${r.number}</b> (تاريخها: ${r.date || '---'})<br>الموضوع: ${r.subject}<br>تاريخ الإنجاز الهجري: ${r.dueDate}<br>متأخرة بـ ${diffDays} يوم</p><hr>`;
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            
+            let statusText = "";
+            let statusColor = "";
+            if (diffDays < 0) {
+                statusText = `متأخرة بـ ${Math.abs(diffDays)} يوم`;
+                statusColor = "#dc2626";
+            } else if (diffDays === 0) {
+                statusText = `مستحقة اليوم`;
+                statusColor = "#d97706";
+            } else {
+                statusText = `متبقي عليها ${diffDays} أيام (قريبة)`;
+                statusColor = "#d97706";
+            }
+
+            printHTML += `
+                <div style="margin-bottom: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px;">
+                        <span>${index + 1}. معاملة رقم: ${r.number}</span>
+                        <span style="color: ${statusColor};">${statusText}</span>
+                    </div>
+                    <div style="font-size: 13px; margin-bottom: 4px;"><b>الموضوع:</b> ${r.subject}</div>
+                    <div style="font-size: 12px; color: #555; display: flex; justify-content: space-between;">
+                        <span>الجهة المحولة لها: ${r.to || '---'}</span>
+                        <span>تاريخ الاستحقاق: ${r.dueDate}</span>
+                    </div>
+                </div>
+            `;
         });
+
         printHTML += `</div>`;
         printArea.innerHTML = printHTML;
         window.print();
