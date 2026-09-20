@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متابعة المعاملات اليومية - العنوان الإدارية</title>
+    <title>متابعة المعاملات اليومية</title>
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -207,12 +207,6 @@
             box-shadow: none !important;
         }
         .login-btn:hover { opacity: 0.9; }
-        
-        .login-footer-note {
-            margin-top: 15px;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
 
         /* واجهة النظام الأساسية */
         .app-main-content { display: none; }
@@ -462,7 +456,7 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <div class="login-header">
-                <span>العنوان الإدارية</span>
+                <span>النظام</span>
                 <span>تسجيل الدخول</span>
             </div>
             <div class="login-body">
@@ -489,8 +483,6 @@
                         <button class="login-btn" onclick="checkSystemPassword()">دخول</button>
                     </div>
                 </div>
-
-                <div class="login-footer-note">ALSHMRANI</div>
             </div>
         </div>
     </div>
@@ -501,7 +493,7 @@
             <div class="navbar-top-row">
                 <div class="navbar-brand-wrapper">
                     <span class="gear-emoji">⚙️</span>
-                    <h1 class="brand-title">متابعة المعاملات - العنوان الإدارية</h1>
+                    <h1 class="brand-title">متابعة المعاملات</h1>
                 </div>
                 <button class="btn-mini btn-mini-del" onclick="lockSystem()" style="padding: 6px 12px;">قفل النظام 🔒</button>
             </div>
@@ -607,29 +599,20 @@
     let activeMetricFilter = null;
     let cachedRecords = []; 
 
-    async function hashPassword(password) {
-        const msgBuffer = new TextEncoder().encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    // هِش صلاحية الاطلاع فقط (لرقم 10030)
-    const HASH_VIEW_ROLE = "f72236d81230e700a424294b22f1c841490284d7285a203f191147814b786315"; 
-    // هِش صلاحية الإدارة الكاملة (تم تغيير كلمة المرور السرية للمدير تماماً لتفادي أي تداخل أو تسريب)
-    const HASH_ADMIN_ROLE = "b109f3bbbc244eb82441917ed06d619b9008dd09b3befd1b5e07394c706a8bb9"; // كلمة سر خاصة بالمدير
-
-    async function checkSystemPassword() {
+    function checkSystemPassword() {
         let pass = document.getElementById('loginPasswordInput').value.trim();
-        let inputHash = await hashPassword(pass);
 
-        if (inputHash === HASH_VIEW_ROLE) {
+        // كلمة المرور للاطلاع فقط
+        if (pass === "10030") {
             userRole = 'view'; 
             initSystemSession();
-        } else if (inputHash === HASH_ADMIN_ROLE) {
+        } 
+        // كلمة مرور المدير (يمكنك تغييرها لاحقاً هنا)
+        else if (pass === "123456") {
             userRole = 'admin'; 
             initSystemSession();
-        } else {
+        } 
+        else {
             alert("كلمة المرور غير صحيحة!");
             document.getElementById('loginPasswordInput').value = '';
             document.getElementById('loginPasswordInput').focus();
@@ -938,7 +921,7 @@
         let printArea = document.getElementById('printArea');
         let printHTML = `
             <div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px; color: #000;">
-                <h2 style="text-align: center; margin-bottom: 5px;">العنوان الإدارية - تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2>
+                <h2 style="text-align: center; margin-bottom: 5px;">تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2>
                 <p style="text-align: center; font-size: 12px; color: #555; margin-bottom: 20px;">تاريخ التقرير الهجري: ${getTodayHijriString()}</p>
                 <hr style="border: 1px solid #ccc; margin-bottom: 15px;">
         `;
