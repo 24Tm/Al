@@ -71,12 +71,12 @@
             align-items: center;
         }
 
-        .dashboard-container { max-width: 1300px; width: 100%; margin: 0 auto; }
+        .dashboard-container { max-width: 1300px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; }
 
-        /* شاشة  الدخول المدمجة والموحدة في الطابع اللوني */
+        /* شاشة الدخول المدمجة والموحدة في الطابع اللوني */
         .login-wrapper {
             width: 100%;
-            max-width: 440px;
+            max-width: 420px;
             margin: auto;
             background: var(--bg-card);
             backdrop-filter: blur(16px);
@@ -93,27 +93,18 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .login-top-bar {
-            background: rgba(15, 23, 42, 0.6);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            font-weight: 700;
-            font-size: 13.5px;
-            color: #93c5fd;
-        }
-
         .login-content-area {
-            padding: 30px 24px;
+            padding: 28px 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
 
         .unified-logo-box {
-            margin: 0 auto 16px auto;
-            width: 80px;
-            height: 80px;
+            margin-bottom: 16px;
+            width: 72px;
+            height: 72px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -124,24 +115,19 @@
         }
 
         .system-title {
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 800;
             color: #ffffff;
-            margin-bottom: 6px;
+            margin-bottom: 20px;
             letter-spacing: -0.5px;
-        }
-
-        .system-desc {
-            font-size: 12.5px;
-            color: var(--text-muted);
-            margin-bottom: 24px;
         }
 
         .login-quick-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 24px;
+            width: 100%;
+            margin-bottom: 20px;
         }
 
         .quick-stat-box {
@@ -165,11 +151,12 @@
         .login-input-card {
             background: rgba(15, 23, 42, 0.75);
             border: 1px solid var(--border);
-            padding: 18px;
+            padding: 16px;
             border-radius: 16px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            width: 100%;
             text-align: right;
         }
 
@@ -207,7 +194,7 @@
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: #fff;
             border: none;
-            padding: 0 22px;
+            padding: 0 20px;
             border-radius: 12px;
             font-weight: 700;
             font-size: 14px;
@@ -465,20 +452,14 @@
     <div class="dashboard-container">
         <!-- شاشة الدخول الموحدة والمدمجة بالتصميم العام -->
         <div class="login-wrapper" id="loginOverlay">
-            <div class="login-top-bar">
-                <span> </span>
-                <span> </span>
-            </div>
             <div class="login-content-area">
                 <div class="unified-logo-box">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                 </div>
-                <centre>
                 <div class="system-title">متابعة المعاملات اليومية</div>
-                <div class="system-desc"> </div>
 
                 <div class="login-quick-stats">
                     <div class="quick-stat-box yellow">
@@ -490,11 +471,10 @@
                         <span class="q-label">معاملات متأخرة</span>
                         <span class="q-num" id="loginCountDelayed">0</span>
                     </div>
-                    </centre>
                 </div>
 
                 <div class="login-input-card">
-                    <label> كلمة المرور </label>
+                    <label>كلمة المرور</label>
                     <div class="input-action-row">
                         <input type="password" id="loginPasswordInput" placeholder="••••••" onkeydown="if(event.key === 'Enter') checkSystemPassword()">
                         <button class="action-submit-btn" onclick="checkSystemPassword()">دخول</button>
