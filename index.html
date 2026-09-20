@@ -466,8 +466,8 @@
         <!-- شاشة الدخول الموحدة والمدمجة بالتصميم العام -->
         <div class="login-wrapper" id="loginOverlay">
             <div class="login-top-bar">
-                <span>📂 </span>
-                <span> ⚙️</span>
+                <span> </span>
+                <span> </span>
             </div>
             <div class="login-content-area">
                 <div class="unified-logo-box">
@@ -476,6 +476,7 @@
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                 </div>
+                <centre>
                 <div class="system-title">متابعة المعاملات اليومية</div>
                 <div class="system-desc"> </div>
 
@@ -484,14 +485,16 @@
                         <span class="q-label">اقتربت من الوقت</span>
                         <span class="q-num" id="loginCountApproaching">0</span>
                     </div>
+                    
                     <div class="quick-stat-box red">
                         <span class="q-label">معاملات متأخرة</span>
                         <span class="q-num" id="loginCountDelayed">0</span>
                     </div>
+                    </centre>
                 </div>
 
                 <div class="login-input-card">
-                    <label>أدخل كلمة المرور    🔒):</label>
+                    <label> كلمة المرور </label>
                     <div class="input-action-row">
                         <input type="password" id="loginPasswordInput" placeholder="••••••" onkeydown="if(event.key === 'Enter') checkSystemPassword()">
                         <button class="action-submit-btn" onclick="checkSystemPassword()">دخول</button>
