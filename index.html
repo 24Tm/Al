@@ -1,4 +1,3 @@
- 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -466,9 +465,9 @@
         .btn-mini-del { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
         @media print {
-            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; display: block !important; }
             .no-print-zone { display: none !important; }
-            .print-zone { display: block !important; }
+            .print-zone { display: block !important; width: 100% !important; }
         }
         .print-zone { display: none; }
     </style>
@@ -992,8 +991,10 @@
 
         printHTML += `</div>`;
         printArea.innerHTML = printHTML;
-        window.print();
-        setTimeout(() => { printArea.innerHTML = ''; }, 1000);
+        
+        setTimeout(() => {
+            window.print();
+        }, 100);
     }
 
     function renderRecords() {
@@ -1127,4 +1128,3 @@
 
 </body>
 </html>
-
