@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متابعة المعاملات اليومية</title>
+    <title>متابعة المعاملات اليومية - لوحة الإدارة</title>
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -105,32 +105,26 @@
 
         .animated-logo-container {
             margin: 0 auto 16px auto;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+            width: 140px;
+            height: 140px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(17, 24, 39, 1) 70%);
-            animation: logoPulse 3s infinite ease-in-out;
-            border: 2px solid rgba(59, 130, 246, 0.5);
-            position: relative;
         }
 
-        @keyframes logoPulse {
-            0% { transform: scale(1); border-color: rgba(59, 130, 246, 0.5); }
-            50% { transform: scale(1.05); border-color: #60a5fa; }
-            100% { transform: scale(1); border-color: rgba(59, 130, 246, 0.5); }
+        .admin-graphic {
+            width: 100%;
+            height: 100%;
         }
 
-        .shield-icon {
-            font-size: 55px;
-            animation: shieldFloat 4s infinite ease-in-out;
+        .rotating-gear {
+            transform-origin: 100px 140px;
+            animation: spinGear 6s linear infinite;
         }
 
-        @keyframes shieldFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
+        @keyframes spinGear {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .login-title-main {
@@ -156,7 +150,6 @@
             justify-content: space-between;
             align-items: center;
             text-align: right;
-            box-shadow: none !important;
         }
         .login-stat-card.red { border-left: 4px solid #ef4444; }
         .login-stat-card.yellow { border-left: 4px solid #f59e0b; }
@@ -192,7 +185,6 @@
             text-align: center;
             font-size: 14px;
             letter-spacing: 2px;
-            box-shadow: none !important;
         }
 
         .login-btn {
@@ -204,7 +196,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
-            box-shadow: none !important;
         }
         .login-btn:hover { opacity: 0.9; }
 
@@ -232,19 +223,11 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            cursor: pointer;
-            user-select: none;
         }
 
-        .gear-emoji {
-            font-size: 18px;
-            display: inline-block;
-            animation: rotateGear 6s linear infinite;
-        }
-
-        @keyframes rotateGear {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .brand-gear-svg {
+            width: 30px;
+            height: 30px;
         }
 
         .brand-title { 
@@ -275,7 +258,6 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: none !important;
         }
 
         .metric-card:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
@@ -301,7 +283,6 @@
             cursor: pointer;
             text-align: center;
             transition: all 0.25s ease;
-            box-shadow: none !important;
         }
 
         .pill-btn:hover { background: #374151; color: #fff; }
@@ -340,7 +321,6 @@
             color: var(--text-main);
             text-align: right;
             transition: all 0.2s;
-            box-shadow: none !important;
         }
 
         input:focus, select:focus { outline: none; border-color: var(--primary); }
@@ -358,14 +338,13 @@
             cursor: pointer;
             flex: 1;
             transition: all 0.2s ease;
-            box-shadow: none !important;
         }
         .btn:hover { opacity: 0.9; }
         .btn-alt { background: #4b5563; }
         .btn-pdf { background: #0284c7; }
 
         .search-box-wrapper { margin-bottom: 14px; display: flex; gap: 8px; align-items: center; }
-        .search-box-wrapper input { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 12.5px; background: var(--sidebar-bg); box-shadow: none !important; }
+        .search-box-wrapper input { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 12.5px; background: var(--sidebar-bg); }
         
         .reset-filter-btn {
             background: var(--sidebar-bg);
@@ -377,7 +356,6 @@
             color: var(--text-muted);
             cursor: pointer;
             white-space: nowrap;
-            box-shadow: none !important;
         }
         .reset-filter-btn:hover { background: #374151; color: #fff; }
 
@@ -394,7 +372,6 @@
             border-radius: var(--radius);
             padding: 14px;
             position: relative;
-            box-shadow: none !important;
         }
 
         .transaction-card.card-delayed {
@@ -438,7 +415,7 @@
         .badge-orange { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
         .table-actions { display: flex; gap: 6px; }
-        .btn-mini { padding: 5px 10px; font-size: 11.5px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; box-shadow: none !important; }
+        .btn-mini { padding: 5px 10px; font-size: 11.5px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
         .btn-mini-edit { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
         .btn-mini-del { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
@@ -452,34 +429,48 @@
 </head>
 <body>
 
-    <!-- نافذة تسجيل الدخول الإلزامية -->
+    <!-- نافذة تسجيل الدخول الإلزامية مع الأيقونة والترس المتحرك -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <div class="login-header">
-                <span>النظام</span>
+                <span>لوحة التحكم الإدارية</span>
                 <span>تسجيل الدخول</span>
             </div>
             <div class="login-body">
                 <div class="animated-logo-container">
-                    <div class="shield-icon">📊📋</div>
+                    <svg class="admin-graphic" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="#2b3e50">
+                            <circle cx="60" cy="55" r="22"/>
+                            <path d="M 38 95 C 38 78 50 72 60 72 C 70 72 82 78 82 95 L 75 115 L 45 115 Z"/>
+                            <circle cx="100" cy="55" r="22"/>
+                            <path d="M 78 95 C 78 78 90 72 100 72 C 110 72 122 78 122 95 L 115 115 L 85 115 Z"/>
+                            <circle cx="140" cy="55" r="22"/>
+                            <path d="M 118 95 C 118 78 130 72 140 72 C 150 72 162 78 162 95 L 155 115 L 125 115 Z"/>
+                        </g>
+                        <g class="rotating-gear">
+                            <path fill="#1976d2" d="M 100,95 L 106,101 L 115,99 L 119,107 L 127,109 L 128,118 L 137,122 L 135,131 L 142,138 L 137,146 L 142,154 L 135,160 L 137,169 L 128,172 L 127,182 L 119,183 L 115,192 L 106,190 L 100,197 L 94,190 L 85,192 L 81,183 L 73,182 L 72,172 L 63,169 L 65,160 L 58,154 L 63,146 L 58,138 L 65,131 L 63,122 L 72,118 L 73,109 L 81,107 L 85,99 L 94,101 Z"/>
+                            <circle fill="#ffffff" cx="100" cy="140" r="32"/>
+                        </g>
+                    </svg>
                 </div>
                 <div class="login-title-main">متابعة المعاملات اليومية</div>
 
                 <div class="login-stats-grid">
                     <div class="login-stat-card red">
-                        <span class="stat-label">معاملات انتهت ولم ترسل</span>
+                        <span class="stat-label">معاملات متأخرة</span>
                         <span class="stat-num" id="loginCountDelayed">0</span>
                     </div>
                     <div class="login-stat-card yellow">
-                        <span class="stat-label">معاملات اقتربت من الوقت</span>
+                        <span class="stat-label">معاملات قريبة الاستحقاق</span>
                         <span class="stat-num" id="loginCountApproaching">0</span>
                     </div>
                 </div>
 
                 <div class="login-form-area">
-                    <label>كلمة المرور أو رمز الدخول:</label>
+                    <label>أدخل كلمة المرور (لصلاحيات المدير أو الاطلاع):</label>
                     <div class="login-input-row">
-                        <input type="password" id="loginPasswordInput" placeholder="•••••" onkeydown="if(event.key === 'Enter') checkSystemPassword()">
+                        <!-- تم ضبط كلمة المرور إلى Dd1616 للمدير -->
+                        <input type="password" id="loginPasswordInput" placeholder="••••••" onkeydown="if(event.key === 'Enter') checkSystemPassword()">
                         <button class="login-btn" onclick="checkSystemPassword()">دخول</button>
                     </div>
                 </div>
@@ -492,7 +483,13 @@
         <div class="compact-header-bar no-print-zone">
             <div class="navbar-top-row">
                 <div class="navbar-brand-wrapper">
-                    <span class="gear-emoji">⚙️</span>
+                    <!-- الترس المتحرك في شريط التنقل -->
+                    <svg class="brand-gear-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <g class="rotating-gear">
+                            <path fill="#1976d2" d="M 100,95 L 106,101 L 115,99 L 119,107 L 127,109 L 128,118 L 137,122 L 135,131 L 142,138 L 137,146 L 142,154 L 135,160 L 137,169 L 128,172 L 127,182 L 119,183 L 115,192 L 106,190 L 100,197 L 94,190 L 85,192 L 81,183 L 73,182 L 72,172 L 63,169 L 65,160 L 58,154 L 63,146 L 58,138 L 65,131 L 63,122 L 72,118 L 73,109 L 81,107 L 85,99 L 94,101 Z"/>
+                            <circle fill="#111827" cx="100" cy="140" r="32"/>
+                        </g>
+                    </svg>
                     <h1 class="brand-title">متابعة المعاملات</h1>
                 </div>
                 <button class="btn-mini btn-mini-del" onclick="lockSystem()" style="padding: 6px 12px;">قفل النظام 🔒</button>
@@ -518,6 +515,7 @@
             <button class="pill-btn" id="tabCompleted" onclick="switchTab('completed')">المعاملات المنجزة</button>
         </div>
 
+        <!-- صندوق الإدارة (إضافة وتعديل المعاملات) -->
         <div class="panel-box no-print-zone" id="adminFormCard">
             <h3 id="formTitleText">➕ تسجيل معاملة جديدة</h3>
             <input type="hidden" id="recordId">
@@ -602,14 +600,14 @@
     function checkSystemPassword() {
         let pass = document.getElementById('loginPasswordInput').value.trim();
 
-        // كلمة المرور للاطلاع فقط
-        if (pass === "10030") {
-            userRole = 'view'; 
+        // كلمة مرور المدير التي طلبتها (Dd1616)
+        if (pass === "Dd1616") {
+            userRole = 'admin'; 
             initSystemSession();
         } 
-        // كلمة مرور المدير (يمكنك تغييرها لاحقاً هنا)
-        else if (pass === "123456") {
-            userRole = 'admin'; 
+        // كلمة مرور بديلة للاطلاع فقط (إذا أردت استخدامها 10030)
+        else if (pass === "10030") {
+            userRole = 'view'; 
             initSystemSession();
         } 
         else {
