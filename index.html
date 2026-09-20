@@ -75,17 +75,17 @@
 
         .dashboard-container { max-width: 1300px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; }
 
-        /* شاشة الدخول الاحترافية الفاخرة */
+        /* شاشة الدخول الاحترافية الفاخرة - مرتبة فوق بعض وبدون تكبير العناصر مع التوسيط */
         .login-wrapper {
             width: 100%;
-            max-width: 420px;
+            max-width: 380px;
             margin: auto;
             background: var(--bg-card);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            border-radius: 28px;
+            border-radius: 24px;
             overflow: hidden;
             animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -96,7 +96,7 @@
         }
 
         .login-content-area {
-            padding: 32px 28px;
+            padding: 24px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -104,50 +104,53 @@
         }
 
         .unified-logo-box {
-            margin-bottom: 18px;
-            width: 72px;
-            height: 72px;
+            margin: 0 auto 12px auto;
+            width: 56px;
+            height: 56px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.05));
-            border-radius: 22px;
+            border-radius: 16px;
             border: 1px solid rgba(59, 130, 246, 0.25);
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
         }
 
         .system-title {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 800;
             color: #ffffff;
-            margin-bottom: 22px;
+            margin-bottom: 16px;
             letter-spacing: -0.3px;
+            text-align: center;
+            width: 100%;
         }
 
-        /* شريط الإحصائيات الأفقية الاحترافي المطور */
+        /* شريط الإحصائيات الأفقية مرتب فوق بعض مدخلات كلمة المرور */
         .login-quick-stats {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
-            margin-bottom: 22px;
+            margin-bottom: 16px;
+            justify-content: center;
         }
 
         .quick-stat-box {
             flex: 1;
             background: rgba(10, 17, 30, 0.75);
             border: 1px solid var(--border);
-            padding: 14px 16px;
-            border-radius: 16px;
+            padding: 10px 12px;
+            border-radius: 12px;
             text-align: right;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
-        .quick-stat-box:hover { transform: translateY(-3px); background: rgba(15, 25, 45, 0.9); }
+        .quick-stat-box:hover { transform: translateY(-2px); background: rgba(15, 25, 45, 0.9); }
 
         .quick-stat-box.yellow { 
             border-right: 4px solid var(--warning); 
@@ -158,21 +161,21 @@
             background: linear-gradient(135deg, rgba(10, 17, 30, 0.85), rgba(244, 63, 94, 0.07));
         }
 
-        .q-info { display: flex; flex-direction: column; gap: 3px; z-index: 1; }
-        .q-label { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: -0.2px; }
-        .q-num { font-size: 20px; font-weight: 900; letter-spacing: 0.5px; }
+        .q-info { display: flex; flex-direction: column; gap: 2px; z-index: 1; text-align: right; }
+        .q-label { font-size: 10.5px; color: var(--text-muted); font-weight: 700; }
+        .q-num { font-size: 16px; font-weight: 900; letter-spacing: 0.5px; }
         
-        .quick-stat-box.yellow .q-num { color: #fde047; text-shadow: 0 0 12px rgba(251, 191, 36, 0.4); }
-        .quick-stat-box.red .q-num { color: #fb7185; text-shadow: 0 0 12px rgba(244, 63, 94, 0.4); }
+        .quick-stat-box.yellow .q-num { color: #fde047; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+        .quick-stat-box.red .q-num { color: #fb7185; text-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
         
         .q-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 12px;
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
+            font-size: 13px;
             z-index: 1;
         }
         .quick-stat-box.yellow .q-icon { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
@@ -181,43 +184,50 @@
         .login-input-card {
             background: rgba(10, 17, 30, 0.75);
             border: 1px solid var(--border);
-            padding: 18px;
-            border-radius: 18px;
+            padding: 14px;
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            text-align: right;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            align-items: center;
         }
 
         .login-input-card label {
-            font-size: 12px;
+            font-size: 11.5px;
             color: #93c5fd;
             font-weight: 700;
+            text-align: center;
+            width: 100%;
+            display: block;
+            margin-bottom: 4px;
         }
 
         .input-action-row {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
         }
 
         .input-action-row input {
             flex: 1;
-            padding: 13px 16px;
-            border-radius: 14px;
+            padding: 10px 14px;
+            border-radius: 10px;
             border: 1px solid var(--border);
             background: #030712;
             color: #fff;
             text-align: center;
-            font-size: 18px;
-            letter-spacing: 6px;
+            font-size: 16px;
+            letter-spacing: 4px;
             transition: all 0.3s;
         }
 
         .input-action-row input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
+            box-shadow: 0 0 12px var(--primary-glow);
             outline: none;
         }
 
@@ -225,15 +235,15 @@
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: #fff;
             border: none;
-            padding: 0 22px;
-            border-radius: 14px;
+            padding: 0 16px;
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
             transition: all 0.3s;
         }
-        .action-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6); }
+        .action-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6); }
 
         /* واجهة النظام الأساسية (مخفية حتى يتم تسجيل الدخول) */
         .app-main-content { display: none; width: 100%; }
@@ -485,18 +495,18 @@
 <body>
 
     <div class="dashboard-container">
-        <!-- شاشة الدخول الاحترافية -->
+        <!-- شاشة الدخول الاحترافية مرتبة فوق بعض وبدون تكبير وموسّطة -->
         <div class="login-wrapper" id="loginOverlay">
             <div class="login-content-area">
                 <div class="unified-logo-box">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                 </div>
                 <div class="system-title">متابعة المعاملات اليومية</div>
 
-                <!-- شريط الإحصائيات الأفقية الاحترافي -->
+                <!-- شريط الإحصائيات الأفقية مرتب فوق مدخل كلمة المرور مباشرة -->
                 <div class="login-quick-stats">
                     <div class="quick-stat-box yellow">
                         <div class="q-info">
