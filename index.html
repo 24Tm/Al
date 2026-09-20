@@ -1,3 +1,4 @@
+إليك التعديل حيث قمنا بإعادة تصميم مربعات "اقتربت من الوقت" و "معاملات متأخرة" في شاشة الدخول لتظهر بشكل أنيق ومدمج في شريط أفقي موحد (أو تصميم أنيق ونظيف) يتماشى مع واجهة النظام دون إزعاج بصري، مع الحفاظ على الأرقام واضحة والحدود الجانبية بالأصفر والأحمر كما طلبت:
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -71,7 +72,7 @@
             align-items: center;
         }
 
-        .dashboard-container { max-width: 1300px; width: 100%; margin: 0 auto; }
+        .dashboard-container { max-width: 1300px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; }
 
         /* شاشة الدخول المدمجة والموحدة في الطابع اللوني */
         .login-wrapper {
@@ -93,27 +94,18 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .login-top-bar {
-            background: rgba(15, 23, 42, 0.6);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            font-weight: 700;
-            font-size: 13.5px;
-            color: #93c5fd;
-        }
-
         .login-content-area {
-            padding: 30px 24px;
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
 
         .unified-logo-box {
-            margin: 0 auto 16px auto;
-            width: 80px;
-            height: 80px;
+            margin-bottom: 14px;
+            width: 68px;
+            height: 68px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -124,52 +116,73 @@
         }
 
         .system-title {
-            font-size: 21px;
+            font-size: 19px;
             font-weight: 800;
             color: #ffffff;
-            margin-bottom: 6px;
+            margin-bottom: 18px;
             letter-spacing: -0.5px;
         }
 
-        .system-desc {
-            font-size: 12.5px;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-
+        /* تصميم جديد ومطور لشريط الإحصائيات المختصرة بشكل منسق وجذاب */
         .login-quick-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
             gap: 12px;
-            margin-bottom: 24px;
+            width: 100%;
+            margin-bottom: 20px;
         }
 
         .quick-stat-box {
-            background: rgba(15, 23, 42, 0.6);
+            flex: 1;
+            background: rgba(15, 23, 42, 0.7);
             border: 1px solid var(--border);
             padding: 12px 14px;
             border-radius: 14px;
             text-align: right;
             display: flex;
-            flex-direction: column;
-            gap: 2px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
         }
-        .quick-stat-box.yellow { border-right: 3px solid #f59e0b; }
-        .quick-stat-box.red { border-right: 3px solid #ef4444; }
+        .quick-stat-box:hover { transform: translateY(-2px); background: rgba(15, 23, 42, 0.9); }
 
-        .q-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .q-num { font-size: 17px; font-weight: 900; }
-        .quick-stat-box.yellow .q-num { color: #fbbf24; }
-        .quick-stat-box.red .q-num { color: #f87171; }
+        .quick-stat-box.yellow { 
+            border-right: 4px solid #f59e0b; 
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(245, 158, 11, 0.06));
+        }
+        .quick-stat-box.red { 
+            border-right: 4px solid #ef4444; 
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(239, 68, 68, 0.06));
+        }
+
+        .q-info { display: flex; flex-direction: column; gap: 2px; }
+        .q-label { font-size: 11px; color: var(--text-muted); font-weight: 700; }
+        .q-num { font-size: 18px; font-weight: 900; letter-spacing: 0.5px; }
+        
+        .quick-stat-box.yellow .q-num { color: #fbb224; text-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+        .quick-stat-box.red .q-num { color: #f87171; text-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+        
+        .q-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .quick-stat-box.yellow .q-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .quick-stat-box.red .q-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
         .login-input-card {
             background: rgba(15, 23, 42, 0.75);
             border: 1px solid var(--border);
-            padding: 18px;
+            padding: 16px;
             border-radius: 16px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            width: 100%;
             text-align: right;
         }
 
@@ -207,7 +220,7 @@
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: #fff;
             border: none;
-            padding: 0 22px;
+            padding: 0 20px;
             border-radius: 12px;
             font-weight: 700;
             font-size: 14px;
@@ -463,35 +476,38 @@
 <body>
 
     <div class="dashboard-container">
-        <!-- شاشة الدخول الموحدة والمدمجة بالتصميم العام -->
+        <!-- شاشة الدخول بتصميم مدمج ومطور -->
         <div class="login-wrapper" id="loginOverlay">
-            <div class="login-top-bar">
-                <span>🛡️ لوحة التحكم الإدارية</span>
-                <span>بوابة المصادقة</span>
-            </div>
             <div class="login-content-area">
                 <div class="unified-logo-box">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                 </div>
                 <div class="system-title">متابعة المعاملات اليومية</div>
-                <div class="system-desc">نظام إداري احترافي لمتابعة الإنجاز والمهام</div>
 
+                <!-- شريط الإحصائيات الأفقية المطور -->
                 <div class="login-quick-stats">
                     <div class="quick-stat-box yellow">
-                        <span class="q-label">قريبة الاستحقاق</span>
-                        <span class="q-num" id="loginCountApproaching">0</span>
+                        <div class="q-info">
+                            <span class="q-label">اقتربت من الوقت</span>
+                            <span class="q-num" id="loginCountApproaching">0</span>
+                        </div>
+                        <div class="q-icon">⏳</div>
                     </div>
+                    
                     <div class="quick-stat-box red">
-                        <span class="q-label">معاملات متأخرة</span>
-                        <span class="q-num" id="loginCountDelayed">0</span>
+                        <div class="q-info">
+                            <span class="q-label">معاملات متأخرة</span>
+                            <span class="q-num" id="loginCountDelayed">0</span>
+                        </div>
+                        <div class="q-icon">⚠️</div>
                     </div>
                 </div>
 
                 <div class="login-input-card">
-                    <label>أدخل كلمة المرور (لصلاحيات المدير أو الاطلاع):</label>
+                    <label>كلمة المرور</label>
                     <div class="input-action-row">
                         <input type="password" id="loginPasswordInput" placeholder="••••••" onkeydown="if(event.key === 'Enter') checkSystemPassword()">
                         <button class="action-submit-btn" onclick="checkSystemPassword()">دخول</button>
@@ -1111,3 +1127,4 @@
 
 </body>
 </html>
+
