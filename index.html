@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متابعة المعاملات اليومية - إدارة الشؤون الإدارية</title>
+    <title>متابعة المعاملات اليومية - العنوان الإدارية</title>
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -65,7 +65,7 @@
 
         .dashboard-container { max-width: 1300px; margin: 0 auto; }
 
-        /* شاشة الدخول (بدون ظل) */
+        /* شاشة الدخول */
         .login-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -103,7 +103,6 @@
             text-align: center;
         }
 
-        /* الشعار المتحرك (بدون ظل) */
         .animated-logo-container {
             margin: 0 auto 16px auto;
             width: 120px;
@@ -141,7 +140,6 @@
             margin-bottom: 15px;
         }
 
-        /* إحصائيات سريعة في واجهة الدخول */
         .login-stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -158,6 +156,7 @@
             justify-content: space-between;
             align-items: center;
             text-align: right;
+            box-shadow: none !important;
         }
         .login-stat-card.red { border-left: 4px solid #ef4444; }
         .login-stat-card.yellow { border-left: 4px solid #f59e0b; }
@@ -193,6 +192,7 @@
             text-align: center;
             font-size: 14px;
             letter-spacing: 2px;
+            box-shadow: none !important;
         }
 
         .login-btn {
@@ -204,6 +204,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
+            box-shadow: none !important;
         }
         .login-btn:hover { opacity: 0.9; }
         
@@ -280,6 +281,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: none !important;
         }
 
         .metric-card:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
@@ -305,6 +307,7 @@
             cursor: pointer;
             text-align: center;
             transition: all 0.25s ease;
+            box-shadow: none !important;
         }
 
         .pill-btn:hover { background: #374151; color: #fff; }
@@ -343,6 +346,7 @@
             color: var(--text-main);
             text-align: right;
             transition: all 0.2s;
+            box-shadow: none !important;
         }
 
         input:focus, select:focus { outline: none; border-color: var(--primary); }
@@ -360,13 +364,14 @@
             cursor: pointer;
             flex: 1;
             transition: all 0.2s ease;
+            box-shadow: none !important;
         }
         .btn:hover { opacity: 0.9; }
         .btn-alt { background: #4b5563; }
         .btn-pdf { background: #0284c7; }
 
         .search-box-wrapper { margin-bottom: 14px; display: flex; gap: 8px; align-items: center; }
-        .search-box-wrapper input { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 12.5px; background: var(--sidebar-bg); }
+        .search-box-wrapper input { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 12.5px; background: var(--sidebar-bg); box-shadow: none !important; }
         
         .reset-filter-btn {
             background: var(--sidebar-bg);
@@ -378,6 +383,7 @@
             color: var(--text-muted);
             cursor: pointer;
             white-space: nowrap;
+            box-shadow: none !important;
         }
         .reset-filter-btn:hover { background: #374151; color: #fff; }
 
@@ -394,6 +400,7 @@
             border-radius: var(--radius);
             padding: 14px;
             position: relative;
+            box-shadow: none !important;
         }
 
         .transaction-card.card-delayed {
@@ -437,7 +444,7 @@
         .badge-orange { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
         .table-actions { display: flex; gap: 6px; }
-        .btn-mini { padding: 5px 10px; font-size: 11.5px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-mini { padding: 5px 10px; font-size: 11.5px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; box-shadow: none !important; }
         .btn-mini-edit { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
         .btn-mini-del { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
@@ -451,21 +458,19 @@
 </head>
 <body>
 
-    <!-- نافذة تسجيل الدخول -->
+    <!-- نافذة تسجيل الدخول الإلزامية -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <div class="login-header">
-                <span>إدارة الشؤون الإدارية</span>
+                <span>العنوان الإدارية</span>
                 <span>تسجيل الدخول</span>
             </div>
             <div class="login-body">
-                <!-- الأيقونة الجديدة المعبرة عن المعاملات والملفات -->
                 <div class="animated-logo-container">
                     <div class="shield-icon">📊📋</div>
                 </div>
                 <div class="login-title-main">متابعة المعاملات اليومية</div>
 
-                <!-- عدادات تنبيهية -->
                 <div class="login-stats-grid">
                     <div class="login-stat-card red">
                         <span class="stat-label">معاملات انتهت ولم ترسل</span>
@@ -478,14 +483,14 @@
                 </div>
 
                 <div class="login-form-area">
-                    <label>كلمة المرور:</label>
+                    <label>كلمة المرور أو رمز الدخول:</label>
                     <div class="login-input-row">
                         <input type="password" id="loginPasswordInput" placeholder="•••••" onkeydown="if(event.key === 'Enter') checkSystemPassword()">
                         <button class="login-btn" onclick="checkSystemPassword()">دخول</button>
                     </div>
                 </div>
 
-                <div class="login-footer-note">ALSHRANI © 2026</div>
+                <div class="login-footer-note">ALSHMRANI</div>
             </div>
         </div>
     </div>
@@ -496,7 +501,7 @@
             <div class="navbar-top-row">
                 <div class="navbar-brand-wrapper">
                     <span class="gear-emoji">⚙️</span>
-                    <h1 class="brand-title">متابعة المعاملات - إدارة الشؤون الإدارية</h1>
+                    <h1 class="brand-title">متابعة المعاملات - العنوان الإدارية</h1>
                 </div>
                 <button class="btn-mini btn-mini-del" onclick="lockSystem()" style="padding: 6px 12px;">قفل النظام 🔒</button>
             </div>
@@ -597,18 +602,33 @@
     </div>
 
 <script>
-    let isAdmin = false;
+    let userRole = null; 
     let currentTab = 'active';
     let activeMetricFilter = null;
     let cachedRecords = []; 
 
-    function checkSystemPassword() {
+    async function hashPassword(password) {
+        const msgBuffer = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // هِش صلاحية الاطلاع فقط (لرقم 10030)
+    const HASH_VIEW_ROLE = "f72236d81230e700a424294b22f1c841490284d7285a203f191147814b786315"; 
+    // هِش صلاحية الإدارة الكاملة (تم تغيير كلمة المرور السرية للمدير تماماً لتفادي أي تداخل أو تسريب)
+    const HASH_ADMIN_ROLE = "b109f3bbbc244eb82441917ed06d619b9008dd09b3befd1b5e07394c706a8bb9"; // كلمة سر خاصة بالمدير
+
+    async function checkSystemPassword() {
         let pass = document.getElementById('loginPasswordInput').value.trim();
-        if (pass === "10030") {
-            isAdmin = true;
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainAppContent').style.display = 'block';
-            renderRecords();
+        let inputHash = await hashPassword(pass);
+
+        if (inputHash === HASH_VIEW_ROLE) {
+            userRole = 'view'; 
+            initSystemSession();
+        } else if (inputHash === HASH_ADMIN_ROLE) {
+            userRole = 'admin'; 
+            initSystemSession();
         } else {
             alert("كلمة المرور غير صحيحة!");
             document.getElementById('loginPasswordInput').value = '';
@@ -616,8 +636,21 @@
         }
     }
 
+    function initSystemSession() {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainAppContent').style.display = 'block';
+
+        if (userRole === 'view') {
+            document.getElementById('adminFormCard').style.display = 'none';
+        } else {
+            document.getElementById('adminFormCard').style.display = 'block';
+        }
+
+        renderRecords();
+    }
+
     function lockSystem() {
-        isAdmin = false;
+        userRole = null;
         document.getElementById('mainAppContent').style.display = 'none';
         document.getElementById('loginOverlay').style.display = 'flex';
         document.getElementById('loginPasswordInput').value = '';
@@ -785,14 +818,18 @@
                 });
             });
             updateLoginScreenCounters();
-            if (isAdmin) renderRecords();
+            if (userRole) renderRecords();
         } catch (error) {
             console.error("خطأ في جلب البيانات:", error);
         }
     }
 
     async function saveRecord() {
-        if (!isAdmin) return;
+        if (userRole !== 'admin') {
+            alert("عذراً، ليس لديك صلاحية التعديل أو الحفظ.");
+            return;
+        }
+
         let docId = document.getElementById('recordId').value;
         let number = document.getElementById('transNumber').value.trim();
         let date = document.getElementById('transDate').value.trim();
@@ -827,7 +864,10 @@
     }
 
     function editRecord(id) {
-        if (!isAdmin) return;
+        if (userRole !== 'admin') {
+            alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية التعديل.");
+            return;
+        }
         let r = cachedRecords.find(item => item.id == id);
         if (!r) return;
 
@@ -845,7 +885,10 @@
     }
 
     async function deleteRecord(id) {
-        if (!isAdmin) return;
+        if (userRole !== 'admin') {
+            alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية الحذف.");
+            return;
+        }
         if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
             let r = cachedRecords.find(item => item.id == id);
             if (r && r.docId) {
@@ -895,7 +938,7 @@
         let printArea = document.getElementById('printArea');
         let printHTML = `
             <div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px; color: #000;">
-                <h2 style="text-align: center; margin-bottom: 5px;">إدارة الشؤون الإدارية - تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2>
+                <h2 style="text-align: center; margin-bottom: 5px;">العنوان الإدارية - تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2>
                 <p style="text-align: center; font-size: 12px; color: #555; margin-bottom: 20px;">تاريخ التقرير الهجري: ${getTodayHijriString()}</p>
                 <hr style="border: 1px solid #ccc; margin-bottom: 15px;">
         `;
@@ -940,7 +983,7 @@
     }
 
     function renderRecords() {
-        if (!isAdmin) return;
+        if (!userRole) return;
         let query = document.getElementById('searchQuery').value.toLowerCase();
         let todayDate = parseHijriToDate(getTodayHijriString());
         todayDate.setHours(0,0,0,0);
@@ -1029,6 +1072,18 @@
                 statusBadge = `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
             }
 
+            let actionsHTML = '';
+            if (userRole === 'admin') {
+                actionsHTML = `
+                    <div class="table-actions">
+                        <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
+                        <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
+                    </div>
+                `;
+            } else {
+                actionsHTML = `<span style="font-size: 11px; color: var(--text-muted);">للاطلاع فقط</span>`;
+            }
+
             let card = document.createElement('div');
             card.className = `transaction-card ${cardClass}`;
             card.innerHTML = `
@@ -1048,10 +1103,7 @@
                 </div>
                 <div class="card-footer">
                     <span style="font-size: 11px; color: var(--text-muted);">إدارة السجل</span>
-                    <div class="table-actions">
-                        <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
-                        <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
-                    </div>
+                    ${actionsHTML}
                 </div>
             `;
             container.appendChild(card);
