@@ -130,23 +130,34 @@
             margin-bottom: 20px;
         }
 
+        /* تعديل تصميم الخلايا لتكون الخطوط الجانبية بلون واضح وخلفية متناسقة مع وضوح تام للأرقام */
         .quick-stat-box {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid var(--border);
-            padding: 12px 14px;
+            padding: 14px 16px;
             border-radius: 14px;
             text-align: right;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease;
         }
-        .quick-stat-box.yellow { border-right: 3px solid #f59e0b; }
-        .quick-stat-box.red { border-right: 3px solid #ef4444; }
+        .quick-stat-box:hover { transform: translateY(-2px); }
 
-        .q-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .q-num { font-size: 17px; font-weight: 900; }
-        .quick-stat-box.yellow .q-num { color: #fbbf24; }
-        .quick-stat-box.red .q-num { color: #f87171; }
+        .quick-stat-box.yellow { 
+            border-right: 5px solid #f59e0b; 
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(245, 158, 11, 0.08));
+        }
+        .quick-stat-box.red { 
+            border-right: 5px solid #ef4444; 
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(239, 68, 68, 0.08));
+        }
+
+        .q-label { font-size: 11.5px; color: var(--text-muted); font-weight: 700; }
+        .q-num { font-size: 20px; font-weight: 900; letter-spacing: 0.5px; }
+        .quick-stat-box.yellow .q-num { color: #fbb224; text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+        .quick-stat-box.red .q-num { color: #f87171; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
 
         .login-input-card {
             background: rgba(15, 23, 42, 0.75);
