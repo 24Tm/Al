@@ -65,12 +65,11 @@
 
         .dashboard-container { max-width: 1300px; margin: 0 auto; }
 
-        /* شاشة الدخول الاحترافية (تشبه نافذة النظام العسكري) */
+        /* شاشة الدخول (بدون ظل) */
         .login-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(5, 8, 15, 0.95);
-            backdrop-filter: blur(8px);
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -84,9 +83,7 @@
             border-radius: 16px;
             width: 100%;
             max-width: 580px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
             overflow: hidden;
-            animation: fadeIn 0.4s ease-out;
         }
 
         .login-header {
@@ -106,7 +103,7 @@
             text-align: center;
         }
 
-        /* الشعار المتحرك (نبض وتوهج) */
+        /* الشعار المتحرك (بدون ظل) */
         .animated-logo-container {
             margin: 0 auto 16px auto;
             width: 120px;
@@ -116,16 +113,15 @@
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(17, 24, 39, 1) 70%);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
             animation: logoPulse 3s infinite ease-in-out;
             border: 2px solid rgba(59, 130, 246, 0.5);
             position: relative;
         }
 
         @keyframes logoPulse {
-            0% { transform: scale(1); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
-            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(59, 130, 246, 0.7); border-color: #60a5fa; }
-            100% { transform: scale(1); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+            0% { transform: scale(1); border-color: rgba(59, 130, 246, 0.5); }
+            50% { transform: scale(1.05); border-color: #60a5fa; }
+            100% { transform: scale(1); border-color: rgba(59, 130, 246, 0.5); }
         }
 
         .shield-icon {
@@ -142,12 +138,7 @@
             font-size: 18px;
             font-weight: 800;
             color: #ffffff;
-            margin-bottom: 4px;
-        }
-        .login-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         /* إحصائيات سريعة في واجهة الدخول */
@@ -222,7 +213,7 @@
             color: var(--text-muted);
         }
 
-        /* واجهة النظام الأساسية (تخفى خلف شاشة الدخول) */
+        /* واجهة النظام الأساسية */
         .app-main-content { display: none; }
 
         .compact-header-bar {
@@ -234,7 +225,6 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            box-shadow: 0 6px 15px -3px rgba(0, 0, 0, 0.3);
         }
 
         .navbar-top-row {
@@ -293,7 +283,7 @@
         }
 
         .metric-card:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
-        .metric-card.active-filter { border-color: var(--primary); background: rgba(59, 130, 246, 0.2); box-shadow: 0 0 0 1px var(--primary); }
+        .metric-card.active-filter { border-color: var(--primary); background: rgba(59, 130, 246, 0.2); }
 
         .metric-card .label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
         .metric-card .val { font-size: 16px; font-weight: 900; }
@@ -318,7 +308,7 @@
         }
 
         .pill-btn:hover { background: #374151; color: #fff; }
-        .pill-btn.active { background: var(--primary); border-color: var(--primary); color: #ffffff; box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3); }
+        .pill-btn.active { background: var(--primary); border-color: var(--primary); color: #ffffff; }
 
         .panel-box {
             background: var(--sidebar-bg);
@@ -326,13 +316,6 @@
             border-radius: var(--radius);
             border: 1px solid var(--border);
             margin-bottom: 14px;
-            box-shadow: 0 8px 20px -5px rgba(0,0,0,0.3);
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .panel-box h3 {
@@ -362,7 +345,7 @@
             transition: all 0.2s;
         }
 
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
 
         .actions-group { display: flex; gap: 8px; margin-top: 12px; }
 
@@ -378,7 +361,7 @@
             flex: 1;
             transition: all 0.2s ease;
         }
-        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:hover { opacity: 0.9; }
         .btn-alt { background: #4b5563; }
         .btn-pdf { background: #0284c7; }
 
@@ -395,7 +378,6 @@
             color: var(--text-muted);
             cursor: pointer;
             white-space: nowrap;
-            transition: all 0.2s;
         }
         .reset-filter-btn:hover { background: #374151; color: #fff; }
 
@@ -412,32 +394,16 @@
             border-radius: var(--radius);
             padding: 14px;
             position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .transaction-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px -4px rgba(0, 0, 0, 0.4); }
-
-        @keyframes pulseBorder {
-            0% { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            50% { border-color: rgba(239, 68, 68, 1); box-shadow: 0 0 10px 2px rgba(239, 68, 68, 0.4); }
-            100% { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
         }
 
         .transaction-card.card-delayed {
             background: linear-gradient(135deg, var(--sidebar-bg), rgba(239, 68, 68, 0.08));
-            animation: pulseBorder 2s infinite ease-in-out;
-        }
-
-        @keyframes pulseYellowBorder {
-            0% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-            50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 10px 2px rgba(245, 158, 11, 0.4); }
-            100% { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            border-color: rgba(239, 68, 68, 0.4);
         }
 
         .transaction-card.card-approaching {
             background: linear-gradient(135deg, var(--sidebar-bg), rgba(245, 158, 11, 0.08));
-            animation: pulseYellowBorder 2s infinite ease-in-out;
+            border-color: rgba(245, 158, 11, 0.4);
         }
 
         .card-header {
@@ -485,7 +451,7 @@
 </head>
 <body>
 
-    <!-- نافذة تسجيل الدخول وحماية المحتوى (واجهة مطابقة للصورة وبشعار متحرك) -->
+    <!-- نافذة تسجيل الدخول -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <div class="login-header">
@@ -493,14 +459,13 @@
                 <span>تسجيل الدخول</span>
             </div>
             <div class="login-body">
-                <!-- شعار متحرك يوحي بالمعاملات والمتابعة الأمنية -->
+                <!-- الأيقونة الجديدة المعبرة عن المعاملات والملفات -->
                 <div class="animated-logo-container">
-                    <div class="shield-icon">🛡️📁</div>
+                    <div class="shield-icon">📊📋</div>
                 </div>
                 <div class="login-title-main">متابعة المعاملات اليومية</div>
-                <div class="login-subtitle">نظام المتابعة والإشراف الإداري المؤمّن</div>
 
-                <!-- عدادات تنبيهية تظهر الإحصائيات العامة للمتأخرات والقريبة دون الكشف عن المحتوى -->
+                <!-- عدادات تنبيهية -->
                 <div class="login-stats-grid">
                     <div class="login-stat-card red">
                         <span class="stat-label">معاملات انتهت ولم ترسل</span>
@@ -525,11 +490,11 @@
         </div>
     </div>
 
-    <!-- محتوى النظام الكامل (يخفى تماماً حتى يتم إدخال كلمة المرور الصحيحة 10030) -->
+    <!-- محتوى النظام الأساسي -->
     <div class="dashboard-container app-main-content" id="mainAppContent">
         <div class="compact-header-bar no-print-zone">
             <div class="navbar-top-row">
-                <div class="navbar-brand-wrapper" title="النظام يعمل بكفاءة">
+                <div class="navbar-brand-wrapper">
                     <span class="gear-emoji">⚙️</span>
                     <h1 class="brand-title">متابعة المعاملات - إدارة الشؤون الإدارية</h1>
                 </div>
@@ -1046,7 +1011,7 @@
 
         filtered.forEach(r => {
             let dueD = parseHijriToDate(r.dueDate);
-            dueD.setHours, dueD.setHours(0,0,0,0);
+            dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
 
             let cardClass = '';
