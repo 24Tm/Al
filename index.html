@@ -40,8 +40,8 @@
         :root {
             --font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --bg-deep: #030712;
-            --bg-card: rgba(17, 24, 39, 0.75);
-            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --bg-card: rgba(17, 24, 39, 0.80);
+            --bg-card-hover: rgba(30, 41, 59, 0.90);
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --primary: #3b82f6;
@@ -59,9 +59,6 @@
 
         body {
             background-color: var(--bg-deep);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(30, 58, 138, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(15, 23, 42, 0.4) 0%, transparent 40%);
             color: var(--text-main);
             margin: 0;
             padding: 16px;
@@ -70,16 +67,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .dashboard-container { max-width: 1300px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; }
+        /* خلفية الشبكة المتحركة (Canvas) */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .dashboard-container { max-width: 1300px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 1; }
 
         /* شاشة الدخول الجديدة بتصميم عمودي فاخر */
         .login-wrapper {
             width: 100%;
             max-width: 440px;
             margin: auto;
-            background: linear-gradient(160deg, rgba(17, 24, 39, 0.9), rgba(11, 15, 25, 0.98));
+            background: linear-gradient(160deg, rgba(17, 24, 39, 0.92), rgba(11, 15, 25, 0.98));
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(59, 130, 246, 0.3);
@@ -144,7 +154,7 @@
 
         .quick-stat-box {
             width: 100%;
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid var(--border);
             padding: 16px 20px;
             border-radius: 16px;
@@ -159,12 +169,12 @@
 
         .quick-stat-box.yellow { 
             border-right: 5px solid #f59e0b; 
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(245, 158, 11, 0.1));
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(245, 158, 11, 0.12));
             box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 15px rgba(245, 158, 11, 0.05);
         }
         .quick-stat-box.red { 
             border-right: 5px solid #ef4444; 
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(239, 68, 68, 0.1));
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(239, 68, 68, 0.12));
             box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 15px rgba(239, 68, 68, 0.05);
         }
 
@@ -188,7 +198,7 @@
         .quick-stat-box.red .q-icon { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
 
         .login-input-card {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.9);
             border: 1px solid var(--border);
             padding: 20px;
             border-radius: 20px;
@@ -303,7 +313,7 @@
         }
 
         .metric-card {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.7);
             padding: 14px;
             border-radius: 14px;
             border: 1px solid var(--border);
@@ -315,8 +325,8 @@
             transition: all 0.25s ease;
         }
 
-        .metric-card:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.12); transform: translateY(-2px); }
-        .metric-card.active-filter { border-color: var(--primary); background: rgba(59, 130, 246, 0.25); box-shadow: 0 0 15px var(--primary-glow); }
+        .metric-card:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.15); transform: translateY(-2px); }
+        .metric-card.active-filter { border-color: var(--primary); background: rgba(59, 130, 246, 0.3); box-shadow: 0 0 15px var(--primary-glow); }
 
         .metric-card .label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
         .metric-card .val { font-size: 19px; font-weight: 900; }
@@ -440,12 +450,12 @@
         .transaction-card:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 15px 30px rgba(0,0,0,0.35); }
 
         .transaction-card.card-delayed {
-            background: linear-gradient(145deg, var(--bg-card), rgba(239, 68, 68, 0.1));
+            background: linear-gradient(145deg, var(--bg-card), rgba(239, 68, 68, 0.12));
             border-color: rgba(239, 68, 68, 0.45);
         }
 
         .transaction-card.card-approaching {
-            background: linear-gradient(145deg, var(--bg-card), rgba(245, 158, 11, 0.1));
+            background: linear-gradient(145deg, var(--bg-card), rgba(245, 158, 11, 0.12));
             border-color: rgba(245, 158, 11, 0.45);
         }
 
@@ -487,6 +497,7 @@
 
         @media print {
             body { background: #fff !important; color: #000 !important; padding: 0 !important; display: block !important; }
+            #bgCanvas { display: none !important; }
             .no-print-zone { display: none !important; }
             .print-zone { display: block !important; width: 100% !important; }
         }
@@ -494,6 +505,9 @@
     </style>
 </head>
 <body>
+
+    <!-- عنصر الخلفية المتحركة -->
+    <canvas id="bgCanvas"></canvas>
 
     <div class="dashboard-container">
         <!-- شاشة الدخول بتصميم عمودي فخم ومطور -->
@@ -647,6 +661,100 @@
     </div>
 
 <script>
+    // تشغيل خلفية الشبكة المتحركة (Canvas)
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let particles = [];
+
+    function resizeCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 0.6;
+            this.vy = (Math.random() - 0.5) * 0.6;
+            this.radius = Math.random() * 2 + 1;
+            // تدرج بين الأزرق والأحمر/البرتقالي مثل الصورة
+            this.isRed = Math.random() < 0.35; 
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0 || this.x > width) this.vx = -this.vx;
+            if (this.y < 0 || this.y > height) this.vy = -this.vy;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.isRed ? 'rgba(239, 68, 68, 0.7)' : 'rgba(59, 130, 246, 0.7)';
+            ctx.fill();
+        }
+    }
+
+    // إنشاء عدد مناسب من النقاط لتشكيل الشبكة التقنية
+    function initParticles() {
+        particles = [];
+        let count = Math.floor((width * height) / 18000);
+        count = Math.max(35, Math.min(count, 90));
+        for (let i = 0; i < count; i++) {
+            particles.push(new Particle());
+        }
+    }
+    initParticles();
+
+    function animateBg() {
+        ctx.clearRect(0, 0, width, height);
+
+        // رسم تدرج خفيف في الخلفية
+        let grad = ctx.createLinearGradient(0, 0, width, height);
+        grad.addColorStop(0, '#030712');
+        grad.addColorStop(0.5, '#0b0f19');
+        grad.addColorStop(1, '#030712');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        // تحديث ورسم النقاط والخطوط الواصلة بينها
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+
+            for (let j = i + 1; j < particles.length; j++) {
+                let dx = particles[i].x - particles[j].x;
+                let dy = particles[i].y - particles[j].y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 140) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    let alpha = (1 - (dist / 140)) * 0.25;
+                    
+                    if (particles[i].isRed || particles[j].isRed) {
+                        ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+                    } else {
+                        ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+                    }
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animateBg);
+    }
+    animateBg();
+
+
     let userRole = null; 
     let currentTab = 'active';
     let activeMetricFilter = null;
