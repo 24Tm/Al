@@ -3,1130 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متابعة المعاملات اليومية - لوحة الإدارة المتكاملة</title>
-    <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
-          authDomain: "project-3958113961260211077.firebaseapp.com",
-          projectId: "project-3958113961260211077",
-          storageBucket: "project-3958113961260211077.firebasestorage.app",
-          messagingSenderId: "889377835896",
-          appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.db = db;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.updateDoc = updateDoc;
-        window.deleteDoc = deleteDoc;
-        window.doc = doc;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (typeof loadRecordsFromCloud === 'function') {
-                loadRecordsFromCloud();
-            }
-        });
-    </script>
-
+    <title>تسجيل الدخول - النظام الإداري</title>
     <style>
-        :root {
-            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --bg-deep: #030712;
-            --bg-card: rgba(17, 24, 39, 0.75);
-            --bg-card-hover: rgba(30, 41, 59, 0.85);
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.35);
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --border: rgba(55, 65, 81, 0.6);
-            --radius: 18px;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-
-        * { box-sizing: border-box; }
 
         body {
-            font-family: var(--font-family);
-            background-color: var(--bg-deep);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(30, 58, 138, 0.18) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(15, 23, 42, 0.5) 0%, transparent 40%);
-            color: var(--text-main);
-            margin: 0;
-            padding: 16px;
-            direction: rtl;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .dashboard-container { max-width: 1300px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; }
-
-        /* شاشة الدخول المدمجة والموحدة في الطابع اللوني */
-        .login-wrapper {
-            width: 100%;
-            max-width: 440px;
-            margin: auto;
-            background: linear-gradient(145deg, rgba(17, 24, 39, 0.88), rgba(11, 15, 25, 0.96));
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            box-shadow: 0 35px 65px -15px rgba(0, 0, 0, 0.85), 0 0 45px rgba(59, 130, 246, 0.15);
-            border-radius: 30px;
             overflow: hidden;
-            animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: translateY(15px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .login-content-area {
-            padding: 36px 28px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .unified-logo-box {
-            margin-bottom: 18px;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.05) 100%);
-            border-radius: 24px;
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3), inset 0 0 12px rgba(59, 130, 246, 0.15);
-            animation: pulseGlow 3s infinite ease-in-out;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.3), inset 0 0 12px rgba(59, 130, 246, 0.15); }
-            50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.5), inset 0 0 18px rgba(59, 130, 246, 0.25); }
-        }
-
-        .system-title {
-            font-size: 21px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 24px;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        /* شريط الإحصائيات المختصرة المطور */
-        .login-quick-stats {
-            display: flex;
-            gap: 14px;
+        .login-container {
             width: 100%;
-            margin-bottom: 24px;
-        }
-
-        .quick-stat-box {
-            flex: 1;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--border);
-            padding: 16px;
-            border-radius: 18px;
-            text-align: right;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 8px 22px rgba(0,0,0,0.35);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .quick-stat-box:hover { transform: translateY(-3px); background: rgba(15, 23, 42, 0.98); }
-
-        .quick-stat-box.yellow { 
-            border-right: 4px solid #f59e0b; 
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(245, 158, 11, 0.1));
-            box-shadow: 0 8px 22px rgba(0,0,0,0.35), 0 0 18px rgba(245, 158, 11, 0.08);
-        }
-        .quick-stat-box.red { 
-            border-right: 4px solid #ef4444; 
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(239, 68, 68, 0.1));
-            box-shadow: 0 8px 22px rgba(0,0,0,0.35), 0 0 18px rgba(239, 68, 68, 0.08);
-        }
-
-        .q-info { display: flex; flex-direction: column; gap: 4px; }
-        .q-label { font-size: 12px; color: var(--text-muted); font-weight: 700; }
-        .q-num { font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
-        
-        .quick-stat-box.yellow .q-num { color: #fbbf24; text-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
-        .quick-stat-box.red .q-num { color: #f87171; text-shadow: 0 0 12px rgba(239, 68, 68, 0.4); }
-
-        .login-input-card {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-            text-align: right;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.45);
-        }
-
-        .login-input-card label {
-            font-size: 13px;
-            color: #93c5fd;
-            font-weight: 700;
-        }
-
-        .input-action-row {
-            display: flex;
-            gap: 12px;
-        }
-
-        .input-action-row input {
-            flex: 1;
-            padding: 14px 16px;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            background: #030712;
-            color: #fff;
-            text-align: center;
-            font-size: 18px;
-            letter-spacing: 6px;
-            transition: all 0.3s;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-        }
-
-        .input-action-row input:focus {
-            border-color: var(--primary);
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 15px var(--primary-glow);
-            outline: none;
-        }
-
-        .action-submit-btn {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: #fff;
-            border: none;
-            padding: 0 24px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.45);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .action-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(59, 130, 246, 0.65); filter: brightness(1.1); }
-        .action-submit-btn:active { transform: translateY(0); }
-
-        /* واجهة النظام الأساسية (مخفية حتى يتم تسجيل الدخول) */
-        .app-main-content { display: none; width: 100%; }
-
-        .compact-header-bar {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 20px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
-        }
-
-        .navbar-top-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar-brand-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-icon-box {
-            width: 38px; height: 38px;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-        }
-
-        .brand-title { 
-            margin: 0; 
-            font-size: 18.5px; 
-            font-weight: 800; 
-            background: linear-gradient(to left, #60a5fa, #38bdf8); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-        }
-
-        .metrics-inline {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            border-top: 1px solid var(--border);
-            padding-top: 14px;
-        }
-
-        .metric-card {
-            background: rgba(15, 23, 42, 0.6);
-            padding: 14px;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .metric-card:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.12); transform: translateY(-2px); }
-        .metric-card.active-filter { border-color: var(--primary); background: rgba(59, 130, 246, 0.25); box-shadow: 0 0 15px var(--primary-glow); }
-
-        .metric-card .label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
-        .metric-card .val { font-size: 19px; font-weight: 900; }
-        .metric-card.in-progress .val { color: #60a5fa; text-shadow: 0 0 10px rgba(96, 165, 250, 0.3); }
-        .metric-card.delayed .val { color: #f87171; text-shadow: 0 0 10px rgba(248, 113, 113, 0.3); }
-        .metric-card.completed .val { color: #34d399; text-shadow: 0 0 10px rgba(52, 211, 153, 0.3); }
-
-        .nav-pills { display: flex; gap: 12px; margin-bottom: 16px; }
-
-        .pill-btn {
-            flex: 1;
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            padding: 13px;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.25s ease;
-        }
-
-        .pill-btn:hover { background: var(--bg-card-hover); color: #fff; }
-        .pill-btn.active { background: var(--primary); border-color: var(--primary); color: #ffffff; box-shadow: 0 4px 18px var(--primary-glow); }
-
-        .panel-box {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            padding: 26px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            margin-bottom: 16px;
-            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.4);
-        }
-
-        .panel-box h3 {
-            margin-top: 0;
-            font-size: 16.5px;
-            color: #ffffff;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 14px;
-            margin-bottom: 18px;
-        }
-
-        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .form-item { margin-bottom: 14px; }
-        .form-item.full-width { grid-column: span 2; }
-
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 12.5px; color: var(--text-muted); }
-
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-size: 14px;
-            background: #030712;
-            color: var(--text-main);
-            text-align: right;
-            transition: all 0.25s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
-        }
-
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 12px var(--primary-glow); }
-
-        .actions-group { display: flex; gap: 12px; margin-top: 20px; }
-
-        .btn {
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            padding: 12px 22px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            flex: 1;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-        }
-        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        .btn-alt { background: #374151; box-shadow: none; }
-        .btn-pdf { background: #0284c7; }
-
-        .search-box-wrapper { margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
-        .search-box-wrapper input { padding: 14px 18px; border-radius: 14px; border: 1px solid var(--border); font-size: 14px; background: var(--bg-card); }
-        
-        .reset-filter-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 14px 18px;
-            border-radius: 14px;
-            font-size: 13.5px;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        .reset-filter-btn:hover { background: var(--bg-card-hover); color: #fff; }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .transaction-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
+            max-width: 420px;
+            padding: 2.5rem;
+            background: #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-        }
-        .transaction-card:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 15px 30px rgba(0,0,0,0.35); }
-
-        .transaction-card.card-delayed {
-            background: linear-gradient(145deg, var(--bg-card), rgba(239, 68, 68, 0.1));
-            border-color: rgba(239, 68, 68, 0.45);
+            transition: all 0.3s ease;
         }
 
-        .transaction-card.card-approaching {
-            background: linear-gradient(145deg, var(--bg-card), rgba(245, 158, 11, 0.1));
-            border-color: rgba(245, 158, 11, 0.45);
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .card-header {
+        .login-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #f1f5f9;
+        }
+
+        .login-header p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        /* Role Switcher Tabs */
+        .role-switcher {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 12px;
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #334155;
         }
 
-        .trans-number-date-group { display: flex; flex-direction: column; gap: 4px; }
-        .trans-number { font-weight: 800; font-size: 15.5px; color: #60a5fa; }
-        .trans-date { font-size: 12px; color: var(--text-muted); font-weight: 600; }
-        
-        .card-body { margin-bottom: 14px; }
-        .card-subject { font-size: 14.5px; font-weight: 700; color: #f3f4f6; margin-bottom: 12px; line-height: 1.5; }
-        .card-meta { font-size: 12.5px; color: var(--text-muted); display: flex; justify-content: space-between; }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid var(--border);
-            padding-top: 12px;
+        .role-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
         }
 
-        .status-badge { padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; display: inline-block; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .badge-green { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
-        .badge-red { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
-        .badge-orange { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
-
-        .table-actions { display: flex; gap: 8px; }
-        .btn-mini { padding: 7px 14px; font-size: 12px; border-radius: 9px; border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-        .btn-mini:hover { transform: translateY(-1px); filter: brightness(1.15); }
-        .btn-mini-edit { background: rgba(245, 158, 11, 0.22); color: #fbbf24; }
-        .btn-mini-del { background: rgba(239, 68, 68, 0.22); color: #f87171; }
-
-        @media print {
-            body { background: #fff !important; color: #000 !important; padding: 0 !important; display: block !important; }
-            .no-print-zone { display: none !important; }
-            .print-zone { display: block !important; width: 100% !important; }
+        .role-btn.active {
+            background: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
-        .print-zone { display: none; }
+
+        /* Dynamic style when Admin is selected */
+        .login-container.admin-mode .role-btn.active {
+            background: #d97706; /* لون ذهبي/برتقالي رصين للمسؤول */
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        }
+
+        .login-container.admin-mode {
+            border-color: #d9770655;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #f8fafc;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .login-container.admin-mode .form-control:focus {
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: #2563eb;
+        }
+
+        .login-container.admin-mode .submit-btn {
+            background: #d97706;
+        }
+
+        .login-container.admin-mode .submit-btn:hover {
+            background: #b45309;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .system-status {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: #64748b;
+            border-top: 1px solid #334155;
+            padding-top: 1rem;
+        }
     </style>
 </head>
 <body>
 
-    <div class="dashboard-container">
-        <!-- شاشة الدخول المطورة -->
-        <div class="login-wrapper" id="loginOverlay">
-            <div class="login-content-area">
-                <div class="unified-logo-box">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                </div>
-                <div class="system-title">متابعة المعاملات اليومية</div>
-
-                <!-- شريط الإحصائيات الأفقية المطور -->
-                <div class="login-quick-stats">
-                    <div class="quick-stat-box yellow">
-                        <div class="q-info">
-                            <span class="q-label">اقتربت من الوقت</span>
-                            <span class="q-num" id="loginCountApproaching">0</span>
-                        </div>
-                    </div>
-                    
-                    <div class="quick-stat-box red">
-                        <div class="q-info">
-                            <span class="q-label">معاملات متأخرة</span>
-                            <span class="q-num" id="loginCountDelayed">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="login-input-card">
-                    <label>كلمة المرور</label>
-                    <div class="input-action-row">
-                        <input type="password" id="loginPasswordInput" placeholder="••••••" onkeydown="if(event.key === 'Enter') checkSystemPassword()">
-                        <button class="action-submit-btn" onclick="checkSystemPassword()">دخول</button>
-                    </div>
-                </div>
-            </div>
+    <div class="login-container" id="loginCard">
+        <div class="login-header">
+            <h2>تسجيل الدخول للنظام</h2>
+            <p id="roleDescription">يرجى إدخال البيانات الخاصة بالمستخدم العادي</p>
         </div>
 
-        <!-- محتوى النظام الأساسي -->
-        <div class="app-main-content" id="mainAppContent">
-            <div class="compact-header-bar no-print-zone">
-                <div class="navbar-top-row">
-                    <div class="navbar-brand-wrapper">
-                        <div class="brand-icon-box">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                        </div>
-                        <h1 class="brand-title">متابعة المعاملات اليومية</h1>
-                    </div>
-                    <button class="btn-mini btn-mini-del" onclick="lockSystem()" style="padding: 7px 14px;">قفل النظام 🔒</button>
-                </div>
-                <div class="metrics-inline">
-                    <div class="metric-card in-progress" id="cardInProgress" onclick="filterByMetric('in-progress')">
-                        <div class="label">تحت الإجراء</div>
-                        <div class="val" id="countInProgress">0</div>
-                    </div>
-                    <div class="metric-card delayed" id="cardDelayed" onclick="filterByMetric('delayed')">
-                        <div class="label">متأخرة</div>
-                        <div class="val" id="countDelayed">0</div>
-                    </div>
-                    <div class="metric-card completed" id="cardCompleted" onclick="filterByMetric('completed')">
-                        <div class="label">المنجزة</div>
-                        <div class="val" id="countCompleted">0</div>
-                    </div>
-                </div>
+        <!-- تبديل الصلاحيات -->
+        <div class="role-switcher">
+            <button type="button" class="role-btn active" id="userTab" onclick="setRole('user')">مستخدم عادي</button>
+            <button type="button" class="role-btn" id="adminTab" onclick="setRole('admin')">صلاحية المسؤول</button>
+        </div>
+
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label id="idLabel" for="username">اسم المستخدم أو الرقم الوظيفي</label>
+                <input type="text" id="username" class="form-control" placeholder="أدخل المعرف هنا" required>
             </div>
 
-            <div class="nav-pills no-print-zone">
-                <button class="pill-btn active" id="tabActive" onclick="switchTab('active')">المعاملات النشطة والمتأخرة</button>
-                <button class="pill-btn" id="tabCompleted" onclick="switchTab('completed')">المعاملات المنجزة</button>
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
             </div>
 
-            <!-- صندوق الإدارة (إضافة وتعديل المعاملات) -->
-            <div class="panel-box no-print-zone" id="adminFormCard">
-                <h3 id="formTitleText">➕ تسجيل معاملة جديدة</h3>
-                <input type="hidden" id="recordId">
-                
-                <div class="form-grid-2">
-                    <div class="form-item">
-                        <label>رقم المعاملة:</label>
-                        <input type="text" id="transNumber" placeholder="رقم المعاملة">
-                    </div>
-                    <div class="form-item">
-                        <label>الحالة:</label>
-                        <select id="transStatus">
-                            <option value="لم تنجز">لم تنجز</option>
-                            <option value="أنجزت">أنجزت</option>
-                        </select>
-                    </div>
-                </div>
+            <button type="submit" class="submit-btn" id="submitBtn">دخول النظام</button>
+        </form>
 
-                <div class="form-item full-width">
-                    <label>موضوع المعاملة:</label>
-                    <input type="text" id="transSubject" placeholder="موضوع المعاملة بالتفصيل">
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-item">
-                        <label>حولت لـ:</label>
-                        <input type="text" id="transTo" placeholder="الجهة المحولة لها">
-                    </div>
-                    <div class="form-item">
-                        <label>مدة الإنجاز المطلوبة:</label>
-                        <select id="durationDays" class="form-control" onchange="calculateDueDate()">
-                            <option value="1">يوم واحد (24 ساعة)</option>
-                            <option value="3" selected>3 أيام</option>
-                            <option value="5">5 أيام</option>
-                            <option value="7">أسبوع (7 أيام)</option>
-                            <option value="14">أسبوعين (14 يوماً)</option>
-                            <option value="30">شهر كامل (30 يوماً)</option>
-                            <option value="custom">تحديد عدد أيام آخر...</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-item full-width" id="customDaysGroup" style="display: none;">
-                    <label>أدخل عدد الأيام يدوياً:</label>
-                    <input type="number" id="customDaysInput" class="form-control" min="1" value="3" oninput="calculateDueDate()">
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-item">
-                        <label>تاريخ الاستحقاق المحسوب (هجري YYYY-MM-DD):</label>
-                        <input type="text" id="transDueDate" readonly style="background-color: #030712; font-weight: bold; color: #38bdf8;">
-                    </div>
-                    <div class="form-item">
-                        <label>تاريخ المعاملة (هجري YYYY-MM-DD):</label>
-                        <input type="text" id="transDate" placeholder="1447-04-01" oninput="calculateDueDate()">
-                    </div>
-                </div>
-
-                <div class="actions-group">
-                    <button class="btn" onclick="saveRecord()" id="saveBtnText">حفظ المعاملة</button>
-                    <button class="btn btn-alt" onclick="resetForm()">إلغاء</button>
-                    <button class="btn btn-pdf" onclick="exportDelayedAndApproachingPDF()">📄 تقرير المتأخرات والقريبة PDF</button>
-                </div>
-            </div>
-
-            <div class="search-box-wrapper no-print-zone">
-                <input type="text" id="searchQuery" placeholder="🔍 بحث فوري تفاعلي (برقم المعاملة، الموضوع...)" oninput="renderRecords()">
-                <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
-            </div>
-
-            <div class="cards-grid no-print-zone" id="recordsCardsContainer"></div>
-
-            <div id="printArea" class="print-zone"></div>
+        <div class="system-status">
+            الحالة: النظام آمن ومتصل • الإصدار 2.6
         </div>
     </div>
 
-<script>
-    let userRole = null; 
-    let currentTab = 'active';
-    let activeMetricFilter = null;
-    let cachedRecords = []; 
+    <script>
+        function setRole(role) {
+            const card = document.getElementById('loginCard');
+            const userTab = document.getElementById('userTab');
+            const adminTab = document.getElementById('adminTab');
+            const roleDesc = document.getElementById('roleDescription');
+            const idLabel = document.getElementById('idLabel');
 
-    function checkSystemPassword() {
-        let pass = document.getElementById('loginPasswordInput').value.trim();
-
-        if (pass === "Dd1616") {
-            userRole = 'admin'; 
-            initSystemSession();
-        } 
-        else if (pass === "10030") {
-            userRole = 'view'; 
-            initSystemSession();
-        } 
-        else {
-            alert("كلمة المرور غير صحيحة!");
-            document.getElementById('loginPasswordInput').value = '';
-            document.getElementById('loginPasswordInput').focus();
-        }
-    }
-
-    function initSystemSession() {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainAppContent').style.display = 'block';
-
-        if (userRole === 'view') {
-            document.getElementById('adminFormCard').style.display = 'none';
-        } else {
-            document.getElementById('adminFormCard').style.display = 'block';
+            if (role === 'admin') {
+                card.classList.add('admin-mode');
+                adminTab.classList.add('active');
+                userTab.classList.remove('active');
+                roleDesc.textContent = 'منطقة مخصصة لمسؤولي النظام وصلاحيات الإشراف العليا';
+                idLabel.textContent = 'معرف المسؤول / السجل المدني';
+            } else {
+                card.classList.remove('admin-mode');
+                userTab.classList.add('active');
+                adminTab.classList.remove('active');
+                roleDesc.textContent = 'يرجى إدخال البيانات الخاصة بالمستخدم العادي';
+                idLabel.textContent = 'اسم المستخدم أو الرقم الوظيفي';
+            }
         }
 
-        renderRecords();
-    }
-
-    function lockSystem() {
-        userRole = null;
-        document.getElementById('mainAppContent').style.display = 'none';
-        document.getElementById('loginOverlay').style.display = 'block';
-        document.getElementById('loginPasswordInput').value = '';
-        updateLoginScreenCounters();
-    }
-
-    function getTodayHijriString() {
-        try {
-            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            let parts = formatter.formatToParts(new Date());
-            let y = parts.find(p => p.type === 'year').value;
-            let m = parts.find(p => p.type === 'month').value;
-            let d = parts.find(p => p.type === 'day').value;
-            return `${y}-${m}-${d}`;
-        } catch (e) {
-            return "1447-04-01";
-        }
-    }
-
-    function parseHijriToDate(hijriStr) {
-        if (!hijriStr) return new Date();
-        let parts = hijriStr.split(/[-/]/);
-        if (parts.length !== 3) return new Date();
-        let hy = parseInt(parts[0], 10);
-        let hm = parseInt(parts[1], 10);
-        let hd = parseInt(parts[2], 10);
-
-        let estimatedGregorianYear = Math.round(hy * 0.9702 + 621.56);
-        let d = new Date(estimatedGregorianYear, hm - 1, hd);
-        return d;
-    }
-
-    function calculateDueDate() {
-        let selectElement = document.getElementById('durationDays');
-        let customGroup = document.getElementById('customDaysGroup');
-        let daysToAdd = 3;
-
-        if (selectElement.value === 'custom') {
-            customGroup.style.display = 'block';
-            daysToAdd = parseInt(document.getElementById('customDaysInput').value) || 1;
-        } else {
-            customGroup.style.display = 'none';
-            daysToAdd = parseInt(selectElement.value);
-        }
-
-        let baseDateStr = document.getElementById('transDate').value.trim();
-        let parts = baseDateStr.split(/[-/]/);
-        
-        if (parts.length === 3) {
-            let hy = parseInt(parts[0], 10);
-            let hm = parseInt(parts[1], 10);
-            let hd = parseInt(parts[2], 10) + daysToAdd;
-
-            while (hd > 30) { hd -= 30; hm += 1; }
-            while (hm > 12) { hm -= 12; hy += 1; }
-            while (hd < 1) { hd += 30; hm -= 1; }
-            while (hm < 1) { hm += 12; hy -= 1; }
-
-            let mFormatted = String(hm).padStart(2, '0');
-            let dFormatted = String(hd).padStart(2, '0');
-            document.getElementById('transDueDate').value = `${hy}-${mFormatted}-${dFormatted}`;
-        } else {
-            document.getElementById('transDueDate').value = baseDateStr;
-        }
-    }
-
-    document.getElementById('transDate').value = getTodayHijriString();
-    calculateDueDate();
-
-    function updateLoginScreenCounters() {
-        let todayDate = parseHijriToDate(getTodayHijriString());
-        todayDate.setHours(0,0,0,0);
-
-        let delayedCount = 0;
-        let approachingCount = 0;
-
-        cachedRecords.forEach(r => {
-            if (r.status === 'أنجزت') return;
-            let dueD = parseHijriToDate(r.dueDate);
-            dueD.setHours(0,0,0,0);
-            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+        function handleLogin(event) {
+            event.preventDefault();
+            const isুম Admin = document.getElementById('loginCard').classList.contains('admin-mode');
+            const user = document.getElementById('username').value;
             
-            if (diffDays < 0) {
-                delayedCount++;
-            } else if (diffDays <= 4) {
-                approachingCount++;
-            }
-        });
-
-        document.getElementById('loginCountDelayed').innerText = delayedCount;
-        document.getElementById('loginCountApproaching').innerText = approachingCount;
-    }
-
-    function animateValue(id, start, end, duration) {
-        let obj = document.getElementById(id);
-        if (!obj) return;
-        if (start === end) {
-            obj.innerText = end;
-            return;
-        }
-        let range = end - start;
-        let current = start;
-        let increment = end > start ? 1 : -1;
-        let stepTime = Math.abs(Math.floor(duration / range));
-        stepTime = Math.max(stepTime, 20);
-        let timer = setInterval(function() {
-            current += increment;
-            obj.innerText = current;
-            if (current == end) { clearInterval(timer); }
-        }, stepTime);
-    }
-
-    function switchTab(tab) {
-        currentTab = tab;
-        activeMetricFilter = null;
-        document.getElementById('resetFilterBtn').style.display = 'none';
-        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
-
-        document.getElementById('tabActive').classList.toggle('active', tab === 'active');
-        document.getElementById('tabCompleted').classList.toggle('active', tab === 'completed');
-        renderRecords();
-    }
-
-    function filterByMetric(metricType) {
-        activeMetricFilter = activeMetricFilter === metricType ? null : metricType;
-        
-        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
-        if (activeMetricFilter) {
-            document.getElementById('resetFilterBtn').style.display = 'block';
-            if (metricType === 'in-progress') document.getElementById('cardInProgress').classList.add('active-filter');
-            if (metricType === 'delayed') document.getElementById('cardDelayed').classList.add('active-filter');
-            if (metricType === 'completed') document.getElementById('cardCompleted').classList.add('active-filter');
-        } else {
-            document.getElementById('resetFilterBtn').style.display = 'none';
-        }
-        renderRecords();
-    }
-
-    function clearMetricFilter() {
-        activeMetricFilter = null;
-        document.getElementById('resetFilterBtn').style.display = 'none';
-        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
-        renderRecords();
-    }
-
-    async function loadRecordsFromCloud() {
-        try {
-            const querySnapshot = await window.getDocs(window.collection(window.db, "transactions"));
-            cachedRecords = [];
-            querySnapshot.forEach((docSnap) => {
-                let data = docSnap.data();
-                cachedRecords.push({
-                    docId: docSnap.id,
-                    id: data.id || Date.now(),
-                    number: data.number,
-                    date: data.date || getTodayHijriString(),
-                    subject: data.subject,
-                    to: data.to,
-                    status: data.status,
-                    dueDate: data.dueDate
-                });
-            });
-            updateLoginScreenCounters();
-            if (userRole) renderRecords();
-        } catch (error) {
-            console.error("خطأ في جلب البيانات:", error);
-        }
-    }
-
-    async function saveRecord() {
-        if (userRole !== 'admin') {
-            alert("عذراً، ليس لديك صلاحية التعديل أو الحفظ.");
-            return;
-        }
-
-        let docId = document.getElementById('recordId').value;
-        let number = document.getElementById('transNumber').value.trim();
-        let date = document.getElementById('transDate').value.trim();
-        let subject = document.getElementById('transSubject').value.trim();
-        let to = document.getElementById('transTo').value.trim();
-        let status = document.getElementById('transStatus').value;
-        let dueDate = document.getElementById('transDueDate').value.trim();
-
-        if (!number || !subject || !dueDate || !date) {
-            alert('الرجاء التأكد من تعبئة جميع الحقول الأساسية وتواريخ المعاملة.');
-            return;
-        }
-
-        let recordData = { id: Date.now(), number, date, subject, to, status, dueDate };
-
-        try {
-            if (docId) {
-                let targetDoc = cachedRecords.find(r => r.id == docId);
-                if (targetDoc) {
-                    recordData.id = Number(docId);
-                    await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), recordData);
-                }
+            if (isAdmin) {
+                alert(`جاري التحقق من صلاحيات المسؤول للمستخدم: ${user}...`);
             } else {
-                await window.addDoc(window.collection(window.db, "transactions"), recordData);
-            }
-
-            resetForm();
-            loadRecordsFromCloud();
-        } catch (error) {
-            alert("حدث خطأ أثناء حفظ المعاملة: " + error.message);
-        }
-    }
-
-    function editRecord(id) {
-        if (userRole !== 'admin') {
-            alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية التعديل.");
-            return;
-        }
-        let r = cachedRecords.find(item => item.id == id);
-        if (!r) return;
-
-        document.getElementById('recordId').value = r.id;
-        document.getElementById('transNumber').value = r.number;
-        document.getElementById('transDate').value = r.date || getTodayHijriString();
-        document.getElementById('transSubject').value = r.subject;
-        document.getElementById('transTo').value = r.to || '';
-        document.getElementById('transStatus').value = r.status;
-        document.getElementById('transDueDate').value = r.dueDate;
-        
-        document.getElementById('formTitleText').innerText = "✏️ تعديل المعاملة";
-        document.getElementById('saveBtnText').innerText = "تحديث البيانات";
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-
-    async function deleteRecord(id) {
-        if (userRole !== 'admin') {
-            alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية الحذف.");
-            return;
-        }
-        if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
-            let r = cachedRecords.find(item => item.id == id);
-            if (r && r.docId) {
-                try {
-                    await window.deleteDoc(window.doc(window.db, "transactions", r.docId));
-                    loadRecordsFromCloud();
-                } catch (error) {
-                    alert("تعذر الحذف: " + error.message);
-                }
+                alert(`جاري تسجيل دخول المستخدم العادي: ${user}...`);
             }
         }
-    }
-
-    function resetForm() {
-        document.getElementById('recordId').value = '';
-        document.getElementById('transNumber').value = '';
-        document.getElementById('transSubject').value = '';
-        document.getElementById('transTo').value = '';
-        document.getElementById('transStatus').value = 'لم تنجز';
-        document.getElementById('transDate').value = getTodayHijriString();
-        document.getElementById('durationDays').value = "3";
-        document.getElementById('customDaysGroup').style.display = 'none';
-        calculateDueDate();
-        document.getElementById('formTitleText').innerText = "➕ تسجيل معاملة جديدة";
-        document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
-    }
-
-    function exportDelayedAndApproachingPDF() {
-        let todayDate = parseHijriToDate(getTodayHijriString());
-        todayDate.setHours(0,0,0,0);
-
-        let targetRecords = cachedRecords.filter(r => {
-            if (r.status === 'أنجزت') return false;
-            let dueD = parseHijriToDate(r.dueDate);
-            dueD.setHours(0,0,0,0);
-            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            return diffDays <= 4;
-        });
-
-        if (targetRecords.length === 0) {
-            alert('لا توجد معاملات متأخرة أو قريبة من الاستحقاق حالياً.');
-            return;
-        }
-
-        targetRecords.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
-
-        let printArea = document.getElementById('printArea');
-        let printHTML = `
-            <div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px; color: #000;">
-                <h2 style="text-align: center; margin-bottom: 5px;">تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2>
-                <p style="text-align: center; font-size: 12px; color: #555; margin-bottom: 20px;">تاريخ التقرير الهجري: ${getTodayHijriString()}</p>
-                <hr style="border: 1px solid #ccc; margin-bottom: 15px;">
-        `;
-
-        targetRecords.forEach((r, index) => {
-            let dueD = parseHijriToDate(r.dueDate);
-            dueD.setHours(0,0,0,0);
-            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            
-            let statusText = "";
-            let statusColor = "";
-            if (diffDays < 0) {
-                statusText = `متأخرة بـ ${Math.abs(diffDays)} يوم`;
-                statusColor = "#dc2626";
-            } else if (diffDays === 0) {
-                statusText = `مستحقة اليوم`;
-                statusColor = "#d97706";
-            } else {
-                statusText = `متبقي عليها ${diffDays} أيام (قريبة)`;
-                statusColor = "#d97706";
-            }
-
-            printHTML += `
-                <div style="margin-bottom: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9;">
-                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px;">
-                        <span>${index + 1}. معاملة رقم: ${r.number}</span>
-                        <span style="color: ${statusColor};">${statusText}</span>
-                    </div>
-                    <div style="font-size: 13px; margin-bottom: 4px;"><b>الموضوع:</b> ${r.subject}</div>
-                    <div style="font-size: 12px; color: #555; display: flex; justify-content: space-between;">
-                        <span>الجهة المحولة لها: ${r.to || '---'}</span>
-                        <span>تاريخ الاستحقاق: ${r.dueDate}</span>
-                    </div>
-                </div>
-            `;
-        });
-
-        printHTML += `</div>`;
-        printArea.innerHTML = printHTML;
-        
-        setTimeout(() => {
-            window.print();
-        }, 100);
-    }
-
-    function renderRecords() {
-        if (!userRole) return;
-        let query = document.getElementById('searchQuery').value.toLowerCase();
-        let todayDate = parseHijriToDate(getTodayHijriString());
-        todayDate.setHours(0,0,0,0);
-
-        let inProgressCount = 0;
-        let completedCount = 0;
-        let delayedCount = 0;
-
-        cachedRecords.forEach(r => {
-            let dueD = parseHijriToDate(r.dueDate);
-            dueD.setHours(0,0,0,0);
-            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            if (diffDays < 0 && r.status === 'لم تنجز') {
-                delayedCount++;
-            } else if (r.status === 'أنجزت') {
-                completedCount++;
-            } else {
-                inProgressCount++;
-            }
-        });
-
-        let oldInProgress = parseInt(document.getElementById('countInProgress').innerText) || 0;
-        let oldDelayed = parseInt(document.getElementById('countDelayed').innerText) || 0;
-        let oldCompleted = parseInt(document.getElementById('countCompleted').innerText) || 0;
-
-        animateValue('countInProgress', oldInProgress, inProgressCount, 400);
-        animateValue('countDelayed', oldDelayed, delayedCount, 400);
-        animateValue('countCompleted', oldCompleted, completedCount, 400);
-
-        updateLoginScreenCounters();
-
-        let filtered = cachedRecords.filter(r => {
-            let dueD = parseHijriToDate(r.dueDate);
-            dueD.setHours(0,0,0,0);
-            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            let isDelayed = diffDays < 0 && r.status === 'لم تنجز';
-            let isCompleted = r.status === 'أنجزت';
-            let isInProgress = !isDelayed && !isCompleted;
-
-            if (activeMetricFilter === 'in-progress' && !isInProgress) return false;
-            if (activeMetricFilter === 'delayed' && !isDelayed) return false;
-            if (activeMetricFilter === 'completed' && !isCompleted) return false;
-
-            if (!activeMetricFilter) {
-                if (currentTab === 'active' && isCompleted) return false;
-                if (currentTab === 'completed' && !isCompleted) return false;
-            }
-
-            return true;
-        });
-        
-        filtered = filtered.filter(r => 
-            r.number.toLowerCase().includes(query) || 
-            r.subject.toLowerCase().includes(query) || 
-            (r.to && r.to.toLowerCase().includes(query)) ||
-            (r.date && r.date.toLowerCase().includes(query))
-        );
-
-        filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
-
-        let container = document.getElementById('recordsCardsContainer');
-        container.innerHTML = '';
-
-        if (filtered.length === 0) {
-            container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 30px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">لا توجد سجلات مطابقة للعرض</div>`;
-            return;
-        }
-
-        filtered.forEach(r => {
-            let dueD = parseHijriToDate(r.dueDate);
-            dueD.setHours(0,0,0,0);
-            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-
-            let cardClass = '';
-            let statusBadge = '';
-
-            if (r.status === 'أنجزت') {
-                statusBadge = `<span class="status-badge badge-green">منجزة</span>`;
-            } else if (diffDays < 0) {
-                cardClass = 'card-delayed';
-                statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diffDays)} يوم)</span>`;
-            } else if (diffDays <= 4) {
-                cardClass = 'card-approaching';
-                statusBadge = `<span class="status-badge badge-orange">متبقي ${diffDays} يوم (قريب)</span>`;
-            } else {
-                statusBadge = `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
-            }
-
-            let actionsHTML = '';
-            if (userRole === 'admin') {
-                actionsHTML = `
-                    <div class="table-actions">
-                        <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
-                        <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
-                    </div>
-                `;
-            } else {
-                actionsHTML = `<span style="font-size: 11px; color: var(--text-muted);">للاطلاع فقط</span>`;
-            }
-
-            let card = document.createElement('div');
-            card.className = `transaction-card ${cardClass}`;
-            card.innerHTML = `
-                <div class="card-header">
-                    <div class="trans-number-date-group">
-                        <span class="trans-number"># ${r.number}</span>
-                        <span class="trans-date">📅 ${r.date || 'غير محددة'}</span>
-                    </div>
-                    ${statusBadge}
-                </div>
-                <div class="card-body">
-                    <div class="card-subject">${r.subject}</div>
-                    <div class="card-meta">
-                        <span>الجهة: <b>${r.to || '---'}</b></span>
-                        <span>الإنجاز: ${r.dueDate}</span>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <span style="font-size: 11px; color: var(--text-muted);">إدارة السجل</span>
-                    ${actionsHTML}
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-</script>
+    </script>
 
 </body>
 </html>
