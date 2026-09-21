@@ -71,7 +71,7 @@
             overflow-x: hidden;
         }
 
-        /* خلفية الشبكة المتحركة (Canvas) - تم زيادة وضوحها وحيويتها */
+        /* خلفية الشبكة المتحركة (Canvas) */
         #bgCanvas {
             position: fixed;
             top: 0;
@@ -484,6 +484,7 @@
         .table-actions { display: flex; gap: 6px; }
         .btn-mini { padding: 5px 10px; font-size: 11px; border-radius: 7px; border: none; cursor: pointer; font-weight: 600; transition: all 0.15s; }
         .btn-mini:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        .btn-mini-complete { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
         .btn-mini-edit { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
         .btn-mini-del { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
@@ -498,7 +499,7 @@
 </head>
 <body>
 
-    <!-- خلفية الشبكة المتحكرة الأكثر وضوحاً وحيوية -->
+    <!-- خلفية الشبكة المتحركة -->
     <canvas id="bgCanvas"></canvas>
 
     <div class="dashboard-container">
@@ -652,7 +653,7 @@
     </div>
 
 <script>
-    // خلفية الشبكة المتحركة الأوضح والأسرع قليلاً
+    // خلفية الشبكة المتحركة
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -670,7 +671,6 @@
         constructor() {
             this.x = Math.random() * width;
             this.y = Math.random() * height;
-            // سرعة أعلى وحيوية أكبر للشبكة الخلفية
             this.vx = (Math.random() - 0.5) * 0.9;
             this.vy = (Math.random() - 0.5) * 0.9;
             this.radius = Math.random() * 2.2 + 1.2;
@@ -688,7 +688,6 @@
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            // زيادة الوضوح (Alpha أعلى)
             ctx.fillStyle = this.isRed ? 'rgba(239, 68, 68, 0.85)' : 'rgba(59, 130, 246, 0.85)';
             ctx.fill();
         }
@@ -727,7 +726,6 @@
                     ctx.beginPath();
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(particles[j].x, particles[j].y);
-                    // زيادة وضوح خطوط الربط لتظهر الشبكة بجلاء
                     let alpha = (1 - (dist / 150)) * 0.38;
                     
                     if (particles[i].isRed || particles[j].isRed) {
@@ -994,6 +992,33 @@
         }
     }
 
+    // دالة الإنجاز السريع المخصصة للأدمن فقط
+    async function quickCompleteRecord(id) {
+        if (userRole !== 'admin') {
+            alert("عذراً، هذه الصلاحية مخصصة للأدمن فقط.");
+            return;
+        }
+        let targetDoc = cachedRecords.find(r => r.id == id);
+        if (!targetDoc) return;
+
+        try {
+            let updatedData = {
+                id: targetDoc.id,
+                number: targetDoc.number,
+                date: targetDoc.date,
+                subject: targetDoc.subject,
+                to: targetDoc.to,
+                status: 'أنجزت',
+                dueDate: targetDoc.dueDate
+            };
+
+            await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), updatedData);
+            loadRecordsFromCloud();
+        } catch (error) {
+            alert("حدث خطأ أثناء تحديث حالة المعاملة: " + error.message);
+        }
+    }
+
     function editRecord(id) {
         if (userRole !== 'admin') {
             alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية التعديل.");
@@ -1207,8 +1232,10 @@
 
             let actionsHTML = '';
             if (userRole === 'admin') {
+                let quickCompleteBtn = r.status !== 'أنجزت' ? `<button class="btn-mini btn-mini-complete" onclick="quickCompleteRecord(${r.id})" title="إنجاز سريع">✓ إنجاز</button>` : '';
                 actionsHTML = `
                     <div class="table-actions">
+                        ${quickCompleteBtn}
                         <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
                         <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
                     </div>
