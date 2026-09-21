@@ -71,7 +71,7 @@
             overflow-x: hidden;
         }
 
-        /* خلفية الشبكة المتحركة (Canvas) */
+        /* خلفية الشبكة المتحركة (تظهر في شاشة الدخول فقط) */
         #bgCanvas {
             position: fixed;
             top: 0;
@@ -499,7 +499,7 @@
 </head>
 <body>
 
-    <!-- خلفية الشبكة المتحركة -->
+    <!-- خلفية الشبكة المتحركة (تظهر في شاشة الدخول فقط) -->
     <canvas id="bgCanvas"></canvas>
 
     <div class="dashboard-container">
@@ -653,12 +653,13 @@
     </div>
 
 <script>
-    // خلفية الشبكة المتحركة
+    // إعداد الشبكة المتحركة (Canvas)
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
 
     let width, height;
     let particles = [];
+    let animationFrameId = null;
 
     function resizeCanvas() {
         width = canvas.width = window.innerWidth;
@@ -738,8 +739,9 @@
                 }
             }
         }
-        requestAnimationFrame(animateBg);
+        animationFrameId = requestAnimationFrame(animateBg);
     }
+    // تشغيل الحركة عند التحميل (شاشة الدخول)
     animateBg();
 
     let userRole = null; 
@@ -766,6 +768,13 @@
     }
 
     function initSystemSession() {
+        // إيقاف وتخفيض استهلاك الموارد للـ Canvas عند الدخول للنظام
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+        document.getElementById('bgCanvas').style.display = 'none';
+
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('mainAppContent').style.display = 'block';
 
@@ -781,6 +790,14 @@
     function lockSystem() {
         userRole = null;
         document.getElementById('mainAppContent').style.display = 'none';
+        
+        // إعادة إظهار وتشغيل الشبكة المتحركة عند العودة لشاشة الدخول
+        let canvasElem = document.getElementById('bgCanvas');
+        canvasElem.style.display = 'block';
+        if (!animationFrameId) {
+            animateBg();
+        }
+
         document.getElementById('loginOverlay').style.display = 'block';
         document.getElementById('loginPasswordInput').value = '';
         updateLoginScreenCounters();
@@ -992,7 +1009,6 @@
         }
     }
 
-    // دالة الإنجاز السريع المخصصة للأدمن فقط
     async function quickCompleteRecord(id) {
         if (userRole !== 'admin') {
             alert("عذراً، هذه الصلاحية مخصصة للأدمن فقط.");
