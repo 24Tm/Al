@@ -664,7 +664,7 @@
 
             <div class="cards-grid no-print-zone" id="recordsCardsContainer"></div>
             <div class="load-more-container no-print-zone" id="loadMoreContainer" style="display: none;">
-                <button class="btn-load-more" onclick="loadMoreRecords()">تحميل المزيد من السجلات...</button>
+                <button class="btn-load-more" onclick="loadMoreRecords()">تحميل المزيد (5 سجلات تالية)...</button>
             </div>
 
             <div id="printArea" class="print-zone"></div>
@@ -767,7 +767,7 @@
     
     let currentLoadedRecords = [];
     let lastVisibleDoc = null;
-    const PAGE_SIZE = 30;
+    const PAGE_SIZE = 5; // تم التعديل لعرض 5 سجلات فقط في كل دفعة
 
     function checkSystemPassword() {
         let pass = document.getElementById('loginPasswordInput').value.trim();
@@ -908,7 +908,6 @@
                 } else {
                     inProgressCount++;
                     if (data.dueDate) {
-                        let dueD = parseHijriT(data.dueDate); // Fixed helper name inside counters if needed, using parseHijriToDate
                         let dueD_obj = parseHijriToDate(data.dueDate);
                         dueD_obj.setHours(0,0,0,0);
                         let diffDays = Math.round((dueD_obj - todayDate) / (1000 * 60 * 60 * 24));
@@ -1037,7 +1036,7 @@
                 let dateB = parseHijriToDate(b.dueDate);
                 dateA.setHours(0,0,0,0);
                 dateB.setHours(0,0,0,0);
-                return dateA - dateB; // الأقدم تاريخاً (الأكثر تأخيراً أو الأقرب) يظهر أولاً
+                return dateA - dateB;
             });
 
             document.getElementById('loadMoreContainer').style.display = querySnapshot.docs.length < PAGE_SIZE ? 'none' : 'block';
@@ -1084,7 +1083,6 @@
                 }
             });
 
-            // ترتيب نتائج البحث أيضاً بنفس الآلية
             searchResults.sort((a, b) => {
                 let dateA = parseHijriToDate(a.dueDate);
                 let dateB = parseHijriToDate(b.dueDate);
