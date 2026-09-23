@@ -767,7 +767,7 @@
     
     let currentLoadedRecords = [];
     let lastVisibleDoc = null;
-    const PAGE_SIZE = 5; // تم التعديل لعرض 5 سجلات فقط في كل دفعة
+    const PAGE_SIZE = 5;
 
     function checkSystemPassword() {
         let pass = document.getElementById('loginPasswordInput').value.trim();
@@ -1030,13 +1030,13 @@
                 currentLoadedRecords = currentLoadedRecords.concat(batchData);
             }
 
-            // ترتيب المعاملات: المتأخرة أولاً، ثم الأقرب استحقاقاً فالأبعد
+            // [تم التعديل]: ترتيب المعاملات بحيث تظهر المتأخرة أولاً (التواريخ الأقدم)، ثم الأقرب فالأبعد
             currentLoadedRecords.sort((a, b) => {
                 let dateA = parseHijriToDate(a.dueDate);
                 let dateB = parseHijriToDate(b.dueDate);
                 dateA.setHours(0,0,0,0);
                 dateB.setHours(0,0,0,0);
-                return dateA - dateB;
+                return dateA - dateB; // ترتيب تصاعدي للتاريخ (الأقدم/المتأخرة أولاً ثم القريبة)
             });
 
             document.getElementById('loadMoreContainer').style.display = querySnapshot.docs.length < PAGE_SIZE ? 'none' : 'block';
