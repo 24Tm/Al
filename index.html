@@ -888,7 +888,6 @@
     document.getElementById('transDate').value = getTodayHijriString();
     calculateDueDate();
 
-    // جلب العدادات والمؤشرات بدقة وسرعة عالية
     async function loadLoginCounters() {
         try {
             const collRef = window.collection(window.db, "transactions");
@@ -909,9 +908,10 @@
                 } else {
                     inProgressCount++;
                     if (data.dueDate) {
-                        let dueD = parseHijriToDate(data.dueDate);
-                        dueD.setHours(0,0,0,0);
-                        let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+                        let dueD = parseHijriT(data.dueDate); // Fixed helper name inside counters if needed, using parseHijriToDate
+                        let dueD_obj = parseHijriToDate(data.dueDate);
+                        dueD_obj.setHours(0,0,0,0);
+                        let diffDays = Math.round((dueD_obj - todayDate) / (1000 * 60 * 60 * 24));
                         if (diffDays < 0) delayedCount++;
                         else if (diffDays <= 4) approachingCount++;
                     }
@@ -994,7 +994,6 @@
                 let data = docSnap.data();
                 let status = data.status || 'لم تنجز';
                 
-                // تطبيق الفلاتر برمجياً لضمان السرعة ومنع أخطاء الفهرسة في فايربيس
                 let passFilter = true;
                 if (activeMetricFilter === 'completed' || currentTab === 'completed') {
                     if (status !== 'أنجزت') passFilter = false;
@@ -1031,6 +1030,15 @@
             } else {
                 currentLoadedRecords = currentLoadedRecords.concat(batchData);
             }
+
+            // ترتيب المعاملات: المتأخرة أولاً، ثم الأقرب استحقاقاً فالأبعد
+            currentLoadedRecords.sort((a, b) => {
+                let dateA = parseHijriToDate(a.dueDate);
+                let dateB = parseHijriToDate(b.dueDate);
+                dateA.setHours(0,0,0,0);
+                dateB.setHours(0,0,0,0);
+                return dateA - dateB; // الأقدم تاريخاً (الأكثر تأخيراً أو الأقرب) يظهر أولاً
+            });
 
             document.getElementById('loadMoreContainer').style.display = querySnapshot.docs.length < PAGE_SIZE ? 'none' : 'block';
             renderRecordsToDOM(currentLoadedRecords);
@@ -1074,6 +1082,15 @@
                         dueDate: data.dueDate || ''
                     });
                 }
+            });
+
+            // ترتيب نتائج البحث أيضاً بنفس الآلية
+            searchResults.sort((a, b) => {
+                let dateA = parseHijriToDate(a.dueDate);
+                let dateB = parseHijriToDate(b.dueDate);
+                dateA.setHours(0,0,0,0);
+                dateB.setHours(0,0,0,0);
+                return dateA - dateB;
             });
 
             currentLoadedRecords = searchResults;
@@ -1258,7 +1275,7 @@
 
     function renderRecordsToDOM(recordsList) {
         if (!userRole) return;
-        let todayDate = parseHijriText = parseHijriToDate(getTodayHijriString());
+        let todayDate = parseHijriToDate(getTodayHijriString());
         todayDate.setHours(0,0,0,0);
 
         let container = document.getElementById('recordsCardsContainer');
