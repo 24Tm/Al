@@ -1,381 +1,1294 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة المعاملات المتقدم</title>
-    <!-- خط Cairo -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        cairo: ['Cairo', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome للأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-        /* خلفية شبكية متحركة */
-        .bg-grid-pattern {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-        }
-        @keyframes moveGrid {
-            0% { background-position: 0 0; }
-            100% { background-position: 40px 40px; }
-        }
-        .animated-grid {
-            animation: moveGrid 20s linear infinite;
-        }
-    </style>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
-
-    <!-- شاشة تسجيل الدخول -->
-    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
-        <div class="bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center relative overflow-hidden">
-            <div class="absolute inset-0 bg-grid-pattern animated-grid opacity-10 pointer-events-none"></div>
-            <div class="w-16 h-16 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                <i class="fa-solid fa-lock"></i>
-            </div>
-            <h2 class="text-2xl font-bold mb-2">تسجيل الدخول للنظام</h2>
-            <p class="text-slate-400 text-sm mb-6">الرجاء إدخال كلمة المرور للوصول إلى لوحة التحكم</p>
-            
-            <form onsubmit="handleLogin(event)" class="space-y-4">
-                <input type="password" id="loginPassword" placeholder="كلمة المرور" required
-                    class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 text-center tracking-widest text-lg">
-                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition duration-200 shadow-lg shadow-blue-600/30">
-                    دخول
-                </button>
-            </form>
-            <p id="loginError" class="text-red-400 text-sm mt-3 hidden">كلمة المرور غير صحيحة!</p>
-        </div>
-    </div>
-
-    <!-- المحتوى الرئيسي للنظام (محمي) -->
-    <div id="appContent" class="opacity-0 pointer-events-none transition-opacity duration-500 flex flex-col min-h-screen">
-        
-        <!-- الهيدر والإحصائيات -->
-        <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
-                        <i class="fa-solid fa-folder-open"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold">إدارة المعاملات (سحابي - عالي الأداء)</h1>
-                        <p class="text-xs text-slate-400">متوافق مع ملايين السجلات والبيانات الضخمة</p>
-                    </div>
-                </div>
-                
-                <!-- أزرار الإجراءات السريعة -->
-                <div class="flex items-center gap-3">
-                    <button onclick="openAddModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold flex items-center gap-2 shadow-lg shadow-blue-600/20">
-                        <i class="fa-solid fa-plus"></i> إضافة معاملة
-                    </button>
-                    <button onclick="exportToPDF()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-semibold flex items-center gap-2">
-                        <i class="fa-solid fa-file-pdf text-red-400"></i> تقرير PDF
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- لوحة التحكم الرئيسية -->
-        <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
-            
-            <!-- شريط البحث والفلترة السحابية -->
-            <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div class="relative w-full md:w-96">
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="بحث برقم المعاملة أو الموضوع..." 
-                        class="w-full pr-10 pl-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                </div>
-
-                <div class="flex items-center gap-3 w-full md:w-auto">
-                    <select id="statusFilter" onchange="handleFilterChange()" class="bg-slate-900 border border-slate-700 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                        <option value="all">جميع الحالات</option>
-                        <option value="لم تنجز">لم تنجز</option>
-                        <option value="أنجزت">أنجزت</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- جدول المعاملات -->
-            <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-xl overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right border-collapse">
-                        <thead>
-                            <tr class="bg-slate-900/50 border-b border-slate-700 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                                <th class="p-4">رقم المعاملة</th>
-                                <th class="p-4">التاريخ</th>
-                                <th class="p-4">الموضوع</th>
-                                <th class="p-4">الجهة</th>
-                                <th class="p-4">الحالة</th>
-                                <th class="p-4">تاريخ الاستحقاق</th>
-                                <th class="p-4 text-center">الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactionsTableBody" class="divide-y divide-slate-700 text-sm">
-                            <!-- يتم تعبئة البيانات برمجياً هنا -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- شريط أزرار التقسيم والتنقل بين الصفحات (Pagination) -->
-                <div class="bg-slate-900/40 p-4 border-t border-slate-700 flex justify-between items-center">
-                    <button id="prevPageBtn" onclick="prevPage()" disabled class="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition">
-                        <i class="fa-solid fa-chevron-right ml-2"></i> السابقة
-                    </button>
-                    <span id="pageIndicator" class="text-sm text-slate-400">الصفحة 1</span>
-                    <button id="nextPageBtn" onclick="nextPage()" disabled class="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition">
-                        التالية <i class="fa-solid fa-chevron-left mr-2"></i>
-                    </button>
-                </div>
-            </div>
-
-        </main>
-
-        <!-- الفوتر -->
-        <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
-            جميع الحقوق محفوظة &copy; 2026 - نظام إدارة المعاملات السحابي
-        </footer>
-    </div>
-
-    <!-- مودال إضافة / تعديل معاملة -->
-    <div id="transactionModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-lg">
-            <h3 id="modalTitle" class="text-xl font-bold mb-4">إضافة معاملة جديدة</h3>
-            <form id="transactionForm" onsubmit="saveTransaction(event)" class="space-y-4">
-                <input type="hidden" id="editDocId">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">رقم المعاملة</label>
-                    <input type="text" id="txNumber" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">التاريخ</label>
-                    <input type="text" id="txDate" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">الموضوع</label>
-                    <textarea id="txSubject" required rows="2" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">الجهة المحولة لها</label>
-                    <input type="text" id="txTo" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">الحالة</label>
-                        <select id="txStatus" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                            <option value="لم تنجز">لم تنجز</option>
-                            <option value="أنجزت">أنجزت</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">تاريخ الاستحقاق</label>
-                        <input type="text" id="txDueDate" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                    </div>
-                </div>
-                <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-semibold">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-blue-600/30">حفظ</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Firebase SDK (Modular) -->
+    <title>متابعة المعاملات اليومية - لوحة الإدارة المتكاملة</title>
+    <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, limit, orderBy, startAfter, startAt, endAt, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, limit, orderBy, startAfter } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
-            apiKey: "AIzaSyDummyKeyForTemplate",
-            authDomain: "project-3958113961260211077.firebaseapp.com",
-            projectId: "project-3958113961260211077",
+          apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
+          authDomain: "project-3958113961260211077.firebaseapp.com",
+          projectId: "project-3958113961260211077",
+          storageBucket: "project-3958113961260211077.appspot.com",
+          messagingSenderId: "889377835896",
+          appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // متغيرات التصفح السحابي (Pagination State)
-        let pageSize = 15; // عدد المعاملات في الصفحة الواحدة
-        let currentPageNum = 1;
-        let lastVisibleList = []; // لحفظ مؤشرات الصفحات لتمكين التنقل التالي/السابق
-        let firstVisibleList = [];
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.query = query;
+        window.limit = limit;
+        window.orderBy = orderBy;
+        window.startAfter = startAfter;
 
-        window.checkAuthAndLoad = function() {
-            // كود التحقق من تسجيل الدخول البسيط
-            document.getElementById('loginModal').classList.add('hidden');
-            const appContent = document.getElementById('appContent');
-            appContent.classList.remove('opacity-0', 'pointer-events-none');
-            loadTransactionsPage('first');
-        }
-
-        // دالة جلب المعاملات مع نظام الصفحات والدفعات
-        window.loadTransactionsPage = async function(direction) {
-            const tbody = document.getElementById('transactionsTableBody');
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري تحميل البيانات من السحابة...</td></tr>`;
-
-            try {
-                const txRef = collection(db, "transactions");
-                let q = query(txRef, orderBy("number"), limit(pageSize));
-
-                const statusFilter = document.getElementById('statusFilter').value;
-                // ملاحظة: الفلترة السحابية المتقدمة تتطلب Indexes في فايربيس، سنقوم بالجلب الذكي هنا
-                
-                const snapshot = await getDocs(q);
-                if (snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد معاملات مسجلة حالياً.</td></tr>`;
-                    document.getElementById('nextPageBtn').disabled = true;
-                    document.getElementById('prevPageBtn').disabled = true;
-                    return;
-                }
-
-                let html = "";
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    if (statusFilter === 'all' || data.status === statusFilter) {
-                        html += `
-                            <tr class="hover:bg-slate-700/40 transition">
-                                <td class="p-4 font-semibold text-blue-400">${data.number || ''}</td>
-                                <td class="p-4 text-slate-300">${data.date || ''}</td>
-                                <td class="p-4 text-slate-200">${data.subject || ''}</td>
-                                <td class="p-4 text-slate-300">${data.to || ''}</td>
-                                <td class="p-4">
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${data.status === 'أنجزت' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
-                                        ${data.status || ''}
-                                    </span>
-                                </td>
-                                <td class="p-4 text-slate-300">${data.dueDate || ''}</td>
-                                <td class="p-4 text-center space-x-2 space-x-reverse">
-                                    <button onclick="quickComplete('${docSnap.id}')" title="إنجاز سريع" class="w-8 h-8 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white transition flex items-center justify-center inline-flex">
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
-                                    <button onclick="deleteTx('${docSnap.id}')" title="حذف" class="w-8 h-8 rounded-lg bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white transition flex items-center justify-center inline-flex">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    }
-                });
-
-                tbody.innerHTML = html;
-                document.getElementById('pageIndicator').innerText = `الصفحة ${currentPageNum}`;
-                document.getElementById('prevPageBtn').disabled = currentPageNum === 1;
-                document.getElementById('nextPageBtn').disabled = snapshot.size < pageSize;
-
-            } catch (error) {
-                console.error("خطأ في جلب البيانات:", error);
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-red-400">حدث خطأ أثناء جلب البيانات من السحابة.</td></tr>`;
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof loadRecordsFromCloud === 'function') {
+                loadRecordsFromCloud();
             }
-        };
-
-        // دالة الإنجاز السريع
-        window.quickComplete = async function(docId) {
-            try {
-                const docRef = doc(db, "transactions", docId);
-                await updateDoc(docRef, { status: "أنجزت" });
-                loadTransactionsPage('first');
-            } catch (e) {
-                alert("فشل تحديث الحالة!");
-            }
-        };
-
-        // دالة حذف معاملة
-        window.deleteTx = async function(docId) {
-            if (confirm("هل أنت متأكد من حذف هذه المعاملة نهائياً؟")) {
-                try {
-                    await deleteDoc(doc(db, "transactions", docId));
-                    loadTransactionsPage('first');
-                } catch (e) {
-                    alert("فشل الحذف!");
-                }
-            }
-        };
-
-        // دوال مساعدة عامة للواجهة
-        window.handleLogin = function(e) {
-            e.preventDefault();
-            const pass = document.getElementById('loginPassword').value;
-            if (pass === "12345" || pass === "admin") { // كلمة المرور الافتراضية للتجربة
-                window.checkAuthAndLoad();
-            } else {
-                document.getElementById('loginError').classList.remove('hidden');
-            }
-        }
-
-        window.openAddModal = function() {
-            document.getElementById('transactionForm').reset();
-            document.getElementById('editDocId').value = '';
-            document.getElementById('modalTitle').innerText = 'إضافة معاملة جديدة';
-            document.getElementById('transactionModal').classList.remove('hidden');
-            document.getElementById('transactionModal').classList.add('flex');
-        }
-
-        window.closeModal = function() {
-            document.getElementById('transactionModal').classList.add('hidden');
-            document.getElementById('transactionModal').classList.remove('flex');
-        }
-
-        window.handleSearch = function() {
-            // يمكن ربط البحث المباشر هنا
-        }
-
-        window.handleFilterChange = function() {
-            currentPageNum = 1;
-            loadTransactionsPage('first');
-        }
-
-        window.nextPage = function() {
-            currentPageNum++;
-            loadTransactionsPage('next');
-        }
-
-        window.prevPage = function() {
-            if (currentPageNum > 1) {
-                currentPageNum--;
-                loadTransactionsPage('prev');
-            }
-        }
-
-        window.exportToPDF = function() {
-            window.print();
-        }
-
-        // حفظ معاملة جديدة
-        window.saveTransaction = async function(e) {
-            e.preventDefault();
-            const number = document.getElementById('txNumber').value;
-            const date = document.getElementById('txDate').value;
-            const subject = document.getElementById('txSubject').value;
-            const to = document.getElementById('txTo').value;
-            const status = document.getElementById('txStatus').value;
-            const dueDate = document.getElementById('txDueDate').value;
-
-            try {
-                await addDoc(collection(db, "transactions"), {
-                    number, date, subject, to, status, dueDate, createdAt: Date.now()
-                });
-                closeModal();
-                loadTransactionsPage('first');
-            } catch (err) {
-                alert("حدث خطأ أثناء الحفظ بالسحابة!");
-            }
-        }
+        });
     </script>
+
+    <style>
+        :root {
+            --font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --bg-deep: #030712;
+            --bg-card: rgba(17, 24, 39, 0.75);
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: rgba(55, 65, 81, 0.5);
+            --radius: 14px;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+
+        * { box-sizing: border-box; font-family: var(--font-family); }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            margin: 0;
+            padding: 12px;
+            direction: rtl;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* خلفية الشبكة المتحركة (تظهر في شاشة الدخول فقط) */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .dashboard-container { max-width: 1150px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 1; }
+
+        /* شاشة الدخول المدمجة والأنيقة */
+        .login-wrapper {
+            width: 100%;
+            max-width: 390px;
+            margin: auto;
+            background: linear-gradient(160deg, rgba(17, 24, 39, 0.88), rgba(11, 15, 25, 0.96));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(59, 130, 246, 0.2);
+            border-radius: 22px;
+            overflow: hidden;
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateY(15px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-content-area {
+            padding: 28px 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .unified-logo-box {
+            margin-bottom: 14px;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border-radius: 18px;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.35), inset 0 0 10px rgba(59, 130, 246, 0.2);
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3), inset 0 0 8px rgba(59, 130, 246, 0.15); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.55), inset 0 0 15px rgba(59, 130, 246, 0.3); }
+        }
+
+        .system-title {
+            font-size: 19px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 18px;
+            background: linear-gradient(to left, #ffffff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-quick-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 18px;
+        }
+
+        .quick-stat-box {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+            transition: all 0.25s ease;
+        }
+        .quick-stat-box:hover { transform: translateY(-1px); background: rgba(15, 23, 42, 0.95); }
+
+        .quick-stat-box.yellow { 
+            border-right: 4px solid #f59e0b; 
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(245, 158, 11, 0.1));
+        }
+        .quick-stat-box.red { 
+            border-right: 4px solid #ef4444; 
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(239, 68, 68, 0.1));
+        }
+
+        .q-info { display: flex; flex-direction: column; gap: 2px; }
+        .q-label { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+        .q-num { font-size: 18px; font-weight: 900; }
+        
+        .quick-stat-box.yellow .q-num { color: #fbbf24; text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+        .quick-stat-box.red .q-num { color: #f87171; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+        
+        .q-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .quick-stat-box.yellow .q-icon { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .quick-stat-box.red .q-icon { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        .login-input-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            text-align: right;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        .login-input-card label {
+            font-size: 12.5px;
+            color: #93c5fd;
+            font-weight: 700;
+        }
+
+        .input-action-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-action-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #030712;
+            color: #fff;
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 6px;
+            transition: all 0.25s;
+        }
+
+        .input-action-row input:focus {
+            border-color: var(--primary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 12px var(--primary-glow);
+            outline: none;
+        }
+
+        .action-submit-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #fff;
+            border: none;
+            padding: 0 18px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(59, 130, 246, 0.4);
+            transition: all 0.2s ease;
+        }
+        .action-submit-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+
+        /* واجهة النظام الأساسية المصغرة */
+        .app-main-content { display: none; width: 100%; max-width: 950px; margin: 0 auto; }
+
+        .compact-header-bar {
+            background: var(--bg-card);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 8px 20px -4px rgba(0,0,0,0.3);
+        }
+
+        .navbar-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon-box {
+            width: 32px; height: 32px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-title { 
+            margin: 0; 
+            font-size: 16px; 
+            font-weight: 800; 
+            background: linear-gradient(to left, #60a5fa, #38bdf8); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .metrics-inline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .metric-card:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.15); }
+        .metric-card.active-filter { border-color: var(--primary); background: rgba(59, 130, 246, 0.25); box-shadow: 0 0 10px var(--primary-glow); }
+
+        .metric-card .label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
+        .metric-card .val { font-size: 16px; font-weight: 900; }
+        .metric-card.in-progress .val { color: #60a5fa; }
+        .metric-card.delayed .val { color: #f87171; }
+        .metric-card.completed .val { color: #34d399; }
+
+        .nav-pills { display: flex; gap: 10px; margin-bottom: 12px; }
+
+        .pill-btn {
+            flex: 1;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .pill-btn:hover { background: var(--bg-card-hover); color: #fff; }
+        .pill-btn.active { background: var(--primary); border-color: var(--primary); color: #ffffff; box-shadow: 0 3px 12px var(--primary-glow); }
+
+        .panel-box {
+            background: var(--bg-card);
+            backdrop-filter: blur(14px);
+            padding: 18px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            box-shadow: 0 8px 20px -4px rgba(0,0,0,0.3);
+        }
+
+        .panel-box h3 {
+            margin-top: 0;
+            font-size: 15px;
+            color: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-item { margin-bottom: 10px; }
+        .form-item.full-width { grid-column: span 2; }
+
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 11.5px; color: var(--text-muted); }
+
+        input, select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            font-size: 13px;
+            background: #030712;
+            color: var(--text-main);
+            text-align: right;
+            transition: all 0.2s;
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.3);
+        }
+
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: inset 0 2px 3px rgba(0,0,0,0.3), 0 0 10px var(--primary-glow); }
+
+        .actions-group { display: flex; gap: 10px; margin-top: 14px; }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4);
+        }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-alt { background: #374151; box-shadow: none; }
+        .btn-pdf { background: #0284c7; }
+
+        .search-box-wrapper { margin-bottom: 12px; display: flex; gap: 10px; align-items: center; }
+        .search-box-wrapper input { padding: 11px 14px; border-radius: 11px; border: 1px solid var(--border); font-size: 13px; background: var(--bg-card); }
+        
+        .reset-filter-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 11px 14px;
+            border-radius: 11px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .reset-filter-btn:hover { background: var(--bg-card-hover); color: #fff; }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .transaction-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 15px;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .transaction-card:hover { transform: translateY(-2px); border-color: rgba(59, 130, 246, 0.4); }
+
+        .transaction-card.card-delayed {
+            background: linear-gradient(145deg, var(--bg-card), rgba(239, 68, 68, 0.1));
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        .transaction-card.card-approaching {
+            background: linear-gradient(145deg, var(--bg-card), rgba(245, 158, 11, 0.1));
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .trans-number-date-group { display: flex; flex-direction: column; gap: 2px; }
+        .trans-number { font-weight: 800; font-size: 14px; color: #60a5fa; }
+        .trans-date { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        
+        .card-body { margin-bottom: 10px; }
+        .card-subject { font-size: 13.5px; font-weight: 700; color: #f3f4f6; margin-bottom: 8px; line-height: 1.4; }
+        .card-meta { font-size: 11.5px; color: var(--text-muted); display: flex; justify-content: space-between; }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 8px;
+        }
+
+        .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-red { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge-orange { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        .table-actions { display: flex; gap: 6px; }
+        .btn-mini { padding: 5px 10px; font-size: 11px; border-radius: 7px; border: none; cursor: pointer; font-weight: 600; transition: all 0.15s; }
+        .btn-mini:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        .btn-mini-complete { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .btn-mini-edit { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .btn-mini-del { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        @media print {
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; display: block !important; }
+            #bgCanvas { display: none !important; }
+            .no-print-zone { display: none !important; }
+            .print-zone { display: block !important; width: 100% !important; }
+        }
+        .print-zone { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- خلفية الشبكة المتحركة (تظهر في شاشة الدخول فقط) -->
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="dashboard-container">
+        <!-- شاشة الدخول المدمجة -->
+        <div class="login-wrapper" id="loginOverlay">
+            <div class="login-content-area">
+                <div class="unified-logo-box">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <div class="system-title">متابعة المعاملات اليومية</div>
+
+                <div class="login-quick-stats">
+                    <div class="quick-stat-box yellow">
+                        <div class="q-info">
+                            <span class="q-label">اقتربت من الوقت</span>
+                            <span class="q-num" id="loginCountApproaching">0</span>
+                        </div>
+                        <div class="q-icon">⏳</div>
+                    </div>
+                    
+                    <div class="quick-stat-box red">
+                        <div class="q-info">
+                            <span class="q-label">معاملات متأخرة</span>
+                            <span class="q-num" id="loginCountDelayed">0</span>
+                        </div>
+                        <div class="q-icon">⚠️</div>
+                    </div>
+                </div>
+
+                <div class="login-input-card">
+                    <label>كلمة المرور</label>
+                    <div class="input-action-row">
+                        <input type="password" id="loginPasswordInput" placeholder="••••••" onkeydown="if(event.key === 'Enter') checkSystemPassword()">
+                        <button class="action-submit-btn" onclick="checkSystemPassword()">دخول</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- واجهة النظام الأساسية -->
+        <div class="app-main-content" id="mainAppContent">
+            <div class="compact-header-bar no-print-zone">
+                <div class="navbar-top-row">
+                    <div class="navbar-brand-wrapper">
+                        <div class="brand-icon-box">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        </div>
+                        <h1 class="brand-title">متابعة المعاملات اليومية</h1>
+                    </div>
+                    <button class="btn-mini btn-mini-del" onclick="lockSystem()" style="padding: 5px 10px;">قفل النظام 🔒</button>
+                </div>
+                <div class="metrics-inline">
+                    <div class="metric-card in-progress" id="cardInProgress" onclick="filterByMetric('in-progress')">
+                        <div class="label">تحت الإجراء</div>
+                        <div class="val" id="countInProgress">0</div>
+                    </div>
+                    <div class="metric-card delayed" id="cardDelayed" onclick="filterByMetric('delayed')">
+                        <div class="label">متأخرة</div>
+                        <div class="val" id="countDelayed">0</div>
+                    </div>
+                    <div class="metric-card completed" id="cardCompleted" onclick="filterByMetric('completed')">
+                        <div class="label">المنجزة</div>
+                        <div class="val" id="countCompleted">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-pills no-print-zone">
+                <button class="pill-btn active" id="tabActive" onclick="switchTab('active')">المعاملات النشطة والمتأخرة</button>
+                <button class="pill-btn" id="tabCompleted" onclick="switchTab('completed')">المعاملات المنجزة</button>
+            </div>
+
+            <!-- لوحة الإدارة المصغرة -->
+            <div class="panel-box no-print-zone" id="adminFormCard">
+                <h3 id="formTitleText">➕ تسجيل معاملة جديدة</h3>
+                <input type="hidden" id="recordId">
+                
+                <div class="form-grid-2">
+                    <div class="form-item">
+                        <label>رقم المعاملة:</label>
+                        <input type="text" id="transNumber" placeholder="رقم المعاملة">
+                    </div>
+                    <div class="form-item">
+                        <label>الحالة:</label>
+                        <select id="transStatus">
+                            <option value="لم تنجز">لم تنجز</option>
+                            <option value="أنجزت">أنجزت</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-item full-width">
+                    <label>موضوع المعاملة:</label>
+                    <input type="text" id="transSubject" placeholder="موضوع المعاملة بالتفصيل">
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-item">
+                        <label>حولت لـ:</label>
+                        <input type="text" id="transTo" placeholder="الجهة المحولة لها">
+                    </div>
+                    <div class="form-item">
+                        <label>مدة الإنجاز المطلوبة:</label>
+                        <select id="durationDays" class="form-control" onchange="calculateDueDate()">
+                            <option value="1">يوم واحد (24 ساعة)</option>
+                            <option value="3" selected>3 أيام</option>
+                            <option value="5">5 أيام</option>
+                            <option value="7">أسبوع (7 أيام)</option>
+                            <option value="14">أسبوعين (14 يوماً)</option>
+                            <option value="30">شهر كامل (30 يوماً)</option>
+                            <option value="custom">تحديد عدد أيام آخر...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-item full-width" id="customDaysGroup" style="display: none;">
+                    <label>أدخل عدد الأيام يدوياً:</label>
+                    <input type="number" id="customDaysInput" class="form-control" min="1" value="3" oninput="calculateDueDate()">
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-item">
+                        <label>تاريخ الاستحقاق المحسوب (هجري YYYY-MM-DD):</label>
+                        <input type="text" id="transDueDate" readonly style="background-color: #030712; font-weight: bold; color: #38bdf8;">
+                    </div>
+                    <div class="form-item">
+                        <label>تاريخ المعاملة (هجري YYYY-MM-DD):</label>
+                        <input type="text" id="transDate" placeholder="1447-04-01" oninput="calculateDueDate()">
+                    </div>
+                </div>
+
+                <div class="actions-group">
+                    <button class="btn" onclick="saveRecord()" id="saveBtnText">حفظ المعاملة</button>
+                    <button class="btn btn-alt" onclick="resetForm()">إلغاء</button>
+                    <button class="btn btn-pdf" onclick="exportDelayedAndApproachingPDF()">📄 تقرير المتأخرات PDF</button>
+                </div>
+            </div>
+
+            <div class="search-box-wrapper no-print-zone">
+                <input type="text" id="searchQuery" placeholder="🔍 بحث فوري تفاعلي..." oninput="renderRecords()">
+                <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
+            </div>
+
+            <div class="cards-grid no-print-zone" id="recordsCardsContainer"></div>
+
+            <div id="printArea" class="print-zone"></div>
+        </div>
+    </div>
+
+<script>
+    // إعداد الشبكة المتحركة (Canvas)
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let particles = [];
+    let animationFrameId = null;
+
+    function resizeCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 0.9;
+            this.vy = (Math.random() - 0.5) * 0.9;
+            this.radius = Math.random() * 2.2 + 1.2;
+            this.isRed = Math.random() < 0.35; 
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0 || this.x > width) this.vx = -this.vx;
+            if (this.y < 0 || this.y > height) this.vy = -this.vy;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.isRed ? 'rgba(239, 68, 68, 0.85)' : 'rgba(59, 130, 246, 0.85)';
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        let count = Math.floor((width * height) / 15000);
+        count = Math.max(45, Math.min(count, 110));
+        for (let i = 0; i < count; i++) {
+            particles.push(new Particle());
+        }
+    }
+    initParticles();
+
+    function animateBg() {
+        ctx.clearRect(0, 0, width, height);
+
+        let grad = ctx.createLinearGradient(0, 0, width, height);
+        grad.addColorStop(0, '#030712');
+        grad.addColorStop(0.5, '#0b0f19');
+        grad.addColorStop(1, '#030712');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+
+            for (let j = i + 1; j < particles.length; j++) {
+                let dx = particles[i].x - particles[j].x;
+                let dy = particles[i].y - particles[j].y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 150) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    let alpha = (1 - (dist / 150)) * 0.38;
+                    
+                    if (particles[i].isRed || particles[j].isRed) {
+                        ctx.strokeStyle = `rgba(239, 68, 68, ${alpha})`;
+                    } else {
+                        ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+                    }
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+        animationFrameId = requestAnimationFrame(animateBg);
+    }
+    animateBg();
+
+    let userRole = null; 
+    let currentTab = 'active';
+    let activeMetricFilter = null;
+    let cachedRecords = []; 
+
+    function checkSystemPassword() {
+        let pass = document.getElementById('loginPasswordInput').value.trim();
+
+        if (pass === "Dd1616") {
+            userRole = 'admin'; 
+            initSystemSession();
+        } 
+        else if (pass === "10030") {
+            userRole = 'view'; 
+            initSystemSession();
+        } 
+        else {
+            alert("كلمة المرور غير صحيحة!");
+            document.getElementById('loginPasswordInput').value = '';
+            document.getElementById('loginPasswordInput').focus();
+        }
+    }
+
+    function initSystemSession() {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+        document.getElementById('bgCanvas').style.display = 'none';
+
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainAppContent').style.display = 'block';
+
+        if (userRole === 'view') {
+            document.getElementById('adminFormCard').style.display = 'none';
+        } else {
+            document.getElementById('adminFormCard').style.display = 'block';
+        }
+
+        renderRecords();
+    }
+
+    function lockSystem() {
+        userRole = null;
+        document.getElementById('mainAppContent').style.display = 'none';
+        
+        let canvasElem = document.getElementById('bgCanvas');
+        canvasElem.style.display = 'block';
+        if (!animationFrameId) {
+            animateBg();
+        }
+
+        document.getElementById('loginOverlay').style.display = 'block';
+        document.getElementById('loginPasswordInput').value = '';
+        updateLoginScreenCounters();
+    }
+
+    function getTodayHijriString() {
+        try {
+            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            let parts = formatter.formatToParts(new Date());
+            let y = parts.find(p => p.type === 'year').value;
+            let m = parts.find(p => p.type === 'month').value;
+            let d = parts.find(p => p.type === 'day').value;
+            return `${y}-${m}-${d}`;
+        } catch (e) {
+            return "1447-04-01";
+        }
+    }
+
+    function parseHijriToDate(hijriStr) {
+        if (!hijriStr) return new Date();
+        let parts = hijriStr.split(/[-/]/);
+        if (parts.length !== 3) return new Date();
+        let hy = parseInt(parts[0], 10);
+        let hm = parseInt(parts[1], 10);
+        let hd = parseInt(parts[2], 10);
+
+        let estimatedGregorianYear = Math.round(hy * 0.9702 + 621.56);
+        let d = new Date(estimatedGregorianYear, hm - 1, hd);
+        return d;
+    }
+
+    function calculateDueDate() {
+        let selectElement = document.getElementById('durationDays');
+        let customGroup = document.getElementById('customDaysGroup');
+        let daysToAdd = 3;
+
+        if (selectElement.value === 'custom') {
+            customGroup.style.display = 'block';
+            daysToAdd = parseInt(document.getElementById('customDaysInput').value) || 1;
+        } else {
+            customGroup.style.display = 'none';
+            daysToAdd = parseInt(selectElement.value);
+        }
+
+        let baseDateStr = document.getElementById('transDate').value.trim();
+        let parts = baseDateStr.split(/[-/]/);
+        
+        if (parts.length === 3) {
+            let hy = parseInt(parts[0], 10);
+            let hm = parseInt(parts[1], 10);
+            let hd = parseInt(parts[2], 10) + daysToAdd;
+
+            while (hd > 30) { hd -= 30; hm += 1; }
+            while (hm > 12) { hm -= 12; hy += 1; }
+            while (hd < 1) { hd += 30; hm -= 1; }
+            while (hm < 1) { hm += 12; hy -= 1; }
+
+            let mFormatted = String(hm).padStart(2, '0');
+            let dFormatted = String(hd).padStart(2, '0');
+            document.getElementById('transDueDate').value = `${hy}-${mFormatted}-${dFormatted}`;
+        } else {
+            document.getElementById('transDueDate').value = baseDateStr;
+        }
+    }
+
+    document.getElementById('transDate').value = getTodayHijriString();
+    calculateDueDate();
+
+    function updateLoginScreenCounters() {
+        let todayDate = parseHijriToDate(getTodayHijriString());
+        todayDate.setHours(0,0,0,0);
+
+        let delayedCount = 0;
+        let approachingCount = 0;
+
+        cachedRecords.forEach(r => {
+            if (r.status === 'أنجزت') return;
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                delayedCount++;
+            } else if (diffDays <= 4) {
+                approachingCount++;
+            }
+        });
+
+        document.getElementById('loginCountDelayed').innerText = delayedCount;
+        document.getElementById('loginCountApproaching').innerText = approachingCount;
+    }
+
+    function animateValue(id, start, end, duration) {
+        let obj = document.getElementById(id);
+        if (!obj) return;
+        if (start === end) {
+            obj.innerText = end;
+            return;
+        }
+        let range = end - start;
+        let current = start;
+        let increment = end > start ? 1 : -1;
+        let stepTime = Math.abs(Math.floor(duration / range));
+        stepTime = Math.max(stepTime, 20);
+        let timer = setInterval(function() {
+            current += increment;
+            obj.innerText = current;
+            if (current == end) { clearInterval(timer); }
+        }, stepTime);
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        activeMetricFilter = null;
+        document.getElementById('resetFilterBtn').style.display = 'none';
+        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
+
+        document.getElementById('tabActive').classList.toggle('active', tab === 'active');
+        document.getElementById('tabCompleted').classList.toggle('active', tab === 'completed');
+        renderRecords();
+    }
+
+    function filterByMetric(metricType) {
+        activeMetricFilter = activeMetricFilter === metricType ? null : metricType;
+        
+        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
+        if (activeMetricFilter) {
+            document.getElementById('resetFilterBtn').style.display = 'block';
+            if (metricType === 'in-progress') document.getElementById('cardInProgress').classList.add('active-filter');
+            if (metricType === 'delayed') document.getElementById('cardDelayed').classList.add('active-filter');
+            if (metricType === 'completed') document.getElementById('cardCompleted').classList.add('active-filter');
+        } else {
+            document.getElementById('resetFilterBtn').style.display = 'none';
+        }
+        renderRecords();
+    }
+
+    function clearMetricFilter() {
+        activeMetricFilter = null;
+        document.getElementById('resetFilterBtn').style.display = 'none';
+        document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
+        renderRecords();
+    }
+
+    async function loadRecordsFromCloud() {
+        try {
+            // جلب عالي الأداء مع ترتيب تنازلي لدعم البيانات الكبيرة
+            const q = window.query(window.collection(window.db, "transactions"), window.orderBy("id", "desc"), window.limit(500));
+            const querySnapshot = await window.getDocs(q);
+            cachedRecords = [];
+            querySnapshot.forEach((docSnap) => {
+                let data = docSnap.data();
+                cachedRecords.push({
+                    docId: docSnap.id,
+                    id: data.id || Date.now(),
+                    number: data.number,
+                    date: data.date || getTodayHijriString(),
+                    subject: data.subject,
+                    to: data.to,
+                    status: data.status,
+                    dueDate: data.dueDate
+                });
+            });
+            updateLoginScreenCounters();
+            if (userRole) renderRecords();
+        } catch (error) {
+            console.error("خطأ في جلب البيانات:", error);
+        }
+    }
+
+    async function saveRecord() {
+        if (userRole !== 'admin') {
+            alert("عذراً، ليس لديك صلاحية التعديل أو الحفظ.");
+            return;
+        }
+
+        let docId = document.getElementById('recordId').value;
+        let number = document.getElementById('transNumber').value.trim();
+        let date = document.getElementById('transDate').value.trim();
+        let subject = document.getElementById('transSubject').value.trim();
+        let to = document.getElementById('transTo').value.trim();
+        let status = document.getElementById('transStatus').value;
+        let dueDate = document.getElementById('transDueDate').value.trim();
+
+        if (!number || !subject || !dueDate || !date) {
+            alert('الرجاء التأكد من تعبئة جميع الحقول الأساسية وتواريخ المعاملة.');
+            return;
+        }
+
+        let recordData = { id: Date.now(), number, date, subject, to, status, dueDate };
+
+        try {
+            if (docId) {
+                let targetDoc = cachedRecords.find(r => r.id == docId);
+                if (targetDoc) {
+                    recordData.id = Number(docId);
+                    await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), recordData);
+                }
+            } else {
+                await window.addDoc(window.collection(window.db, "transactions"), recordData);
+            }
+
+            resetForm();
+            loadRecordsFromCloud();
+        } catch (error) {
+            alert("حدث خطأ أثناء حفظ المعاملة: " + error.message);
+        }
+    }
+
+    async function quickCompleteRecord(id) {
+        if (userRole !== 'admin') {
+            alert("عذراً، هذه الصلاحية مخصصة للأدمن فقط.");
+            return;
+        }
+        let targetDoc = cachedRecords.find(r => r.id == id);
+        if (!targetDoc) return;
+
+        try {
+            let updatedData = {
+                id: targetDoc.id,
+                number: targetDoc.number,
+                date: targetDoc.date,
+                subject: targetDoc.subject,
+                to: targetDoc.to,
+                status: 'أنجزت',
+                dueDate: targetDoc.dueDate
+            };
+
+            await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), updatedData);
+            loadRecordsFromCloud();
+        } catch (error) {
+            alert("حدث خطأ أثناء تحديث حالة المعاملة: " + error.message);
+        }
+    }
+
+    function editRecord(id) {
+        if (userRole !== 'admin') {
+            alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية التعديل.");
+            return;
+        }
+        let r = cachedRecords.find(item => item.id == id);
+        if (!r) return;
+
+        document.getElementById('recordId').value = r.id;
+        document.getElementById('transNumber').value = r.number;
+        document.getElementById('transDate').value = r.date || getTodayHijriString();
+        document.getElementById('transSubject').value = r.subject;
+        document.getElementById('transTo').value = r.to || '';
+        document.getElementById('transStatus').value = r.status;
+        document.getElementById('transDueDate').value = r.dueDate;
+        
+        document.getElementById('formTitleText').innerText = "✏️ تعديل المعاملة";
+        document.getElementById('saveBtnText').innerText = "تحديث البيانات";
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    async function deleteRecord(id) {
+        if (userRole !== 'admin') {
+            alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية الحذف.");
+            return;
+        }
+        if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
+            let r = cachedRecords.find(item => item.id == id);
+            if (r && r.docId) {
+                try {
+                    await window.deleteDoc(window.doc(window.db, "transactions", r.docId));
+                    loadRecordsFromCloud();
+                } catch (error) {
+                    alert("تعذر الحذف: " + error.message);
+                }
+            }
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('recordId').value = '';
+        document.getElementById('transNumber').value = '';
+        document.getElementById('transSubject').value = '';
+        document.getElementById('transTo').value = '';
+        document.getElementById('transStatus').value = 'لم تنجز';
+        document.getElementById('transDate').value = getTodayHijriString();
+        document.getElementById('durationDays').value = "3";
+        document.getElementById('customDaysGroup').style.display = 'none';
+        calculateDueDate();
+        document.getElementById('formTitleText').innerText = "➕ تسجيل معاملة جديدة";
+        document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
+    }
+
+    function exportDelayedAndApproachingPDF() {
+        let todayDate = parseHijriToDate(getTodayHijriString());
+        todayDate.setHours(0,0,0,0);
+
+        let targetRecords = cachedRecords.filter(r => {
+            if (r.status === 'أنجزت') return false;
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            return diffDays <= 4;
+        });
+
+        if (targetRecords.length === 0) {
+            alert('لا توجد معاملات متأخرة أو قريبة من الاستحقاق حالياً.');
+            return;
+        }
+
+        targetRecords.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
+
+        let printArea = document.getElementById('printArea');
+        let printHTML = `
+            <div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px; color: #000;">
+                <h2 style="text-align: center; margin-bottom: 5px;">تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2>
+                <p style="text-align: center; font-size: 12px; color: #555; margin-bottom: 20px;">تاريخ التقرير الهجري: ${getTodayHijriString()}</p>
+                <hr style="border: 1px solid #ccc; margin-bottom: 15px;">
+        `;
+
+        targetRecords.forEach((r, index) => {
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            
+            let statusText = "";
+            let statusColor = "";
+            if (diffDays < 0) {
+                statusText = `متأخرة بـ ${Math.abs(diffDays)} يوم`;
+                statusColor = "#dc2626";
+            } else if (diffDays === 0) {
+                statusText = `مستحقة اليوم`;
+                statusColor = "#d97706";
+            } else {
+                statusText = `متبقي عليها ${diffDays} أيام (قريبة)`;
+                statusColor = "#d97706";
+            }
+
+            printHTML += `
+                <div style="margin-bottom: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px;">
+                        <span>${index + 1}. معاملة رقم: ${r.number}</span>
+                        <span style="color: ${statusColor};">${statusText}</span>
+                    </div>
+                    <div style="font-size: 13px; margin-bottom: 4px;"><b>الموضوع:</b> ${r.subject}</div>
+                    <div style="font-size: 12px; color: #555; display: flex; justify-content: space-between;">
+                        <span>الجهة المحولة لها: ${r.to || '---'}</span>
+                        <span>تاريخ الاستحقاق: ${r.dueDate}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        printHTML += `</div>`;
+        printArea.innerHTML = printHTML;
+        
+        setTimeout(() => {
+            window.print();
+        }, 100);
+    }
+
+    function renderRecords() {
+        if (!userRole) return;
+        let query = document.getElementById('searchQuery').value.toLowerCase();
+        let todayDate = parseHijriToDate(getTodayHijriString());
+        todayDate.setHours(0,0,0,0);
+
+        let inProgressCount = 0;
+        let completedCount = 0;
+        let delayedCount = 0;
+
+        cachedRecords.forEach(r => {
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0 && r.status === 'لم تنجز') {
+                delayedCount++;
+            } else if (r.status === 'أنجزت') {
+                completedCount++;
+            } else {
+                inProgressCount++;
+            }
+        });
+
+        let oldInProgress = parseInt(document.getElementById('countInProgress').innerText) || 0;
+        let oldDelayed = parseInt(document.getElementById('countDelayed').innerText) || 0;
+        let oldCompleted = parseInt(document.getElementById('countCompleted').innerText) || 0;
+
+        animateValue('countInProgress', oldInProgress, inProgressCount, 300);
+        animateValue('countDelayed', oldDelayed, delayedCount, 300);
+        animateValue('countCompleted', oldCompleted, completedCount, 300);
+
+        updateLoginScreenCounters();
+
+        let filtered = cachedRecords.filter(r => {
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            let isDelayed = diffDays < 0 && r.status === 'لم تنجز';
+            let isCompleted = r.status === 'أنجزت';
+            let isInProgress = !isDelayed && !isCompleted;
+
+            if (activeMetricFilter === 'in-progress' && !isInProgress) return false;
+            if (activeMetricFilter === 'delayed' && !isDelayed) return false;
+            if (activeMetricFilter === 'completed' && !isCompleted) return false;
+
+            if (!activeMetricFilter) {
+                if (currentTab === 'active' && isCompleted) return false;
+                if (currentTab === 'completed' && !isCompleted) return false;
+            }
+
+            return true;
+        });
+        
+        filtered = filtered.filter(r => 
+            r.number.toLowerCase().includes(query) || 
+            r.subject.toLowerCase().includes(query) || 
+            (r.to && r.to.toLowerCase().includes(query)) ||
+            (r.date && r.date.toLowerCase().includes(query))
+        );
+
+        filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
+
+        let container = document.getElementById('recordsCardsContainer');
+        container.innerHTML = '';
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 25px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">لا توجد سجلات مطابقة للعرض</div>`;
+            return;
+        }
+
+        filtered.forEach(r => {
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+
+            let cardClass = '';
+            let statusBadge = '';
+
+            if (r.status === 'أنجزت') {
+                statusBadge = `<span class="status-badge badge-green">منجزة</span>`;
+            } else if (diffDays < 0) {
+                cardClass = 'card-delayed';
+                statusBadge = `<span class="status-badge badge-red">متأخرة (${Math.abs(diffDays)} يوم)</span>`;
+            } else if (diffDays <= 4) {
+                cardClass = 'card-approaching';
+                statusBadge = `<span class="status-badge badge-orange">متبقي ${diffDays} يوم (قريب)</span>`;
+            } else {
+                statusBadge = `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
+            }
+
+            let actionsHTML = '';
+            if (userRole === 'admin') {
+                let quickCompleteBtn = r.status !== 'أنجزت' ? `<button class="btn-mini btn-mini-complete" onclick="quickCompleteRecord(${r.id})" title="إنجاز سريع">✓ إنجاز</button>` : '';
+                actionsHTML = `
+                    <div class="table-actions">
+                        ${quickCompleteBtn}
+                        <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
+                        <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
+                    </div>
+                `;
+            } else {
+                actionsHTML = `<span style="font-size: 11px; color: var(--text-muted);">للاطلاع فقط</span>`;
+            }
+
+            let card = document.createElement('div');
+            card.className = `transaction-card ${cardClass}`;
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="trans-number-date-group">
+                        <span class="trans-number"># ${r.number}</span>
+                        <span class="trans-date">📅 ${r.date || 'غير محددة'}</span>
+                    </div>
+                    ${statusBadge}
+                </div>
+                <div class="card-body">
+                    <div class="card-subject">${r.subject}</div>
+                    <div class="card-meta">
+                        <span>الجهة: <b>${r.to || '---'}</b></span>
+                        <span>الإنجاز: ${r.dueDate}</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span style="font-size: 10.5px; color: var(--text-muted);">إدارة المعاملة</span>
+                    ${actionsHTML}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+</script>
+
 </body>
 </html>
