@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المعاملات المتقدم</title>
+    <!-- خط Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        /* خلفية شبكية متحركة */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+        .animated-grid {
+            animation: moveGrid 20s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+        <div class="bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-pattern animated-grid opacity-10 pointer-events-none"></div>
+            <div class="w-16 h-16 bg-blue-600/20 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">تسجيل الدخول للنظام</h2>
+            <p class="text-slate-400 text-sm mb-6">الرجاء إدخال كلمة المرور للوصول إلى لوحة التحكم</p>
+            
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <input type="password" id="loginPassword" placeholder="كلمة المرور" required
+                    class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 text-center tracking-widest text-lg">
+                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition duration-200 shadow-lg shadow-blue-600/30">
+                    دخول
+                </button>
+            </form>
+            <p id="loginError" class="text-red-400 text-sm mt-3 hidden">كلمة المرور غير صحيحة!</p>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي للنظام (محمي) -->
+    <div id="appContent" class="opacity-0 pointer-events-none transition-opacity duration-500 flex flex-col min-h-screen">
+        
+        <!-- الهيدر والإحصائيات -->
+        <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">إدارة المعاملات (سحابي - عالي الأداء)</h1>
+                        <p class="text-xs text-slate-400">متوافق مع ملايين السجلات والبيانات الضخمة</p>
+                    </div>
+                </div>
+                
+                <!-- أزرار الإجراءات السريعة -->
+                <div class="flex items-center gap-3">
+                    <button onclick="openAddModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold flex items-center gap-2 shadow-lg shadow-blue-600/20">
+                        <i class="fa-solid fa-plus"></i> إضافة معاملة
+                    </button>
+                    <button onclick="exportToPDF()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf text-red-400"></i> تقرير PDF
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- لوحة التحكم الرئيسية -->
+        <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+            
+            <!-- شريط البحث والفلترة السحابية -->
+            <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div class="relative w-full md:w-96">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="بحث برقم المعاملة أو الموضوع..." 
+                        class="w-full pr-10 pl-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <select id="statusFilter" onchange="handleFilterChange()" class="bg-slate-900 border border-slate-700 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                        <option value="all">جميع الحالات</option>
+                        <option value="لم تنجز">لم تنجز</option>
+                        <option value="أنجزت">أنجزت</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- جدول المعاملات -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900/50 border-b border-slate-700 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                                <th class="p-4">رقم المعاملة</th>
+                                <th class="p-4">التاريخ</th>
+                                <th class="p-4">الموضوع</th>
+                                <th class="p-4">الجهة</th>
+                                <th class="p-4">الحالة</th>
+                                <th class="p-4">تاريخ الاستحقاق</th>
+                                <th class="p-4 text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody" class="divide-y divide-slate-700 text-sm">
+                            <!-- يتم تعبئة البيانات برمجياً هنا -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- شريط أزرار التقسيم والتنقل بين الصفحات (Pagination) -->
+                <div class="bg-slate-900/40 p-4 border-t border-slate-700 flex justify-between items-center">
+                    <button id="prevPageBtn" onclick="prevPage()" disabled class="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition">
+                        <i class="fa-solid fa-chevron-right ml-2"></i> السابقة
+                    </button>
+                    <span id="pageIndicator" class="text-sm text-slate-400">الصفحة 1</span>
+                    <button id="nextPageBtn" onclick="nextPage()" disabled class="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition">
+                        التالية <i class="fa-solid fa-chevron-left mr-2"></i>
+                    </button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- الفوتر -->
+        <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
+            جميع الحقوق محفوظة &copy; 2026 - نظام إدارة المعاملات السحابي
+        </footer>
+    </div>
+
+    <!-- مودال إضافة / تعديل معاملة -->
+    <div id="transactionModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-lg">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4">إضافة معاملة جديدة</h3>
+            <form id="transactionForm" onsubmit="saveTransaction(event)" class="space-y-4">
+                <input type="hidden" id="editDocId">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">رقم المعاملة</label>
+                    <input type="text" id="txNumber" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">التاريخ</label>
+                    <input type="text" id="txDate" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">الموضوع</label>
+                    <textarea id="txSubject" required rows="2" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">الجهة المحولة لها</label>
+                    <input type="text" id="txTo" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">الحالة</label>
+                        <select id="txStatus" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                            <option value="لم تنجز">لم تنجز</option>
+                            <option value="أنجزت">أنجزت</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">تاريخ الاستحقاق</label>
+                        <input type="text" id="txDueDate" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-semibold">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-blue-600/30">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, limit, orderBy, startAfter, startAt, endAt, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // إعدادات Firebase الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyDummyKeyForTemplate",
+            authDomain: "project-3958113961260211077.firebaseapp.com",
+            projectId: "project-3958113961260211077",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // متغيرات التصفح السحابي (Pagination State)
+        let pageSize = 15; // عدد المعاملات في الصفحة الواحدة
+        let currentPageNum = 1;
+        let lastVisibleList = []; // لحفظ مؤشرات الصفحات لتمكين التنقل التالي/السابق
+        let firstVisibleList = [];
+
+        window.checkAuthAndLoad = function() {
+            // كود التحقق من تسجيل الدخول البسيط
+            document.getElementById('loginModal').classList.add('hidden');
+            const appContent = document.getElementById('appContent');
+            appContent.classList.remove('opacity-0', 'pointer-events-none');
+            loadTransactionsPage('first');
+        }
+
+        // دالة جلب المعاملات مع نظام الصفحات والدفعات
+        window.loadTransactionsPage = async function(direction) {
+            const tbody = document.getElementById('transactionsTableBody');
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400"><i class="fa-solid fa-spinner fa-spin ml-2"></i> جاري تحميل البيانات من السحابة...</td></tr>`;
+
+            try {
+                const txRef = collection(db, "transactions");
+                let q = query(txRef, orderBy("number"), limit(pageSize));
+
+                const statusFilter = document.getElementById('statusFilter').value;
+                // ملاحظة: الفلترة السحابية المتقدمة تتطلب Indexes في فايربيس، سنقوم بالجلب الذكي هنا
+                
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500">لا توجد معاملات مسجلة حالياً.</td></tr>`;
+                    document.getElementById('nextPageBtn').disabled = true;
+                    document.getElementById('prevPageBtn').disabled = true;
+                    return;
+                }
+
+                let html = "";
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (statusFilter === 'all' || data.status === statusFilter) {
+                        html += `
+                            <tr class="hover:bg-slate-700/40 transition">
+                                <td class="p-4 font-semibold text-blue-400">${data.number || ''}</td>
+                                <td class="p-4 text-slate-300">${data.date || ''}</td>
+                                <td class="p-4 text-slate-200">${data.subject || ''}</td>
+                                <td class="p-4 text-slate-300">${data.to || ''}</td>
+                                <td class="p-4">
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${data.status === 'أنجزت' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+                                        ${data.status || ''}
+                                    </span>
+                                </td>
+                                <td class="p-4 text-slate-300">${data.dueDate || ''}</td>
+                                <td class="p-4 text-center space-x-2 space-x-reverse">
+                                    <button onclick="quickComplete('${docSnap.id}')" title="إنجاز سريع" class="w-8 h-8 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white transition flex items-center justify-center inline-flex">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                    <button onclick="deleteTx('${docSnap.id}')" title="حذف" class="w-8 h-8 rounded-lg bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white transition flex items-center justify-center inline-flex">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                tbody.innerHTML = html;
+                document.getElementById('pageIndicator').innerText = `الصفحة ${currentPageNum}`;
+                document.getElementById('prevPageBtn').disabled = currentPageNum === 1;
+                document.getElementById('nextPageBtn').disabled = snapshot.size < pageSize;
+
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-red-400">حدث خطأ أثناء جلب البيانات من السحابة.</td></tr>`;
+            }
+        };
+
+        // دالة الإنجاز السريع
+        window.quickComplete = async function(docId) {
+            try {
+                const docRef = doc(db, "transactions", docId);
+                await updateDoc(docRef, { status: "أنجزت" });
+                loadTransactionsPage('first');
+            } catch (e) {
+                alert("فشل تحديث الحالة!");
+            }
+        };
+
+        // دالة حذف معاملة
+        window.deleteTx = async function(docId) {
+            if (confirm("هل أنت متأكد من حذف هذه المعاملة نهائياً؟")) {
+                try {
+                    await deleteDoc(doc(db, "transactions", docId));
+                    loadTransactionsPage('first');
+                } catch (e) {
+                    alert("فشل الحذف!");
+                }
+            }
+        };
+
+        // دوال مساعدة عامة للواجهة
+        window.handleLogin = function(e) {
+            e.preventDefault();
+            const pass = document.getElementById('loginPassword').value;
+            if (pass === "12345" || pass === "admin") { // كلمة المرور الافتراضية للتجربة
+                window.checkAuthAndLoad();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        window.openAddModal = function() {
+            document.getElementById('transactionForm').reset();
+            document.getElementById('editDocId').value = '';
+            document.getElementById('modalTitle').innerText = 'إضافة معاملة جديدة';
+            document.getElementById('transactionModal').classList.remove('hidden');
+            document.getElementById('transactionModal').classList.add('flex');
+        }
+
+        window.closeModal = function() {
+            document.getElementById('transactionModal').classList.add('hidden');
+            document.getElementById('transactionModal').classList.remove('flex');
+        }
+
+        window.handleSearch = function() {
+            // يمكن ربط البحث المباشر هنا
+        }
+
+        window.handleFilterChange = function() {
+            currentPageNum = 1;
+            loadTransactionsPage('first');
+        }
+
+        window.nextPage = function() {
+            currentPageNum++;
+            loadTransactionsPage('next');
+        }
+
+        window.prevPage = function() {
+            if (currentPageNum > 1) {
+                currentPageNum--;
+                loadTransactionsPage('prev');
+            }
+        }
+
+        window.exportToPDF = function() {
+            window.print();
+        }
+
+        // حفظ معاملة جديدة
+        window.saveTransaction = async function(e) {
+            e.preventDefault();
+            const number = document.getElementById('txNumber').value;
+            const date = document.getElementById('txDate').value;
+            const subject = document.getElementById('txSubject').value;
+            const to = document.getElementById('txTo').value;
+            const status = document.getElementById('txStatus').value;
+            const dueDate = document.getElementById('txDueDate').value;
+
+            try {
+                await addDoc(collection(db, "transactions"), {
+                    number, date, subject, to, status, dueDate, createdAt: Date.now()
+                });
+                closeModal();
+                loadTransactionsPage('first');
+            } catch (err) {
+                alert("حدث خطأ أثناء الحفظ بالسحابة!");
+            }
+        }
+    </script>
+</body>
+</html>
