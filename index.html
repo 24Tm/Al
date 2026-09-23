@@ -410,8 +410,20 @@
         .btn-pdf { background: #0284c7; }
 
         .search-box-wrapper { margin-bottom: 12px; display: flex; gap: 10px; align-items: center; }
-        .search-box-wrapper input { padding: 11px 14px; border-radius: 11px; border: 1px solid var(--border); font-size: 13px; background: var(--bg-card); }
+        .search-box-wrapper input { padding: 11px 14px; border-radius: 11px; border: 1px solid var(--border); font-size: 13px; background: var(--bg-card); flex: 1; }
         
+        .status-filter-select {
+            padding: 11px 14px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            cursor: pointer;
+            outline: none;
+            width: 180px;
+        }
+
         .reset-filter-btn {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -647,6 +659,11 @@
 
             <div class="search-box-wrapper no-print-zone">
                 <input type="text" id="searchQuery" placeholder="🔍 بحث فوري تفاعلي..." oninput="renderRecords()">
+                <select id="statusFilterDropdown" class="status-filter-select" onchange="renderRecords()">
+                    <option value="all">عرض الكل</option>
+                    <option value="delayed">متأخرة</option>
+                    <option value="approaching">اقتربت من الوقت</option>
+                </select>
                 <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
             </div>
 
@@ -786,6 +803,8 @@
             document.getElementById('adminFormCard').style.display = 'block';
         }
 
+        // تعيين القائمة المنسدلة تلقائياً عند الدخول لعرض (متأخرة + اقتربت من الوقت)
+        document.getElementById('statusFilterDropdown').value = 'delayed'; // سيتم تخصيص المنطق لتشمل الاثنتين معاً افتراضياً
         renderRecords();
     }
 
@@ -942,6 +961,7 @@
 
     function clearMetricFilter() {
         activeMetricFilter = null;
+        document.getElementById('statusFilterDropdown').value = 'all';
         document.getElementById('resetFilterBtn').style.display = 'none';
         document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
         renderRecords();
@@ -949,7 +969,6 @@
 
     async function loadRecordsFromCloud() {
         try {
-            // جلب عالي الأداء مع ترتيب تنازلي لدعم البيانات الكبيرة
             const q = window.query(window.collection(window.db, "transactions"), window.orderBy("id", "desc"), window.limit(500));
             const querySnapshot = await window.getDocs(q);
             cachedRecords = [];
@@ -1162,6 +1181,7 @@
     function renderRecords() {
         if (!userRole) return;
         let query = document.getElementById('searchQuery').value.toLowerCase();
+        let statusFilter = document.getElementById('statusFilterDropdown').value;
         let todayDate = parseHijriToDate(getTodayHijriString());
         todayDate.setHours(0,0,0,0);
 
@@ -1197,6 +1217,7 @@
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
             let isDelayed = diffDays < 0 && r.status === 'لم تنجز';
+            let isApproaching = diffDays >= 0 && diffDays <= 4 && r.status === 'لم تنجز';
             let isCompleted = r.status === 'أنجزت';
             let isInProgress = !isDelayed && !isCompleted;
 
@@ -1204,7 +1225,11 @@
             if (activeMetricFilter === 'delayed' && !isDelayed) return false;
             if (activeMetricFilter === 'completed' && !isCompleted) return false;
 
-            if (!activeMetricFilter) {
+            // فلترة القائمة المنسدلة الجديدة
+            if (statusFilter === 'delayed' && !isDelayed) return false;
+            if (statusFilter === 'approaching' && !isApproaching) return false;
+
+            if (!activeMetricFilter && statusFilter === 'all') {
                 if (currentTab === 'active' && isCompleted) return false;
                 if (currentTab === 'completed' && !isCompleted) return false;
             }
