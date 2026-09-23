@@ -7,7 +7,7 @@
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, limit, orderBy, startAfter, getCountFromServer, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, limit, orderBy, startAfter } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
@@ -32,8 +32,6 @@
         window.limit = limit;
         window.orderBy = orderBy;
         window.startAfter = startAfter;
-        window.getCountFromServer = getCountFromServer;
-        window.where = where;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (typeof loadLoginCounters === 'function') {
@@ -535,8 +533,8 @@
                 <div class="login-quick-stats">
                     <div class="quick-stat-box yellow">
                         <div class="q-info">
-                            <span class="q-label">اقتربت من الوقت</span>
-                            <span class="q-num" id="loginCountApproaching">0</span>
+                            <span class="q-label">قريبة من الاستحقاق</span>
+                            <span class="q-num" id="loginCountApproaching">-</span>
                         </div>
                         <div class="q-icon">⏳</div>
                     </div>
@@ -544,7 +542,7 @@
                     <div class="quick-stat-box red">
                         <div class="q-info">
                             <span class="q-label">معاملات متأخرة</span>
-                            <span class="q-num" id="loginCountDelayed">0</span>
+                            <span class="q-num" id="loginCountDelayed">-</span>
                         </div>
                         <div class="q-icon">⚠️</div>
                     </div>
@@ -767,10 +765,9 @@
     let currentTab = 'active';
     let activeMetricFilter = null;
     
-    // متغيرات التقسيم والتعامل مع ملايين البيانات
     let currentLoadedRecords = [];
     let lastVisibleDoc = null;
-    const PAGE_SIZE = 25;
+    const PAGE_SIZE = 30;
 
     function checkSystemPassword() {
         let pass = document.getElementById('loginPasswordInput').value.trim();
@@ -891,51 +888,48 @@
     document.getElementById('transDate').value = getTodayHijriString();
     calculateDueDate();
 
-    // جلب العدادات للخلفية (شاشة الدخول واللوحة) بدون تحميل الملايين
+    // جلب العدادات والمؤشرات بدقة وسرعة عالية
     async function loadLoginCounters() {
         try {
             const collRef = window.collection(window.db, "transactions");
-            
-            // عدّاد المنجزة
-            const qCompleted = window.query(collRef, window.where("status", "==", "أنجزت"));
-            const snapCompleted = await window.getCountFromServer(qCompleted);
-            let completedVal = snapCompleted.data().count;
+            const q = window.query(collRef, window.limit(500));
+            const querySnapshot = await window.getDocs(q);
 
-            // عدّاد غير المنجزة (لتقدير المؤشرات)
-            const qActive = window.query(collRef, window.where("status", "==", "لم تنجز"));
-            const snapActive = await window.getCountFromServer(qActive);
-            let activeVal = snapActive.data().count;
+            let completedCount = 0;
+            let inProgressCount = 0;
+            let delayedCount = 0;
+            let approachingCount = 0;
+            let todayDate = parseHijriToDate(getTodayHijriString());
+            todayDate.setHours(0,0,0,0);
+
+            querySnapshot.forEach(docSnap => {
+                let data = docSnap.data();
+                if (data.status === 'أنجزت') {
+                    completedCount++;
+                } else {
+                    inProgressCount++;
+                    if (data.dueDate) {
+                        let dueD = parseHijriToDate(data.dueDate);
+                        dueD.setHours(0,0,0,0);
+                        let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+                        if (diffDays < 0) delayedCount++;
+                        else if (diffDays <= 4) approachingCount++;
+                    }
+                }
+            });
 
             if (document.getElementById('countCompleted')) {
-                document.getElementById('countCompleted').innerText = completedVal;
-                document.getElementById('countInProgress').innerText = activeVal;
+                document.getElementById('countCompleted').innerText = completedCount;
+                document.getElementById('countInProgress').innerText = inProgressCount;
+                document.getElementById('countDelayed').innerText = delayedCount;
             }
             if (document.getElementById('loginCountDelayed')) {
-                document.getElementById('loginCountDelayed').innerText = "---";
-                document.getElementById('loginCountApproaching').innerText = "---";
+                document.getElementById('loginCountDelayed').innerText = delayedCount;
+                document.getElementById('loginCountApproaching').innerText = approachingCount;
             }
         } catch (e) {
             console.error("خطأ في جلب العدادات:", e);
         }
-    }
-
-    function animateValue(id, start, end, duration) {
-        let obj = document.getElementById(id);
-        if (!obj || isNaN(end)) return;
-        if (start === end) {
-            obj.innerText = end;
-            return;
-        }
-        let range = end - start;
-        let current = start;
-        let increment = end > start ? 1 : -1;
-        let stepTime = Math.abs(Math.floor(duration / range));
-        stepTime = Math.max(stepTime, 20);
-        let timer = setInterval(function() {
-            current += increment;
-            obj.innerText = current;
-            if (current == end) { clearInterval(timer); }
-        }, stepTime);
     }
 
     function switchTab(tab) {
@@ -971,7 +965,6 @@
         refreshDashboardData();
     }
 
-    // جلب البيانات بنظام الصفحات (Pagination) من الخادم مباشرة لتتحمل ملايين السجلات
     async function refreshDashboardData() {
         currentLoadedRecords = [];
         lastVisibleDoc = null;
@@ -982,25 +975,10 @@
     async function fetchRecordsBatch(isReset = false) {
         try {
             let collRef = window.collection(window.db, "transactions");
-            let q;
-
-            // بناء الاستعلام بناءً على الفلاتر والتبويبات
-            if (activeMetricFilter === 'completed' || currentTab === 'completed') {
-                q = window.query(collRef, window.where("status", "==", "أنجزت"), window.orderBy("id", "desc"), window.limit(PAGE_SIZE));
-            } else if (activeMetricFilter === 'in-progress') {
-                q = window.query(collRef, window.where("status", "==", "لم تنجز"), window.orderBy("id", "desc"), window.limit(PAGE_SIZE));
-            } else {
-                q = window.query(collRef, window.orderBy("id", "desc"), window.limit(PAGE_SIZE));
-            }
+            let q = window.query(collRef, window.limit(PAGE_SIZE));
 
             if (!isReset && lastVisibleDoc) {
-                if (activeMetricFilter === 'completed' || currentTab === 'completed') {
-                    q = window.query(collRef, window.where("status", "==", "أنجزت"), window.orderBy("id", "desc"), window.startAfter(lastVisibleDoc), window.limit(PAGE_SIZE));
-                } else if (activeMetricFilter === 'in-progress') {
-                    q = window.query(collRef, window.where("status", "==", "لم تنجز"), window.orderBy("id", "desc"), window.startAfter(lastVisibleDoc), window.limit(PAGE_SIZE));
-                } else {
-                    q = window.query(collRef, window.orderBy("id", "desc"), window.startAfter(lastVisibleDoc), window.limit(PAGE_SIZE));
-                }
+                q = window.query(collRef, window.startAfter(lastVisibleDoc), window.limit(PAGE_SIZE));
             }
 
             const querySnapshot = await window.getDocs(q);
@@ -1009,18 +987,43 @@
             }
 
             let batchData = [];
+            let todayDate = parseHijriToDate(getTodayHijriString());
+            todayDate.setHours(0,0,0,0);
+
             querySnapshot.forEach((docSnap) => {
                 let data = docSnap.data();
-                batchData.push({
-                    docId: docSnap.id,
-                    id: data.id || Date.now(),
-                    number: data.number,
-                    date: data.date || getTodayHijriString(),
-                    subject: data.subject,
-                    to: data.to,
-                    status: data.status,
-                    dueDate: data.dueDate
-                });
+                let status = data.status || 'لم تنجز';
+                
+                // تطبيق الفلاتر برمجياً لضمان السرعة ومنع أخطاء الفهرسة في فايربيس
+                let passFilter = true;
+                if (activeMetricFilter === 'completed' || currentTab === 'completed') {
+                    if (status !== 'أنجزت') passFilter = false;
+                } else if (activeMetricFilter === 'in-progress') {
+                    if (status !== 'لم تنجز') passFilter = false;
+                } else if (activeMetricFilter === 'delayed') {
+                    if (status === 'أنجزت') {
+                        passFilter = false;
+                    } else {
+                        let dueD = parseHijriToDate(data.dueDate);
+                        dueD.setHours(0,0,0,0);
+                        if (Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24)) >= 0) passFilter = false;
+                    }
+                } else if (currentTab === 'active') {
+                    if (status === 'أنجزت') passFilter = false;
+                }
+
+                if (passFilter) {
+                    batchData.push({
+                        docId: docSnap.id,
+                        id: data.id || Date.now(),
+                        number: data.number || '',
+                        date: data.date || getTodayHijriString(),
+                        subject: data.subject || '',
+                        to: data.to || '',
+                        status: status,
+                        dueDate: data.dueDate || ''
+                    });
+                }
             });
 
             if (isReset) {
@@ -1029,9 +1032,7 @@
                 currentLoadedRecords = currentLoadedRecords.concat(batchData);
             }
 
-            // إظهار أو إخفاء زر "تحميل المزيد"
             document.getElementById('loadMoreContainer').style.display = querySnapshot.docs.length < PAGE_SIZE ? 'none' : 'block';
-
             renderRecordsToDOM(currentLoadedRecords);
         } catch (error) {
             console.error("خطأ في جلب البيانات:", error);
@@ -1049,10 +1050,9 @@
             return;
         }
 
-        // بحث السيرفر الذكي عبر المطابقة الجزئية للرقم أو الموضوع
         try {
             const collRef = window.collection(window.db, "transactions");
-            const q = window.query(collRef, window.orderBy("id", "desc"), window.limit(50));
+            const q = window.query(collRef, window.limit(300));
             const querySnapshot = await window.getDocs(q);
             
             let searchResults = [];
@@ -1066,12 +1066,12 @@
                     searchResults.push({
                         docId: docSnap.id,
                         id: data.id || Date.now(),
-                        number: data.number,
+                        number: data.number || '',
                         date: data.date || getTodayHijriString(),
-                        subject: data.subject,
-                        to: data.to,
-                        status: data.status,
-                        dueDate: data.dueDate
+                        subject: data.subject || '',
+                        to: data.to || '',
+                        status: data.status || 'لم تنجز',
+                        dueDate: data.dueDate || ''
                     });
                 }
             });
@@ -1111,6 +1111,8 @@
                 if (targetDoc) {
                     recordData.id = Number(docId);
                     await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), recordData);
+                } else {
+                    await window.addDoc(window.collection(window.db, "transactions"), recordData);
                 }
             } else {
                 await window.addDoc(window.collection(window.db, "transactions"), recordData);
@@ -1256,14 +1258,14 @@
 
     function renderRecordsToDOM(recordsList) {
         if (!userRole) return;
-        let todayDate = parseHijriToDate(getTodayHijriString());
+        let todayDate = parseHijriText = parseHijriToDate(getTodayHijriString());
         todayDate.setHours(0,0,0,0);
 
         let container = document.getElementById('recordsCardsContainer');
         container.innerHTML = '';
 
         if (recordsList.length === 0) {
-            container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 25px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">لا توجد سجلات مطابقة للعرض</div>`;
+            container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 25px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">لا توجد سجلات مطابقة للعرض الحالي</div>`;
             return;
         }
 
