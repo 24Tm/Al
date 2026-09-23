@@ -7,13 +7,13 @@
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, limit, orderBy, startAfter } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
           authDomain: "project-3958113961260211077.firebaseapp.com",
           projectId: "project-3958113961260211077",
-          storageBucket: "project-3958113961260211077.appspot.com",
+          storageBucket: "project-3958113961260211077.firebasestorage.app",
           messagingSenderId: "889377835896",
           appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
         };
@@ -28,14 +28,10 @@
         window.updateDoc = updateDoc;
         window.deleteDoc = deleteDoc;
         window.doc = doc;
-        window.query = query;
-        window.limit = limit;
-        window.orderBy = orderBy;
-        window.startAfter = startAfter;
 
         window.addEventListener('DOMContentLoaded', () => {
-            if (typeof loadLoginCounters === 'function') {
-                loadLoginCounters();
+            if (typeof loadRecordsFromCloud === 'function') {
+                loadRecordsFromCloud();
             }
         });
     </script>
@@ -75,6 +71,7 @@
             overflow-x: hidden;
         }
 
+        /* خلفية الشبكة المتحركة (تظهر في شاشة الدخول فقط) */
         #bgCanvas {
             position: fixed;
             top: 0;
@@ -87,6 +84,7 @@
 
         .dashboard-container { max-width: 1150px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 1; }
 
+        /* شاشة الدخول المدمجة والأنيقة */
         .login-wrapper {
             width: 100%;
             max-width: 390px;
@@ -251,6 +249,7 @@
         }
         .action-submit-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
 
+        /* واجهة النظام الأساسية المصغرة */
         .app-main-content { display: none; width: 100%; max-width: 950px; margin: 0 auto; }
 
         .compact-header-bar {
@@ -430,22 +429,6 @@
             margin-bottom: 12px;
         }
 
-        .load-more-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .btn-load-more {
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid var(--primary);
-            color: #60a5fa;
-            padding: 10px 24px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-load-more:hover { background: var(--primary); color: #fff; }
-
         .transaction-card {
             background: var(--bg-card);
             backdrop-filter: blur(10px);
@@ -516,6 +499,7 @@
 </head>
 <body>
 
+    <!-- خلفية الشبكة المتحركة (تظهر في شاشة الدخول فقط) -->
     <canvas id="bgCanvas"></canvas>
 
     <div class="dashboard-container">
@@ -533,8 +517,8 @@
                 <div class="login-quick-stats">
                     <div class="quick-stat-box yellow">
                         <div class="q-info">
-                            <span class="q-label">قريبة من الاستحقاق</span>
-                            <span class="q-num" id="loginCountApproaching">-</span>
+                            <span class="q-label">اقتربت من الوقت</span>
+                            <span class="q-num" id="loginCountApproaching">0</span>
                         </div>
                         <div class="q-icon">⏳</div>
                     </div>
@@ -542,7 +526,7 @@
                     <div class="quick-stat-box red">
                         <div class="q-info">
                             <span class="q-label">معاملات متأخرة</span>
-                            <span class="q-num" id="loginCountDelayed">-</span>
+                            <span class="q-num" id="loginCountDelayed">0</span>
                         </div>
                         <div class="q-icon">⚠️</div>
                     </div>
@@ -591,6 +575,7 @@
                 <button class="pill-btn" id="tabCompleted" onclick="switchTab('completed')">المعاملات المنجزة</button>
             </div>
 
+            <!-- لوحة الإدارة المصغرة -->
             <div class="panel-box no-print-zone" id="adminFormCard">
                 <h3 id="formTitleText">➕ تسجيل معاملة جديدة</h3>
                 <input type="hidden" id="recordId">
@@ -657,21 +642,18 @@
             </div>
 
             <div class="search-box-wrapper no-print-zone">
-                <input type="text" id="searchQuery" placeholder="🔍 بحث برقم أو موضوع المعاملة..." onkeydown="if(event.key === 'Enter') performSearch()">
-                <button class="action-submit-btn" onclick="performSearch()" style="padding: 11px 16px;">بحث</button>
+                <input type="text" id="searchQuery" placeholder="🔍 بحث فوري تفاعلي..." oninput="renderRecords()">
                 <button class="reset-filter-btn" onclick="clearMetricFilter()" id="resetFilterBtn" style="display:none;">إلغاء الفلتر ✖</button>
             </div>
 
             <div class="cards-grid no-print-zone" id="recordsCardsContainer"></div>
-            <div class="load-more-container no-print-zone" id="loadMoreContainer" style="display: none;">
-                <button class="btn-load-more" onclick="loadMoreRecords()">تحميل المزيد (5 سجلات تالية)...</button>
-            </div>
 
             <div id="printArea" class="print-zone"></div>
         </div>
     </div>
 
 <script>
+    // إعداد الشبكة المتحركة (Canvas)
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -759,15 +741,13 @@
         }
         animationFrameId = requestAnimationFrame(animateBg);
     }
+    // تشغيل الحركة عند التحميل (شاشة الدخول)
     animateBg();
 
     let userRole = null; 
     let currentTab = 'active';
     let activeMetricFilter = null;
-    
-    let currentLoadedRecords = [];
-    let lastVisibleDoc = null;
-    const PAGE_SIZE = 5;
+    let cachedRecords = []; 
 
     function checkSystemPassword() {
         let pass = document.getElementById('loginPasswordInput').value.trim();
@@ -788,6 +768,7 @@
     }
 
     function initSystemSession() {
+        // إيقاف وتخفيض استهلاك الموارد للـ Canvas عند الدخول للنظام
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
@@ -803,13 +784,14 @@
             document.getElementById('adminFormCard').style.display = 'block';
         }
 
-        refreshDashboardData();
+        renderRecords();
     }
 
     function lockSystem() {
         userRole = null;
         document.getElementById('mainAppContent').style.display = 'none';
         
+        // إعادة إظهار وتشغيل الشبكة المتحركة عند العودة لشاشة الدخول
         let canvasElem = document.getElementById('bgCanvas');
         canvasElem.style.display = 'block';
         if (!animationFrameId) {
@@ -818,7 +800,7 @@
 
         document.getElementById('loginOverlay').style.display = 'block';
         document.getElementById('loginPasswordInput').value = '';
-        loadLoginCounters();
+        updateLoginScreenCounters();
     }
 
     function getTodayHijriString() {
@@ -888,47 +870,47 @@
     document.getElementById('transDate').value = getTodayHijriString();
     calculateDueDate();
 
-    async function loadLoginCounters() {
-        try {
-            const collRef = window.collection(window.db, "transactions");
-            const q = window.query(collRef, window.limit(500));
-            const querySnapshot = await window.getDocs(q);
+    function updateLoginScreenCounters() {
+        let todayDate = parseHijriToDate(getTodayHijriString());
+        todayDate.setHours(0,0,0,0);
 
-            let completedCount = 0;
-            let inProgressCount = 0;
-            let delayedCount = 0;
-            let approachingCount = 0;
-            let todayDate = parseHijriToDate(getTodayHijriString());
-            todayDate.setHours(0,0,0,0);
+        let delayedCount = 0;
+        let approachingCount = 0;
 
-            querySnapshot.forEach(docSnap => {
-                let data = docSnap.data();
-                if (data.status === 'أنجزت') {
-                    completedCount++;
-                } else {
-                    inProgressCount++;
-                    if (data.dueDate) {
-                        let dueD_obj = parseHijriToDate(data.dueDate);
-                        dueD_obj.setHours(0,0,0,0);
-                        let diffDays = Math.round((dueD_obj - todayDate) / (1000 * 60 * 60 * 24));
-                        if (diffDays < 0) delayedCount++;
-                        else if (diffDays <= 4) approachingCount++;
-                    }
-                }
-            });
-
-            if (document.getElementById('countCompleted')) {
-                document.getElementById('countCompleted').innerText = completedCount;
-                document.getElementById('countInProgress').innerText = inProgressCount;
-                document.getElementById('countDelayed').innerText = delayedCount;
+        cachedRecords.forEach(r => {
+            if (r.status === 'أنجزت') return;
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                delayedCount++;
+            } else if (diffDays <= 4) {
+                approachingCount++;
             }
-            if (document.getElementById('loginCountDelayed')) {
-                document.getElementById('loginCountDelayed').innerText = delayedCount;
-                document.getElementById('loginCountApproaching').innerText = approachingCount;
-            }
-        } catch (e) {
-            console.error("خطأ في جلب العدادات:", e);
+        });
+
+        document.getElementById('loginCountDelayed').innerText = delayedCount;
+        document.getElementById('loginCountApproaching').innerText = approachingCount;
+    }
+
+    function animateValue(id, start, end, duration) {
+        let obj = document.getElementById(id);
+        if (!obj) return;
+        if (start === end) {
+            obj.innerText = end;
+            return;
         }
+        let range = end - start;
+        let current = start;
+        let increment = end > start ? 1 : -1;
+        let stepTime = Math.abs(Math.floor(duration / range));
+        stepTime = Math.max(stepTime, 20);
+        let timer = setInterval(function() {
+            current += increment;
+            obj.innerText = current;
+            if (current == end) { clearInterval(timer); }
+        }, stepTime);
     }
 
     function switchTab(tab) {
@@ -939,7 +921,7 @@
 
         document.getElementById('tabActive').classList.toggle('active', tab === 'active');
         document.getElementById('tabCompleted').classList.toggle('active', tab === 'completed');
-        refreshDashboardData();
+        renderRecords();
     }
 
     function filterByMetric(metricType) {
@@ -954,148 +936,37 @@
         } else {
             document.getElementById('resetFilterBtn').style.display = 'none';
         }
-        refreshDashboardData();
+        renderRecords();
     }
 
     function clearMetricFilter() {
         activeMetricFilter = null;
         document.getElementById('resetFilterBtn').style.display = 'none';
         document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
-        refreshDashboardData();
+        renderRecords();
     }
 
-    async function refreshDashboardData() {
-        currentLoadedRecords = [];
-        lastVisibleDoc = null;
-        await fetchRecordsBatch(true);
-        loadLoginCounters();
-    }
-
-    async function fetchRecordsBatch(isReset = false) {
+    async function loadRecordsFromCloud() {
         try {
-            let collRef = window.collection(window.db, "transactions");
-            let q = window.query(collRef, window.limit(PAGE_SIZE));
-
-            if (!isReset && lastVisibleDoc) {
-                q = window.query(collRef, window.startAfter(lastVisibleDoc), window.limit(PAGE_SIZE));
-            }
-
-            const querySnapshot = await window.getDocs(q);
-            if (!querySnapshot.empty) {
-                lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-            }
-
-            let batchData = [];
-            let todayDate = parseHijriToDate(getTodayHijriString());
-            todayDate.setHours(0,0,0,0);
-
+            const querySnapshot = await window.getDocs(window.collection(window.db, "transactions"));
+            cachedRecords = [];
             querySnapshot.forEach((docSnap) => {
                 let data = docSnap.data();
-                let status = data.status || 'لم تنجز';
-                
-                let passFilter = true;
-                if (activeMetricFilter === 'completed' || currentTab === 'completed') {
-                    if (status !== 'أنجزت') passFilter = false;
-                } else if (activeMetricFilter === 'in-progress') {
-                    if (status !== 'لم تنجز') passFilter = false;
-                } else if (activeMetricFilter === 'delayed') {
-                    if (status === 'أنجزت') {
-                        passFilter = false;
-                    } else {
-                        let dueD = parseHijriToDate(data.dueDate);
-                        dueD.setHours(0,0,0,0);
-                        if (Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24)) >= 0) passFilter = false;
-                    }
-                } else if (currentTab === 'active') {
-                    if (status === 'أنجزت') passFilter = false;
-                }
-
-                if (passFilter) {
-                    batchData.push({
-                        docId: docSnap.id,
-                        id: data.id || Date.now(),
-                        number: data.number || '',
-                        date: data.date || getTodayHijriString(),
-                        subject: data.subject || '',
-                        to: data.to || '',
-                        status: status,
-                        dueDate: data.dueDate || ''
-                    });
-                }
+                cachedRecords.push({
+                    docId: docSnap.id,
+                    id: data.id || Date.now(),
+                    number: data.number,
+                    date: data.date || getTodayHijriString(),
+                    subject: data.subject,
+                    to: data.to,
+                    status: data.status,
+                    dueDate: data.dueDate
+                });
             });
-
-            if (isReset) {
-                currentLoadedRecords = batchData;
-            } else {
-                currentLoadedRecords = currentLoadedRecords.concat(batchData);
-            }
-
-            // [تم التعديل]: ترتيب المعاملات بحيث تظهر المتأخرة أولاً (التواريخ الأقدم)، ثم الأقرب فالأبعد
-            currentLoadedRecords.sort((a, b) => {
-                let dateA = parseHijriToDate(a.dueDate);
-                let dateB = parseHijriToDate(b.dueDate);
-                dateA.setHours(0,0,0,0);
-                dateB.setHours(0,0,0,0);
-                return dateA - dateB; // ترتيب تصاعدي للتاريخ (الأقدم/المتأخرة أولاً ثم القريبة)
-            });
-
-            document.getElementById('loadMoreContainer').style.display = querySnapshot.docs.length < PAGE_SIZE ? 'none' : 'block';
-            renderRecordsToDOM(currentLoadedRecords);
+            updateLoginScreenCounters();
+            if (userRole) renderRecords();
         } catch (error) {
             console.error("خطأ في جلب البيانات:", error);
-        }
-    }
-
-    async function loadMoreRecords() {
-        await fetchRecordsBatch(false);
-    }
-
-    async function performSearch() {
-        let queryText = document.getElementById('searchQuery').value.trim().toLowerCase();
-        if (!queryText) {
-            refreshDashboardData();
-            return;
-        }
-
-        try {
-            const collRef = window.collection(window.db, "transactions");
-            const q = window.query(collRef, window.limit(300));
-            const querySnapshot = await window.getDocs(q);
-            
-            let searchResults = [];
-            querySnapshot.forEach((docSnap) => {
-                let data = docSnap.data();
-                if (
-                    (data.number && data.number.toLowerCase().includes(queryText)) ||
-                    (data.subject && data.subject.toLowerCase().includes(queryText)) ||
-                    (data.to && data.to.toLowerCase().includes(queryText))
-                ) {
-                    searchResults.push({
-                        docId: docSnap.id,
-                        id: data.id || Date.now(),
-                        number: data.number || '',
-                        date: data.date || getTodayHijriString(),
-                        subject: data.subject || '',
-                        to: data.to || '',
-                        status: data.status || 'لم تنجز',
-                        dueDate: data.dueDate || ''
-                    });
-                }
-            });
-
-            searchResults.sort((a, b) => {
-                let dateA = parseHijriToDate(a.dueDate);
-                let dateB = parseHijriToDate(b.dueDate);
-                dateA.setHours(0,0,0,0);
-                dateB.setHours(0,0,0,0);
-                return dateA - dateB;
-            });
-
-            currentLoadedRecords = searchResults;
-            document.getElementById('loadMoreContainer').style.display = 'none';
-            renderRecordsToDOM(currentLoadedRecords);
-        } catch (e) {
-            console.error("خطأ في البحث:", e);
         }
     }
 
@@ -1122,19 +993,17 @@
 
         try {
             if (docId) {
-                let targetDoc = currentLoadedRecords.find(r => r.id == docId);
+                let targetDoc = cachedRecords.find(r => r.id == docId);
                 if (targetDoc) {
                     recordData.id = Number(docId);
                     await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), recordData);
-                } else {
-                    await window.addDoc(window.collection(window.db, "transactions"), recordData);
                 }
             } else {
                 await window.addDoc(window.collection(window.db, "transactions"), recordData);
             }
 
             resetForm();
-            refreshDashboardData();
+            loadRecordsFromCloud();
         } catch (error) {
             alert("حدث خطأ أثناء حفظ المعاملة: " + error.message);
         }
@@ -1145,7 +1014,7 @@
             alert("عذراً، هذه الصلاحية مخصصة للأدمن فقط.");
             return;
         }
-        let targetDoc = currentLoadedRecords.find(r => r.id == id);
+        let targetDoc = cachedRecords.find(r => r.id == id);
         if (!targetDoc) return;
 
         try {
@@ -1160,7 +1029,7 @@
             };
 
             await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), updatedData);
-            refreshDashboardData();
+            loadRecordsFromCloud();
         } catch (error) {
             alert("حدث خطأ أثناء تحديث حالة المعاملة: " + error.message);
         }
@@ -1171,7 +1040,7 @@
             alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية التعديل.");
             return;
         }
-        let r = currentLoadedRecords.find(item => item.id == id);
+        let r = cachedRecords.find(item => item.id == id);
         if (!r) return;
 
         document.getElementById('recordId').value = r.id;
@@ -1193,11 +1062,11 @@
             return;
         }
         if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
-            let r = currentLoadedRecords.find(item => item.id == id);
+            let r = cachedRecords.find(item => item.id == id);
             if (r && r.docId) {
                 try {
                     await window.deleteDoc(window.doc(window.db, "transactions", r.docId));
-                    refreshDashboardData();
+                    loadRecordsFromCloud();
                 } catch (error) {
                     alert("تعذر الحذف: " + error.message);
                 }
@@ -1223,7 +1092,7 @@
         let todayDate = parseHijriToDate(getTodayHijriString());
         todayDate.setHours(0,0,0,0);
 
-        let targetRecords = currentLoadedRecords.filter(r => {
+        let targetRecords = cachedRecords.filter(r => {
             if (r.status === 'أنجزت') return false;
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
@@ -1232,9 +1101,11 @@
         });
 
         if (targetRecords.length === 0) {
-            alert('لا توجد معاملات متأخرة أو قريبة في العرض الحالي.');
+            alert('لا توجد معاملات متأخرة أو قريبة من الاستحقاق حالياً.');
             return;
         }
+
+        targetRecords.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
 
         let printArea = document.getElementById('printArea');
         let printHTML = `
@@ -1249,17 +1120,28 @@
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
             
-            let statusText = diffDays < 0 ? `متأخرة بـ ${Math.abs(diffDays)} يوم` : `متبقي عليها ${diffDays} أيام`;
+            let statusText = "";
+            let statusColor = "";
+            if (diffDays < 0) {
+                statusText = `متأخرة بـ ${Math.abs(diffDays)} يوم`;
+                statusColor = "#dc2626";
+            } else if (diffDays === 0) {
+                statusText = `مستحقة اليوم`;
+                statusColor = "#d97706";
+            } else {
+                statusText = `متبقي عليها ${diffDays} أيام (قريبة)`;
+                statusColor = "#d97706";
+            }
 
             printHTML += `
                 <div style="margin-bottom: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9;">
                     <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px;">
                         <span>${index + 1}. معاملة رقم: ${r.number}</span>
-                        <span style="color: #dc2626;">${statusText}</span>
+                        <span style="color: ${statusColor};">${statusText}</span>
                     </div>
                     <div style="font-size: 13px; margin-bottom: 4px;"><b>الموضوع:</b> ${r.subject}</div>
                     <div style="font-size: 12px; color: #555; display: flex; justify-content: space-between;">
-                        <span>الجهة: ${r.to || '---'}</span>
+                        <span>الجهة المحولة لها: ${r.to || '---'}</span>
                         <span>تاريخ الاستحقاق: ${r.dueDate}</span>
                     </div>
                 </div>
@@ -1268,23 +1150,83 @@
 
         printHTML += `</div>`;
         printArea.innerHTML = printHTML;
-        setTimeout(() => { window.print(); }, 100);
+        
+        setTimeout(() => {
+            window.print();
+        }, 100);
     }
 
-    function renderRecordsToDOM(recordsList) {
+    function renderRecords() {
         if (!userRole) return;
+        let query = document.getElementById('searchQuery').value.toLowerCase();
         let todayDate = parseHijriToDate(getTodayHijriString());
         todayDate.setHours(0,0,0,0);
+
+        let inProgressCount = 0;
+        let completedCount = 0;
+        let delayedCount = 0;
+
+        cachedRecords.forEach(r => {
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0 && r.status === 'لم تنجز') {
+                delayedCount++;
+            } else if (r.status === 'أنجزت') {
+                completedCount++;
+            } else {
+                inProgressCount++;
+            }
+        });
+
+        let oldInProgress = parseInt(document.getElementById('countInProgress').innerText) || 0;
+        let oldDelayed = parseInt(document.getElementById('countDelayed').innerText) || 0;
+        let oldCompleted = parseInt(document.getElementById('countCompleted').innerText) || 0;
+
+        animateValue('countInProgress', oldInProgress, inProgressCount, 300);
+        animateValue('countDelayed', oldDelayed, delayedCount, 300);
+        animateValue('countCompleted', oldCompleted, completedCount, 300);
+
+        updateLoginScreenCounters();
+
+        let filtered = cachedRecords.filter(r => {
+            let dueD = parseHijriToDate(r.dueDate);
+            dueD.setHours(0,0,0,0);
+            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+            let isDelayed = diffDays < 0 && r.status === 'لم تنجز';
+            let isCompleted = r.status === 'أنجزت';
+            let isInProgress = !isDelayed && !isCompleted;
+
+            if (activeMetricFilter === 'in-progress' && !isInProgress) return false;
+            if (activeMetricFilter === 'delayed' && !isDelayed) return false;
+            if (activeMetricFilter === 'completed' && !isCompleted) return false;
+
+            if (!activeMetricFilter) {
+                if (currentTab === 'active' && isCompleted) return false;
+                if (currentTab === 'completed' && !isCompleted) return false;
+            }
+
+            return true;
+        });
+        
+        filtered = filtered.filter(r => 
+            r.number.toLowerCase().includes(query) || 
+            r.subject.toLowerCase().includes(query) || 
+            (r.to && r.to.toLowerCase().includes(query)) ||
+            (r.date && r.date.toLowerCase().includes(query))
+        );
+
+        filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
 
         let container = document.getElementById('recordsCardsContainer');
         container.innerHTML = '';
 
-        if (recordsList.length === 0) {
-            container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 25px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">لا توجد سجلات مطابقة للعرض الحالي</div>`;
+        if (filtered.length === 0) {
+            container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 25px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">لا توجد سجلات مطابقة للعرض</div>`;
             return;
         }
 
-        recordsList.forEach(r => {
+        filtered.forEach(r => {
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
