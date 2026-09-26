@@ -69,6 +69,29 @@
             align-items: center;
             position: relative;
             overflow-x: hidden;
+            /* منع تحديد النص والحماية الإضافية */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* طبقة الحماية ضد التصوير (تخفي المحتوى عند محاولة مغادرة النافذة أو التصوير) */
+        #securityMask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #030712;
+            z-index: 999999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: #ef4444;
+            font-size: 20px;
+            font-weight: 800;
+            text-align: center;
         }
 
         /* خلفية الشبكة المتحركة (تظهر في شاشة الدخول فقط) */
@@ -499,6 +522,9 @@
 </head>
 <body>
 
+    <!-- طبقة الحماية التي تظهر عند محاولة التصوير أو فقدان تركيز النافذة -->
+    <div id="securityMask">⚠️ تم حجب المحتوى لحماية السرية ومنع التصوير</div>
+
     <!-- خلفية الشبكة المتحركة (تظهر في شاشة الدخول فقط) -->
     <canvas id="bgCanvas"></canvas>
 
@@ -653,6 +679,46 @@
     </div>
 
 <script>
+    // --- أكواد الحماية ومنع التصوير ---
+    const securityMask = document.getElementById('securityMask');
+
+    // تفعيل قناع الحماية عند مغادرة النافذة أو محاولة التقاط الشاشة عبر أدوات خارجية
+    window.addEventListener('blur', () => {
+        if (userRole) {
+            securityMask.style.display = 'flex';
+        }
+    });
+
+    window.addEventListener('focus', () => {
+        securityMask.style.display = 'none';
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && userRole) {
+            securityMask.style.display = 'flex';
+        } else {
+            securityMask.style.display = 'none';
+        }
+    });
+
+    // منع النقر بزر الفأرة الأيمن
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // منع اختصارات التصوير وأدوات المطورين الشائعة
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'PrintScreen') {
+            navigator.clipboard.writeText(''); // مسح الحافظة في حال تم الضغط
+            securityMask.style.display = 'flex';
+            setTimeout(() => { securityMask.style.display = 'none'; }, 2000);
+            e.preventDefault();
+        }
+        // منع F12 أو Ctrl+Shift+I / Ctrl+U
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U')) {
+            e.preventDefault();
+        }
+    });
+    // ---------------------------------
+
     // إعداد الشبكة المتحركة (Canvas)
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
@@ -741,7 +807,6 @@
         }
         animationFrameId = requestAnimationFrame(animateBg);
     }
-    // تشغيل الحركة عند التحميل (شاشة الدخول)
     animateBg();
 
     let userRole = null; 
@@ -768,7 +833,6 @@
     }
 
     function initSystemSession() {
-        // إيقاف وتخفيض استهلاك الموارد للـ Canvas عند الدخول للنظام
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
@@ -791,7 +855,6 @@
         userRole = null;
         document.getElementById('mainAppContent').style.display = 'none';
         
-        // إعادة إظهار وتشغيل الشبكة المتحركة عند العودة لشاشة الدخول
         let canvasElem = document.getElementById('bgCanvas');
         canvasElem.style.display = 'block';
         if (!animationFrameId) {
@@ -1226,7 +1289,7 @@
             return;
         }
 
-        filtered.forEach(r => {
+        filtered.exports = filtered.forEach(r => {
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
@@ -1271,17 +1334,18 @@
                     ${statusBadge}
                 </div>
                 <div class="card-body">
-                    <div class="card-subject">${r.subject}</div>
-                    <div class="card-meta">
-                        <span>الجهة: <b>${r.to || '---'}</b></span>
-                        <span>الإنجاز: ${r.dueDate}</span>
+                    <div class="card-subject">${r.subject}`,
+                    card.innerHTML += `
+                        <div class="card-meta">
+                            <span>الجهة: <b>${r.to || '---'}</b></span>
+                            <span>الإنجاز: ${r.dueDate}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="card-footer">
-                    <span style="font-size: 10.5px; color: var(--text-muted);">إدارة المعاملة</span>
-                    ${actionsHTML}
-                </div>
-            `;
+                    <div class="card-footer">
+                        <span style="font-size: 10.5px; color: var(--text-muted);">إدارة المعاملة</span>
+                        ${actionsHTML}
+                    </div>
+                `;
             container.appendChild(card);
         });
     }
