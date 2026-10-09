@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام متابعة المعاملات والصلاحيات</title>
+  <title>نظام متابعة المعاملات</title>
   <style>
     body {
       font-family: Tahoma, sans-serif;
@@ -38,7 +38,7 @@
     .btn-danger { background-color: #dc3545; color: white; }
     .btn-primary { background-color: #007bff; color: white; }
     #admin-controls {
-      display: none;
+      display: none; /* مخفي افتراضياً لحين التحقق من صلاحية الأدمن */
       margin-bottom: 20px;
       padding: 15px;
       background: #e9ecef;
@@ -72,7 +72,7 @@
       </div>
     </header>
 
-    <!-- الأزرار الخاصة بالمدير فقط -->
+    <!-- لوحة تحكم المدير (تظهر للأدمن فقط) -->
     <div id="admin-controls">
       <h3>لوحة تحكم المدير</h3>
       <button class="btn-primary" id="add-transaction-btn">إضافة معاملة جديدة</button>
@@ -88,7 +88,7 @@
             <th>الموضوع</th>
             <th>التاريخ</th>
             <th>الحالة</th>
-            <th id="actions-th">الإجراءات</th>
+            <th id="actions-th" style="display: none;">الإجراءات</th>
           </tr>
         </thead>
         <tbody id="transactions-table-body">
@@ -98,15 +98,15 @@
     </div>
   </div>
 
-  <!-- سكربت Firebase المتكامل -->
+  <!-- سكربت Firebase وصلاحيات الرتب -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // إعدادات مشروع فايربيس المحدثة لمشروعك
+    // إعدادات مشروع فايربيس
     const firebaseConfig = {
-      apiKey: "AIzaSyD-YourAPIKeyHere", // استبدلها بمفتاح الـ API الفعلي لمشروعك إن لزم
+      apiKey: "YOUR_API_KEY",
       authDomain: "project-3958113961260211077.firebaseapp.com",
       projectId: "project-3958113961260211077",
       storageBucket: "project-3958113961260211077.appspot.com",
@@ -126,42 +126,40 @@
     const logoutBtn = document.getElementById('logout-btn');
     const tableBody = document.getElementById('transactions-table-body');
 
-    // مراقبة تسجيل الدخول والصلاحيات
+    let isAdminUser = false;
+
+    // مراقبة حالة تسجيل الدخول وصلاحيات المستخدم
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         userEmailDisplay.textContent = `المستخدم: ${user.email}`;
         
         try {
+          // التحقق من صلاحية المستخدم في مجموعة users حسب الـ UID
           const userDocRef = doc(db, "users", user.uid);
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
-            const userRole = userData.role;
-
-            if (userRole === 'admin') {
+            if (userData.role === 'admin') {
+              isAdminUser = true;
               adminControls.style.display = 'block';
               if (actionsTh) actionsTh.style.display = 'table-cell';
-            } else {
-              adminControls.style.display = 'none';
-              if (actionsTh) actionsTh.style.display = 'none';
             }
-          } else {
-            adminControls.style.display = 'none';
-            if (actionsTh) actionsTh.style.display = 'none';
           }
         } catch (error) {
-          console.error("خطأ في جلب الصلاحيات:", error);
-          adminControls.style.display = 'none';
+          console.error("خطأ في جلب صلاحيات المستخدم:", error);
         }
 
+        // جلب وعرض المعاملات بعد تحديد الصلاحية
         loadTransactions();
 
       } else {
+        // إذا لم يكن مسجلاً للدخول، يتم توجيهه لصفحة الدخول
         window.location.href = "login.html";
       }
     });
 
+    // دالة جلب المعاملات من قاعدة البيانات وعرضها بالجدول
     async function loadTransactions() {
       tableBody.innerHTML = "";
       try {
@@ -170,15 +168,14 @@
           const data = docSnap.data();
           const row = document.createElement('tr');
           
-          let isAdmin = adminControls.style.display === 'block';
-          let actionCell = isAdmin ? `<td><button class="btn-danger">حذف</button></td>` : ``;
+          let actionCell = isAdminUser ? `<td><button class="btn-danger">حذف</button></td>` : ``;
 
           row.innerHTML = `
             <td>${data.number || ''}</td>
             <td>${data.subject || ''}</td>
             <td>${data.date || ''}</td>
             <td>${data.status || ''}</td>
-            ${isAdmin ? actionCell : ''}
+            ${isAdminUser ? actionCell : ''}
           `;
           tableBody.appendChild(row);
         });
@@ -187,6 +184,7 @@
       }
     }
 
+    // زر تسجيل الخروج
     logoutBtn.addEventListener('click', () => {
       signOut(auth).then(() => {
         window.location.href = "login.html";
