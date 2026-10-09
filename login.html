@@ -42,6 +42,8 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
+            direction: ltr;
+            text-align: left;
         }
         button {
             width: 100%;
@@ -72,11 +74,11 @@
         <form id="login-form">
             <div class="form-group">
                 <label for="email">البريد الإلكتروني</label>
-                <input type="email" id="email" required placeholder="ادخل البريد الإلكتروني">
+                <input type="email" id="email" required placeholder="1@1.com">
             </div>
             <div class="form-group">
                 <label for="password">كلمة المرور</label>
-                <input type="password" id="password" required placeholder="ادخل كلمة المرور">
+                <input type="password" id="password" required placeholder="********">
             </div>
             <button type="submit">دخول</button>
             <div id="error-message"></div>
@@ -86,7 +88,7 @@
     <!-- استيراد مكتبات Firebase عبر CDN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         // إعدادات مشروع الـ Firebase الخاص بك
         const firebaseConfig = {
@@ -102,21 +104,25 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // التعامل مع عملية تسجيل الدخول عند إرسال النموذج
         const loginForm = document.getElementById('login-form');
         const errorMessage = document.getElementById('error-message');
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
 
             errorMessage.textContent = "جاري تسجيل الدخول...";
 
             try {
+                // ضبط الحفظ ليبقى مسجلاً في المتصفح
+                await setPersistence(auth, browserLocalPersistence);
+                
+                // تسجيل الدخول
                 await signInWithEmailAndPassword(auth, email, password);
-                // الانتقال إلى الصفحة الرئيسية بعد نجاح الدخول
-                window.location.href = "index.html";
+                
+                // الانتقال المباشر للصفحة الرئيسية
+                window.location.replace("index.html");
             } catch (error) {
                 console.error("خطأ في تسجيل الدخول:", error.code);
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
