@@ -8,7 +8,6 @@
         :root {
             --font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --bg-deep: #030712;
-            --bg-card: rgba(17, 24, 39, 0.85);
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --primary: #3b82f6;
@@ -28,13 +27,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             padding: 15px;
-            overflow: hidden;
             position: relative;
+            overflow-x: hidden;
         }
 
-        /* خلفية جمالية خفيفة */
         body::before {
             content: '';
             position: absolute;
@@ -48,89 +46,116 @@
 
         .login-wrapper {
             width: 100%;
-            max-width: 400px;
+            max-width: 410px;
             background: linear-gradient(160deg, rgba(17, 24, 39, 0.9), rgba(11, 15, 25, 0.95));
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(59, 130, 246, 0.35);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(59, 130, 246, 0.15);
             border-radius: var(--radius);
-            padding: 32px 24px;
+            padding: 28px 22px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: translateY(15px) scale(0.96); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .unified-logo-box {
-            margin-bottom: 16px;
-            width: 64px;
-            height: 64px;
+            margin-bottom: 12px;
+            width: 56px;
+            height: 56px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.05) 100%);
-            border-radius: 18px;
+            border-radius: 16px;
             border: 1px solid rgba(59, 130, 246, 0.5);
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.35);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
         }
 
         h2 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
             color: #ffffff;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             background: linear-gradient(to left, #ffffff, #93c5fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-align: center;
         }
 
+        /* مربعات الإحصائيات السريعة */
+        .login-quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .quick-stat-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        .quick-stat-box.yellow { border-right: 4px solid #f59e0b; background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(245, 158, 11, 0.1)); }
+        .quick-stat-box.red { border-right: 4px solid #ef4444; background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(239, 68, 68, 0.1)); }
+
+        .q-info { display: flex; flex-direction: column; gap: 2px; text-align: right; }
+        .q-label { font-size: 11px; color: var(--text-muted); font-weight: 700; }
+        .q-num { font-size: 16px; font-weight: 900; }
+
+        .quick-stat-box.yellow .q-num { color: #fbbf24; text-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
+        .quick-stat-box.red .q-num { color: #f87171; text-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+
+        .q-icon {
+            width: 30px; height: 30px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+        .quick-stat-box.yellow .q-icon { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .quick-stat-box.red .q-icon { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
         form {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
             text-align: right;
         }
 
         label {
-            font-size: 12.5px;
+            font-size: 12px;
             color: #93c5fd;
             font-weight: 700;
         }
 
         input {
             width: 100%;
-            padding: 12px 14px;
-            border-radius: 11px;
+            padding: 11px 14px;
+            border-radius: 10px;
             border: 1px solid var(--border);
             background: #030712;
             color: #fff;
-            font-size: 14px;
+            font-size: 13.5px;
+            text-align: right;
             transition: all 0.25s;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
         }
 
-        input#email {
-            direction: ltr;
-            text-align: left;
-        }
-
         input:focus {
             border-color: var(--primary);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 12px var(--primary-glow);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 10px var(--primary-glow);
             outline: none;
         }
 
@@ -138,27 +163,26 @@
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: #fff;
             border: none;
-            padding: 13px;
-            border-radius: 11px;
+            padding: 12px;
+            border-radius: 10px;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 14.5px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
             transition: all 0.2s ease;
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         button[type="submit"]:hover {
             transform: translateY(-1px);
             filter: brightness(1.1);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
         }
 
         #error-message {
             color: #f87171;
             text-align: center;
-            margin-top: 10px;
-            font-size: 13px;
+            margin-top: 8px;
+            font-size: 12.5px;
             font-weight: 700;
         }
     </style>
@@ -167,17 +191,36 @@
 
     <div class="login-wrapper">
         <div class="unified-logo-box">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
         </div>
         <h2>تسجيل الدخول للنظام</h2>
+
+        <!-- عدادات المعاملات المتأخرة والقريبة -->
+        <div class="login-quick-stats">
+            <div class="quick-stat-box yellow">
+                <div class="q-info">
+                    <span class="q-label">قريبة الاستحقاق</span>
+                    <span class="q-num" id="loginCountApproaching">0</span>
+                </div>
+                <div class="q-icon">⏳</div>
+            </div>
+            
+            <div class="quick-stat-box red">
+                <div class="q-info">
+                    <span class="q-label">معاملات متأخرة</span>
+                    <span class="q-num" id="loginCountDelayed">0</span>
+                </div>
+                <div class="q-icon">⚠️</div>
+            </div>
+        </div>
         
         <form id="login-form">
             <div class="form-group">
-                <label for="email">البريد الإلكتروني</label>
-                <input type="email" id="email" required placeholder="1@1.com">
+                <label for="username">اسم المستخدم أو البريد</label>
+                <input type="text" id="username" required placeholder="مثال: admin أو 1@1.com">
             </div>
             
             <div class="form-group">
@@ -194,8 +237,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // إعدادات مشروع الـ Firebase الخاص بك
         const firebaseConfig = {
           apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
           authDomain: "project-3958113961260211077.firebaseapp.com",
@@ -207,21 +250,85 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // حساب التواريخ الهجرية لحساب المتأخرات وقريبة الاستحقاق مباشرة في شاشة الدخول
+        function getTodayHijriString() {
+            try {
+                let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
+                    year: 'numeric', month: '2-digit', day: '2-digit'
+                });
+                let parts = formatter.formatToParts(new Date());
+                let y = parts.find(p => p.type === 'year').value;
+                let m = parts.find(p => p.type === 'month').value;
+                let d = parts.find(p => p.type === 'day').value;
+                return `${y}-${m}-${d}`;
+            } catch (e) {
+                return "1447-04-01";
+            }
+        }
+
+        function parseHijriToDate(hijriStr) {
+            if (!hijriStr) return new Date();
+            let parts = hijriStr.split(/[-/]/);
+            if (parts.length !== 3) return new Date();
+            let hy = parseInt(parts[0], 10);
+            let hm = parseInt(parts[1], 10);
+            let hd = parseInt(parts[2], 10);
+            let estimatedGregorianYear = Math.round(hy * 0.9702 + 621.56);
+            return new Date(estimatedGregorianYear, hm - 1, hd);
+        }
+
+        // جلب المعاملات وحساب المتأخرات والقريبة فور فتح الصفحة
+        async function fetchLoginStats() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "transactions"));
+                let todayDate = parseHijriToDate(getTodayHijriString());
+                todayDate.setHours(0,0,0,0);
+
+                let delayedCount = 0;
+                let approachingCount = 0;
+
+                querySnapshot.forEach((docSnap) => {
+                    let data = docSnap.data();
+                    if (data.status === 'أنجزت') return;
+                    
+                    let dueD = parseHijriToDate(data.dueDate);
+                    dueD.setHours(0,0,0,0);
+                    let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 0) {
+                        delayedCount++;
+                    } else if (diffDays <= 4) {
+                        approachingCount++;
+                    }
+                });
+
+                document.getElementById('loginCountDelayed').innerText = delayedCount;
+                document.getElementById('loginCountApproaching').innerText = approachingCount;
+            } catch (error) {
+                console.error("خطأ في جلب إحصائيات الدخول:", error);
+            }
+        }
+
+        fetchLoginStats();
 
         const loginForm = document.getElementById('login-form');
         const errorMessage = document.getElementById('error-message');
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value.trim();
+            let userInput = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
+
+            const mappedEmail = userInput.includes('@') ? userInput : `${userInput}@24tm.local`;
 
             errorMessage.style.color = "#93c5fd";
             errorMessage.textContent = "جاري التحقق وتسجيل الدخول...";
 
             try {
                 await setPersistence(auth, browserLocalPersistence);
-                await signInWithEmailAndPassword(auth, email, password);
+                await signInWithEmailAndPassword(auth, mappedEmail, password);
                 
                 setTimeout(() => {
                     window.location.replace("index.html");
@@ -231,7 +338,7 @@
                 console.error("خطأ في تسجيل الدخول:", error.code);
                 errorMessage.style.color = "#f87171";
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-                    errorMessage.textContent = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+                    errorMessage.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة.";
                 } else {
                     errorMessage.textContent = "حدث خطأ: " + error.message;
                 }
