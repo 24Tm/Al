@@ -38,7 +38,7 @@
     .btn-danger { background-color: #dc3545; color: white; }
     .btn-primary { background-color: #007bff; color: white; }
     #admin-controls {
-      display: none; /* مخفي افتراضياً لحين التحقق من صلاحية الأدمن */
+      display: none;
       margin-bottom: 20px;
       padding: 15px;
       background: #e9ecef;
@@ -106,7 +106,7 @@
 
     // إعدادات مشروع فايربيس
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
+      apiKey: "AIzaSyD-YourAPIKeyHere",
       authDomain: "project-3958113961260211077.firebaseapp.com",
       projectId: "project-3958113961260211077",
       storageBucket: "project-3958113961260211077.appspot.com",
@@ -128,13 +128,12 @@
 
     let isAdminUser = false;
 
-    // مراقبة حالة تسجيل الدخول وصلاحيات المستخدم
+    // مراقبة حالة تسجيل الدخول والصلاحيات
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         userEmailDisplay.textContent = `المستخدم: ${user.email}`;
         
         try {
-          // التحقق من صلاحية المستخدم في مجموعة users حسب الـ UID
           const userDocRef = doc(db, "users", user.uid);
           const userDocSnap = await getDoc(userDocRef);
 
@@ -150,11 +149,10 @@
           console.error("خطأ في جلب صلاحيات المستخدم:", error);
         }
 
-        // جلب وعرض المعاملات بعد تحديد الصلاحية
         loadTransactions();
 
       } else {
-        // إذا لم يكن مسجلاً للدخول، يتم توجيهه لصفحة الدخول
+        // إذا لم يكن مسجلاً للدخول، يتم توجيهه لصفحة تسجيل الدخول داخل المجلد
         window.location.href = "login.html";
       }
     });
