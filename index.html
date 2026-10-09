@@ -1,193 +1,97 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام متابعة المعاملات</title>
-  <style>
-    body {
-      font-family: Tahoma, sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-      direction: rtl;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-    }
-    button {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .btn-danger { background-color: #dc3545; color: white; }
-    .btn-primary { background-color: #007bff; color: white; }
-    #admin-controls {
-      display: none;
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #e9ecef;
-      border-radius: 5px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    table, th, td {
-      border: 1px solid #dee2e6;
-    }
-    th, td {
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #f8f9fa;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النظام الرئيسي - متابعة المعاملات</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #c82333;
+        }
+        .content {
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <header>
-      <h2>لوحة متابعة المعاملات</h2>
-      <div>
-        <span id="user-email-display" style="margin-left: 15px; font-weight: bold;"></span>
-        <button id="logout-btn" class="btn-danger">تسجيل الخروج</button>
-      </div>
-    </header>
-
-    <!-- لوحة تحكم المدير (تظهر للأدمن فقط) -->
-    <div id="admin-controls">
-      <h3>لوحة تحكم المدير</h3>
-      <button class="btn-primary" id="add-transaction-btn">إضافة معاملة جديدة</button>
+    <div class="header">
+        <h2>نظام متابعة المعاملات</h2>
+        <div>
+            <span id="user-email" style="margin-left: 15px; color: #555;"></span>
+            <button id="logout-btn">تسجيل الخروج</button>
+        </div>
     </div>
 
-    <!-- جدول عرض المعاملات -->
-    <div>
-      <h3>قائمة المعاملات</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>رقم المعاملة</th>
-            <th>الموضوع</th>
-            <th>التاريخ</th>
-            <th>الحالة</th>
-            <th id="actions-th" style="display: none;">الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody id="transactions-table-body">
-          <!-- يتم تعبئة البيانات برمجياً -->
-        </tbody>
-      </table>
+    <div class="content">
+        <h3>مرحباً بك في لوحة التحكم</h3>
+        <p>تم تسجيل دخولك بنجاح إلى النظام.</p>
     </div>
-  </div>
 
-  <!-- سكربت Firebase وصلاحيات الرتب -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <!-- استيراد مكتبات Firebase عبر CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // إعدادات مشروع فايربيس
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-YourAPIKeyHere",
-      authDomain: "project-3958113961260211077.firebaseapp.com",
-      projectId: "project-3958113961260211077",
-      storageBucket: "project-3958113961260211077.appspot.com",
-      messagingSenderId: "2914",
-      appId: "1:2914:web:firebase"
-    };
+        // إعدادات مشروع الـ Firebase الخاص بك
+        const firebaseConfig = {
+          apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
+          authDomain: "project-3958113961260211077.firebaseapp.com",
+          projectId: "project-3958113961260211077",
+          storageBucket: "project-3958113961260211077.firebasestorage.app",
+          messagingSenderId: "889377835896",
+          appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
+        };
 
-    // تهيئة Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-    // عناصر واجهة المستخدم
-    const adminControls = document.getElementById('admin-controls');
-    const actionsTh = document.getElementById('actions-th');
-    const userEmailDisplay = document.getElementById('user-email-display');
-    const logoutBtn = document.getElementById('logout-btn');
-    const tableBody = document.getElementById('transactions-table-body');
-
-    let isAdminUser = false;
-
-    // مراقبة حالة تسجيل الدخول والصلاحيات
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        userEmailDisplay.textContent = `المستخدم: ${user.email}`;
-        
-        try {
-          const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            if (userData.role === 'admin') {
-              isAdminUser = true;
-              adminControls.style.display = 'block';
-              if (actionsTh) actionsTh.style.display = 'table-cell';
+        // التحقق من حالة تسجيل الدخول
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // المستخدم مسجل الدخول بنجاح
+                document.getElementById('user-email').textContent = user.email;
+            } else {
+                // إذا لم يكن مسجلاً، أعده لصفحة الدخول
+                window.location.href = "login.html";
             }
-          }
-        } catch (error) {
-          console.error("خطأ في جلب صلاحيات المستخدم:", error);
-        }
-
-        loadTransactions();
-
-      } else {
-        // إذا لم يكن مسجلاً للدخول، يتم توجيهه لصفحة تسجيل الدخول داخل المجلد
-        window.location.href = "login.html";
-      }
-    });
-
-    // دالة جلب المعاملات من قاعدة البيانات وعرضها بالجدول
-    async function loadTransactions() {
-      tableBody.innerHTML = "";
-      try {
-        const querySnapshot = await getDocs(collection(db, "transactions"));
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const row = document.createElement('tr');
-          
-          let actionCell = isAdminUser ? `<td><button class="btn-danger">حذف</button></td>` : ``;
-
-          row.innerHTML = `
-            <td>${data.number || ''}</td>
-            <td>${data.subject || ''}</td>
-            <td>${data.date || ''}</td>
-            <td>${data.status || ''}</td>
-            ${isAdminUser ? actionCell : ''}
-          `;
-          tableBody.appendChild(row);
         });
-      } catch (error) {
-        console.error("خطأ في جلب المعاملات:", error);
-      }
-    }
 
-    // زر تسجيل الخروج
-    logoutBtn.addEventListener('click', () => {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
-      });
-    });
-  </script>
+        // زر تسجيل الخروج
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            }).catch((error) => {
+                console.error("خطأ في تسجيل الخروج", error);
+            });
+        });
+    </script>
 </body>
 </html>
