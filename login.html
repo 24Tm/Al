@@ -121,8 +121,11 @@
                 // تسجيل الدخول
                 await signInWithEmailAndPassword(auth, email, password);
                 
-                // الانتقال المباشر للصفحة الرئيسية
-                window.location.replace("index.html");
+                // تأخير بسيط لضمان استقرار جلسة الـ Firebase قبل الانتقال
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 500);
+
             } catch (error) {
                 console.error("خطأ في تسجيل الدخول:", error.code);
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
