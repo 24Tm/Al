@@ -6,10 +6,10 @@
     <title>تسجيل الدخول - نظام متابعة المعاملات</title>
     <style>
         :root {
-            --font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-family: 'Cairo', system-ui, -apple-system, sans-serif;
             --bg-deep: #090d16;
-            --card-bg: rgba(15, 23, 42, 0.75);
-            --border-glow: rgba(59, 130, 246, 0.3);
+            --card-bg: #0f172a;
+            --border-color: rgba(255, 255, 255, 0.08);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary: #3b82f6;
@@ -17,217 +17,137 @@
             --radius: 20px;
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
 
-        * { box-sizing: border-box; font-family: var(--font-family); }
+        * { box-sizing: border-box; font-family: var(--font-family); margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg-deep);
             color: var(--text-main);
-            margin: 0;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-            position: relative;
             overflow: hidden;
         }
-
-        /* خلفية مضيئة متحركة وناعمة */
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            width: 350px;
-            height: 350px;
-            border-radius: 50%;
-            filter: blur(90px);
-            z-index: -1;
-        }
-        body::before { background: rgba(59, 130, 246, 0.18); top: -100px; right: -100px; }
-        body::after { background: rgba(16, 185, 129, 0.12); bottom: -100px; left: -100px; }
 
         .login-container {
             width: 100%;
-            max-width: 440px;
+            max-width: 380px;
             background: var(--card-bg);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
             border-radius: var(--radius);
-            padding: 32px 28px;
+            padding: 28px 22px;
             display: flex;
             flex-direction: column;
-            position: relative;
-            animation: containerAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            align-center: center;
         }
 
-        @keyframes containerAppear {
-            from { opacity: 0; transform: translateY(20px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* الهيدر الأنيق */
+        /* الهيدر النظيف */
         .header-section {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding-bottom: 18px;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
-        .logo-emblem {
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.4));
-            border: 1px solid rgba(59, 130, 246, 0.5);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-            color: #60a5fa;
-            flex-shrink: 0;
-        }
-
-        .title-group h1 {
+        .header-section h1 {
             font-size: 17px;
             font-weight: 800;
             color: #ffffff;
-            margin: 0 0 4px 0;
-            letter-spacing: -0.3px;
+            margin-bottom: 4px;
         }
 
-        .title-group p {
-            font-size: 12px;
+        .header-section p {
+            font-size: 11.5px;
             color: var(--text-muted);
-            margin: 0;
         }
 
-        /* بطاقات الإحصائيات الفاخرة */
+        /* بطاقات الإحصائيات النظيفة */
         .stats-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
-            background: rgba(3, 7, 18, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 14px;
+            background: #030712;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s;
+            gap: 2px;
+            text-align: center;
         }
-
-        .stat-card:hover { transform: translateY(-2px); }
 
         .stat-card.warning { border-top: 2px solid #f59e0b; }
         .stat-card.danger { border-top: 2px solid #ef4444; }
 
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .stat-title { font-size: 10.5px; color: var(--text-muted); font-weight: 700; }
+        .stat-number { font-size: 18px; font-weight: 900; }
 
-        .stat-title { font-size: 11px; color: var(--text-muted); font-weight: 700; }
-        .stat-icon { font-size: 14px; }
-
-        .stat-number {
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-        }
-
-        .stat-card.warning .stat-number { color: #fbbf24; text-shadow: 0 0 12px rgba(245, 158, 11, 0.3); }
-        .stat-card.danger .stat-number { color: #f87171; text-shadow: 0 0 12px rgba(239, 68, 68, 0.3); }
+        .stat-card.warning .stat-number { color: #fbbf24; }
+        .stat-card.danger .stat-number { color: #f87171; }
 
         /* نموذج الإدخال */
         .input-group {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             text-align: right;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 6px;
-            font-size: 12px;
+            margin-bottom: 5px;
+            font-size: 11.5px;
             font-weight: 700;
             color: #cbd5e1;
-            letter-spacing: 0.2px;
-        }
-
-        .input-field-wrapper {
-            position: relative;
         }
 
         input {
             width: 100%;
-            padding: 13px 16px;
-            background: rgba(3, 7, 18, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
+            padding: 11px 14px;
+            background: #030712;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
             color: #ffffff;
-            font-size: 14px;
+            font-size: 13.5px;
             text-align: right;
-            transition: all 0.25s ease;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
         }
 
         input:focus {
             outline: none;
             border-color: var(--primary);
-            background: rgba(3, 7, 18, 0.95);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(59, 130, 246, 0.25);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
         }
 
         .login-action-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            padding: 12px;
+            background: var(--primary);
             color: #ffffff;
             border: none;
-            border-radius: 12px;
-            font-size: 15px;
+            border-radius: 10px;
+            font-size: 14.5px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.25s ease;
-            margin-top: 8px;
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            transition: background 0.2s;
+            margin-top: 6px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .login-action-btn:hover {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            transform: translateY(-1px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+            background: var(--primary-hover);
         }
-
-        .login-action-btn:active { transform: translateY(0); }
 
         #error-message {
             color: #f87171;
             text-align: center;
-            margin-top: 14px;
-            font-size: 12.5px;
+            margin-top: 10px;
+            font-size: 12px;
             font-weight: 700;
-        }
-
-        .system-footer {
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 22px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 14px;
-            font-weight: 600;
         }
     </style>
 </head>
@@ -236,33 +156,19 @@
     <div class="login-container">
         <!-- الهيدر -->
         <div class="header-section">
-            <div class="logo-emblem">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-            </div>
-            <div class="title-group">
-                <h1>نظام متابعة المعاملات</h1>
-                <p>بوابة الدخول الآمن للمنظومة</p>
-            </div>
+            <h1>نظام متابعة المعاملات</h1>
+            <p>تسجيل الدخول للاعتماد</p>
         </div>
 
         <!-- بطاقات الإحصائيات -->
         <div class="stats-row">
             <div class="stat-card warning">
-                <div class="stat-header">
-                    <span class="stat-title">قريبة الاستحقاق</span>
-                    <span class="stat-icon">⏳</span>
-                </div>
+                <span class="stat-title">⏳ قريبة الاستحقاق</span>
                 <span class="stat-number" id="loginCountApproaching">0</span>
             </div>
             
             <div class="stat-card danger">
-                <div class="stat-header">
-                    <span class="stat-title">معاملات متأخرة</span>
-                    <span class="stat-icon">⚠️</span>
-                </div>
+                <span class="stat-title">⚠️ معاملات متأخرة</span>
                 <span class="stat-number" id="loginCountDelayed">0</span>
             </div>
         </div>
@@ -270,26 +176,18 @@
         <!-- نموذج تسجيل الدخول -->
         <form id="login-form">
             <div class="input-group">
-                <label for="username">اسم المستخدم أو البريد الإلكتروني</label>
-                <div class="input-field-wrapper">
-                    <input type="text" id="username" required placeholder="admin أو 1@1.com">
-                </div>
+                <label for="username">اسم المستخدم</label>
+                <input type="text" id="username" required placeholder="admin">
             </div>
             
             <div class="input-group">
                 <label for="password">كلمة المرور</label>
-                <div class="input-field-wrapper">
-                    <input type="password" id="password" required placeholder="••••••••">
-                </div>
+                <input type="password" id="password" required placeholder="••••••••">
             </div>
             
-            <button type="submit" class="login-action-btn">دخول النظام</button>
+            <button type="submit" class="login-action-btn">دخول</button>
             <div id="error-message"></div>
         </form>
-
-        <div class="system-footer">
-            منظومة المتابعة الرقمية الموحدة © 2026
-        </div>
     </div>
 
     <!-- كود الربط والتحقق Firebase -->
@@ -381,7 +279,7 @@
             const mappedEmail = userInput.includes('@') ? userInput : `${userInput}@24tm.local`;
 
             errorMessage.style.color = "#93c5fd";
-            errorMessage.textContent = "جاري التحقق من الاعتماد...";
+            errorMessage.textContent = "جاري التحقق...";
 
             try {
                 await setPersistence(auth, browserLocalPersistence);
@@ -397,7 +295,7 @@
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
                     errorMessage.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة.";
                 } else {
-                    errorMessage.textContent = "تعذر تسجيل الدخول: " + error.message;
+                    errorMessage.textContent = "تعذر تسجيل الدخول.";
                 }
             }
         });
