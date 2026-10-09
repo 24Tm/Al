@@ -7,155 +7,179 @@
     <style>
         :root {
             --font-family: 'Cairo', system-ui, -apple-system, sans-serif;
-            --bg-deep: #090d16;
-            --card-bg: #0f172a;
-            --border-color: rgba(255, 255, 255, 0.08);
+            --bg-deep: #030712;
+            --card-bg: #0b1329;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(59, 130, 246, 0.25);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --radius: 16px;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --radius: 20px;
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
 
         * { box-sizing: border-box; font-family: var(--font-family); margin: 0; padding: 0; }
 
         body {
             background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 100% 100%, rgba(15, 23, 42, 0.8) 0%, transparent 100%);
             color: var(--text-main);
-            width: 100vw;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            padding: 20px;
         }
 
         .login-container {
             width: 100%;
-            max-width: 380px;
+            max-width: 420px;
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(37, 99, 235, 0.05);
             border-radius: var(--radius);
-            padding: 32px 24px;
+            padding: 36px 30px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            position: relative;
         }
 
-        /* الهيدر الإداري */
+        /* الهيدر الإداري الفاخر */
         .header-section {
             text-align: center;
-            margin-bottom: 24px;
-            width: 100%;
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 20px;
         }
 
         .header-section h1 {
-            font-size: 17px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 800;
             color: #ffffff;
             margin-bottom: 6px;
-            letter-spacing: -0.2px;
+            letter-spacing: -0.3px;
         }
 
         .header-section p {
-            font-size: 11.5px;
+            font-size: 12.5px;
             color: var(--text-muted);
-            font-weight: 400;
+            font-weight: 500;
         }
 
-        /* بطاقات الإحصائيات الإدارية */
+        /* بطاقات الإحصائيات الرسمية */
         .stats-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-            width: 100%;
+            gap: 14px;
+            margin-bottom: 26px;
         }
 
         .stat-card {
-            background: #030712;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
+            background: #020617;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-card.warning { border-top: 2px solid #f59e0b; }
-        .stat-card.danger { border-top: 2px solid #ef4444; }
+        .stat-card.warning { border-right: 3px solid #f59e0b; }
+        .stat-card.danger { border-right: 3px solid #ef4444; }
 
-        .stat-title { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .stat-number { font-size: 18px; font-weight: 800; }
+        .stat-title { font-size: 11.5px; color: var(--text-muted); font-weight: 700; }
+        .stat-number { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
 
         .stat-card.warning .stat-number { color: #fbbf24; }
         .stat-card.danger .stat-number { color: #f87171; }
 
         /* نموذج الإدخال */
         form {
-            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
 
         .input-group {
-            margin-bottom: 16px;
             text-align: right;
-            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .input-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 11.5px;
-            font-weight: 600;
+            font-size: 12.5px;
+            font-weight: 700;
             color: #cbd5e1;
+            letter-spacing: 0.2px;
         }
 
         input {
             width: 100%;
-            padding: 11px 14px;
-            background: #030712;
-            border: 1px solid var(--border-color);
-            border-radius: 9px;
+            padding: 13px 16px;
+            background: #020617;
+            border: 1px solid var(--border-subtle);
+            border-radius: 11px;
             color: #ffffff;
-            font-size: 13.5px;
+            font-size: 14px;
             text-align: right;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
 
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background: #040d21;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
         }
 
         .login-action-btn {
             width: 100%;
-            padding: 12px;
-            background: var(--primary);
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #ffffff;
             border: none;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 700;
+            border-radius: 11px;
+            font-size: 15px;
+            font-weight: 800;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 6px;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+            transition: all 0.25s ease;
+            margin-top: 4px;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
         }
 
         .login-action-btn:hover {
-            background: var(--primary-hover);
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
+        }
+
+        .login-action-btn:active {
+            transform: translateY(0);
         }
 
         #error-message {
             color: #f87171;
             text-align: center;
-            margin-top: 12px;
-            font-size: 12px;
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 14px;
             font-weight: 600;
         }
     </style>
@@ -166,7 +190,7 @@
         <!-- الهيدر -->
         <div class="header-section">
             <h1>نظام متابعة المعاملات</h1>
-            <p>تسجيل الدخول للاعتماد</p>
+            <p>بوابة الاعتماد والدخول الإداري الآمن</p>
         </div>
 
         <!-- بطاقات الإحصائيات -->
@@ -185,8 +209,8 @@
         <!-- نموذج تسجيل الدخول -->
         <form id="login-form">
             <div class="input-group">
-                <label for="username">اسم المستخدم</label>
-                <input type="text" id="username" required placeholder="admin">
+                <label for="username">اسم المستخدم أو البريد الإلكتروني</label>
+                <input type="text" id="username" required placeholder="admin أو البريد الإلكتروني">
             </div>
             
             <div class="input-group">
@@ -197,6 +221,10 @@
             <button type="submit" class="login-action-btn">تسجيل الدخول</button>
             <div id="error-message"></div>
         </form>
+
+        <div class="footer-note">
+            منظومة المتابعة الرقمية الموحدة © 2026
+        </div>
     </div>
 
     <!-- كود الربط والتحقق Firebase -->
@@ -288,7 +316,7 @@
             const mappedEmail = userInput.includes('@') ? userInput : `${userInput}@24tm.local`;
 
             errorMessage.style.color = "#93c5fd";
-            errorMessage.textContent = "جاري التحقق...";
+            errorMessage.textContent = "جاري التحقق من الاعتماد...";
 
             try {
                 await setPersistence(auth, browserLocalPersistence);
