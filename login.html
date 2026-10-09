@@ -5,82 +5,187 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - نظام متابعة المعاملات</title>
     <style>
+        :root {
+            --font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --bg-deep: #030712;
+            --bg-card: rgba(17, 24, 39, 0.85);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --border: rgba(55, 65, 81, 0.5);
+            --radius: 18px;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+
+        * { box-sizing: border-box; font-family: var(--font-family); }
+
         body {
-            font-family: Tahoma, Arial, sans-serif;
-            background-color: #f4f7f6;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            padding: 15px;
+            overflow: hidden;
+            position: relative;
         }
-        .login-card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+        /* خلفية جمالية خفيفة */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(59, 130, 246, 0.15);
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .login-wrapper {
             width: 100%;
             max-width: 400px;
-            box-sizing: border-box;
+            background: linear-gradient(160deg, rgba(17, 24, 39, 0.9), rgba(11, 15, 25, 0.95));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(59, 130, 246, 0.15);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateY(15px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .unified-logo-box {
+            margin-bottom: 16px;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border-radius: 18px;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.35);
+        }
+
         h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 24px;
+            background: linear-gradient(to left, #ffffff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-align: center;
-            color: #333;
-            margin-bottom: 20px;
         }
+
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: right;
         }
+
         label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
+            font-size: 12.5px;
+            color: #93c5fd;
+            font-weight: 700;
         }
+
         input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
+            padding: 12px 14px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #030712;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.25s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        input#email {
             direction: ltr;
             text-align: left;
         }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 12px var(--primary-glow);
+            outline: none;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: #fff;
             border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
+            padding: 13px;
+            border-radius: 11px;
+            font-weight: 800;
+            font-size: 15px;
             cursor: pointer;
-            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.2s ease;
+            margin-top: 6px;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        button[type="submit"]:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
         }
+
         #error-message {
-            color: red;
+            color: #f87171;
             text-align: center;
             margin-top: 10px;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 700;
         }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <h2>تسجيل الدخول</h2>
+    <div class="login-wrapper">
+        <div class="unified-logo-box">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+        </div>
+        <h2>تسجيل الدخول للنظام</h2>
+        
         <form id="login-form">
             <div class="form-group">
                 <label for="email">البريد الإلكتروني</label>
                 <input type="email" id="email" required placeholder="1@1.com">
             </div>
+            
             <div class="form-group">
                 <label for="password">كلمة المرور</label>
-                <input type="password" id="password" required placeholder="********">
+                <input type="password" id="password" required placeholder="••••••••">
             </div>
-            <button type="submit">دخول</button>
+            
+            <button type="submit">دخول النظام</button>
             <div id="error-message"></div>
         </form>
     </div>
@@ -100,7 +205,6 @@
           appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
         };
 
-        // تهيئة Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
@@ -112,22 +216,20 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
 
-            errorMessage.textContent = "جاري تسجيل الدخول...";
+            errorMessage.style.color = "#93c5fd";
+            errorMessage.textContent = "جاري التحقق وتسجيل الدخول...";
 
             try {
-                // ضبط الحفظ ليبقى مسجلاً في المتصفح
                 await setPersistence(auth, browserLocalPersistence);
-                
-                // تسجيل الدخول
                 await signInWithEmailAndPassword(auth, email, password);
                 
-                // تأخير بسيط لضمان استقرار جلسة الـ Firebase قبل الانتقال
                 setTimeout(() => {
-                    window.location.href = "index.html";
+                    window.location.replace("index.html");
                 }, 500);
 
             } catch (error) {
                 console.error("خطأ في تسجيل الدخول:", error.code);
+                errorMessage.style.color = "#f87171";
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
                     errorMessage.textContent = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
                 } else {
