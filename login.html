@@ -45,6 +45,11 @@
       box-sizing: border-box;
       font-size: 14px;
     }
+    /* تثبيت خانة البريد لتقبل الكتابة بشكل صحيح من اليسار لليمين */
+    #email {
+      direction: ltr;
+      text-align: left;
+    }
     button {
       width: 100%;
       padding: 10px;
@@ -74,7 +79,7 @@
     <form id="login-form">
       <div class="form-group">
         <label for="email">البريد الإلكتروني</label>
-        <input type="email" id="email" required placeholder="أدخل البريد الإلكتروني">
+        <input type="email" id="email" required placeholder="1@1.com">
       </div>
       <div class="form-group">
         <label for="password">كلمة المرور</label>
@@ -85,12 +90,10 @@
     </form>
   </div>
 
-  <!-- سكربت Firebase لتسجيل الدخول -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // إعدادات المشروع
     const firebaseConfig = {
       apiKey: "AIzaSyD-YourAPIKeyHere",
       authDomain: "project-3958113961260211077.firebaseapp.com",
@@ -113,12 +116,11 @@
       errorMessage.textContent = "جاري التحقق وتسجيل الدخول...";
 
       try {
-        await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-        // عند نجاح الدخول الانتقال لصفحة المعاملات الرئيسية داخل المجلد
+        await signInWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value);
         window.location.href = "index.html";
       } catch (error) {
         console.error(error);
-        errorMessage.textContent = "خطأ في البريد الإلكتروني أو كلمة المرور.";
+        errorMessage.textContent = "خطأ في البريد الإلكتروني أو كلمة المرور (تأكد من إنشاء الحساب في Firebase).";
       }
     });
   </script>
