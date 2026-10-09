@@ -1,128 +1,131 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول - نظام متابعة المعاملات</title>
-  <style>
-    body {
-      font-family: Tahoma, sans-serif;
-      background-color: #f4f6f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      direction: rtl;
-    }
-    .login-box {
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 14px;
-      color: #555;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
-    /* تثبيت خانة البريد لتقبل الكتابة بشكل صحيح من اليسار لليمين */
-    #email {
-      direction: ltr;
-      text-align: left;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #error-message {
-      color: #dc3545;
-      text-align: center;
-      margin-top: 15px;
-      font-size: 14px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نظام متابعة المعاملات</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #error-message {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="login-box">
-    <h2>تسجيل الدخول</h2>
-    <form id="login-form">
-      <div class="form-group">
-        <label for="email">البريد الإلكتروني</label>
-        <input type="email" id="email" required placeholder="1@1.com">
-      </div>
-      <div class="form-group">
-        <label for="password">كلمة المرور</label>
-        <input type="password" id="password" required placeholder="أدخل كلمة المرور">
-      </div>
-      <button type="submit">دخول</button>
-      <div id="error-message"></div>
-    </form>
-  </div>
+    <div class="login-card">
+        <h2>تسجيل الدخول</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني</label>
+                <input type="email" id="email" required placeholder="ادخل البريد الإلكتروني">
+            </div>
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" required placeholder="ادخل كلمة المرور">
+            </div>
+            <button type="submit">دخول</button>
+            <div id="error-message"></div>
+        </form>
+    </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <!-- استيراد مكتبات Firebase عبر CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-YourAPIKeyHere",
-      authDomain: "project-3958113961260211077.firebaseapp.com",
-      projectId: "project-3958113961260211077",
-      storageBucket: "project-3958113961260211077.appspot.com",
-      messagingSenderId: "2914",
-      appId: "1:2914:web:firebase"
-    };
+        // إعدادات مشروع الـ Firebase الخاص بك
+        const firebaseConfig = {
+          apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
+          authDomain: "project-3958113961260211077.firebaseapp.com",
+          projectId: "project-3958113961260211077",
+          storageBucket: "project-3958113961260211077.firebasestorage.app",
+          messagingSenderId: "889377835896",
+          appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-    const loginForm = document.getElementById('login-form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const errorMessage = document.getElementById('error-message');
+        // التعامل مع عملية تسجيل الدخول عند إرسال النموذج
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
 
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorMessage.textContent = "جاري التحقق وتسجيل الدخول...";
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-      try {
-        await signInWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value);
-        window.location.href = "index.html";
-      } catch (error) {
-        console.error(error);
-        errorMessage.textContent = "خطأ في البريد الإلكتروني أو كلمة المرور (تأكد من إنشاء الحساب في Firebase).";
-      }
-    });
-  </script>
+            errorMessage.textContent = "جاري تسجيل الدخول...";
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // الانتقال إلى الصفحة الرئيسية بعد نجاح الدخول
+                window.location.href = "index.html";
+            } catch (error) {
+                console.error("خطأ في تسجيل الدخول:", error.code);
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    errorMessage.textContent = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+                } else {
+                    errorMessage.textContent = "حدث خطأ: " + error.message;
+                }
+            }
+        });
+    </script>
 </body>
 </html>
