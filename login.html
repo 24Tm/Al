@@ -7,10 +7,10 @@
     <style>
         :root {
             --font-family: 'Cairo', system-ui, -apple-system, sans-serif;
-            --bg-deep: #050b14;
-            --card-bg: rgba(11, 18, 35, 0.78);
-            --border-subtle: rgba(255, 255, 255, 0.12);
-            --border-glow: rgba(59, 130, 246, 0.4);
+            --bg-deep: #030712;
+            --card-bg: #0b1329;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(59, 130, 246, 0.3);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary: #2563eb;
@@ -30,61 +30,19 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .bg-animation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            animation: bgZoomMove 20s ease-in-out infinite alternate;
-            filter: brightness(0.7) contrast(1.25) saturate(1.1);
-        }
-
-        .bg-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            background: radial-gradient(circle at 50% 50%, rgba(5, 11, 20, 0.3) 0%, rgba(5, 11, 20, 0.88) 100%),
-                        linear-gradient(to bottom, rgba(5, 11, 20, 0.5), rgba(5, 11, 20, 0.9));
-        }
-
-        @keyframes bgZoomMove {
-            0% {
-                transform: scale(1) translate(0, 0);
-            }
-            50% {
-                transform: scale(1.1) translate(-20px, -15px);
-            }
-            100% {
-                transform: scale(1.18) translate(20px, 15px);
-            }
         }
 
         .login-container {
             width: 100%;
             max-width: 440px;
             background: var(--card-bg);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--border-subtle);
-            box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.9), 0 0 50px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(37, 99, 235, 0.05);
             border-radius: var(--radius);
             padding: 40px 32px;
             display: flex;
             flex-direction: column;
             position: relative;
-            z-index: 10;
         }
 
         .header-section {
@@ -116,7 +74,7 @@
         }
 
         .stat-card {
-            background: rgba(3, 7, 18, 0.7);
+            background: #020617;
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
             padding: 14px 20px;
@@ -130,9 +88,7 @@
 
         .stat-card:hover {
             border-color: var(--border-glow);
-            background: rgba(3, 7, 18, 0.9);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            transform: translateY(-1px);
         }
 
         .stat-card.warning { border-right: 4px solid #f59e0b; }
@@ -167,7 +123,7 @@
         input {
             width: 100%;
             padding: 13px 16px;
-            background: rgba(3, 7, 18, 0.85);
+            background: #020617;
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
             color: #ffffff;
@@ -179,7 +135,7 @@
         input:focus {
             outline: none;
             border-color: var(--primary);
-            background: rgba(5, 13, 31, 0.95);
+            background: #040d21;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
         }
 
@@ -228,9 +184,6 @@
     </style>
 </head>
 <body>
-
-    <div class="bg-animation"></div>
-    <div class="bg-overlay"></div>
 
     <div class="login-container">
         <div class="header-section">
@@ -327,56 +280,4 @@
                     let data = docSnap.data();
                     if (data.status === 'أنجزت') return;
                     
-                    let dueD = parseHijriToDate(data.dueDate);
-                    dueD.setHours(0,0,0,0);
-                    let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-                    
-                    if (diffDays < 0) {
-                        delayedCount++;
-                    } else if (diffDays <= 4) {
-                        approachingCount++;
-                    }
-                });
-
-                document.getElementById('loginCountDelayed').innerText = delayedCount;
-                document.getElementById('loginCountApproaching').innerText = approachingCount;
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        fetchLoginStats();
-
-        const loginForm = document.getElementById('login-form');
-        const errorMessage = document.getElementById('error-message');
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            let userInput = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            const mappedEmail = userInput.includes('@') ? userInput : `${userInput}@24tm.local`;
-
-            errorMessage.style.color = "#93c5fd";
-            errorMessage.textContent = "جاري التحقق من الاعتماد...";
-
-            try {
-                await setPersistence(auth, browserLocalPersistence);
-                await signInWithEmailAndPassword(auth, mappedEmail, password);
-                
-                setTimeout(() => {
-                    window.location.replace("index.html");
-                }, 500);
-
-            } catch (error) {
-                errorMessage.style.color = "#f87171";
-                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-                    errorMessage.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة.";
-                } else {
-                    errorMessage.textContent = "تعذر تسجيل الدخول.";
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+                    let dueD = parseHijriTo
