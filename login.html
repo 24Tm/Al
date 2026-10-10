@@ -8,9 +8,9 @@
         :root {
             --font-family: 'Cairo', system-ui, -apple-system, sans-serif;
             --bg-deep: #030712;
-            --card-bg: #0b1329;
+            --card-bg: rgba(11, 19, 41, 0.75);
             --border-subtle: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(59, 130, 246, 0.25);
+            --border-glow: rgba(59, 130, 246, 0.3);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary: #2563eb;
@@ -25,8 +25,8 @@
         body {
             background-color: var(--bg-deep);
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
-                radial-gradient(circle at 100% 100%, rgba(15, 23, 42, 0.8) 0%, transparent 100%);
+                radial-gradient(circle at 50% -20%, rgba(37, 99, 235, 0.18) 0%, transparent 60%),
+                radial-gradient(circle at 100% 100%, rgba(15, 23, 42, 0.9) 0%, transparent 100%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -37,27 +37,28 @@
 
         .login-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border-subtle);
-            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(37, 99, 235, 0.05);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7), 0 0 35px rgba(37, 99, 235, 0.06);
             border-radius: var(--radius);
-            padding: 36px 30px;
+            padding: 40px 32px;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        /* الهيدر الإداري الفاخر */
         .header-section {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             border-bottom: 1px solid var(--border-subtle);
             padding-bottom: 20px;
         }
 
         .header-section h1 {
-            font-size: 20px;
+            font-size: 21px;
             font-weight: 800;
             color: #ffffff;
             margin-bottom: 6px;
@@ -65,46 +66,49 @@
         }
 
         .header-section p {
-            font-size: 12.5px;
+            font-size: 13px;
             color: var(--text-muted);
             font-weight: 500;
         }
 
-        /* بطاقات الإحصائيات الرسمية */
-        .stats-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 26px;
+        .stats-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
-            background: #020617;
+            background: rgba(2, 6, 23, 0.6);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
-            padding: 14px;
+            padding: 12px 18px;
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-            text-align: center;
+            align-items: center;
+            justify-content: space-between;
             position: relative;
             overflow: hidden;
+            transition: all 0.2s ease;
         }
 
-        .stat-card.warning { border-right: 3px solid #f59e0b; }
-        .stat-card.danger { border-right: 3px solid #ef4444; }
+        .stat-card:hover {
+            border-color: var(--border-glow);
+            background: rgba(2, 6, 23, 0.85);
+        }
 
-        .stat-title { font-size: 11.5px; color: var(--text-muted); font-weight: 700; }
-        .stat-number { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+        .stat-card.warning { border-right: 4px solid #f59e0b; }
+        .stat-card.danger { border-right: 4px solid #ef4444; }
+
+        .stat-title { font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
+        .stat-number { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; }
 
         .stat-card.warning .stat-number { color: #fbbf24; }
         .stat-card.danger .stat-number { color: #f87171; }
 
-        /* نموذج الإدخال */
         form {
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
         }
 
         .input-group {
@@ -124,9 +128,9 @@
         input {
             width: 100%;
             padding: 13px 16px;
-            background: #020617;
+            background: rgba(2, 6, 23, 0.8);
             border: 1px solid var(--border-subtle);
-            border-radius: 11px;
+            border-radius: 12px;
             color: #ffffff;
             font-size: 14px;
             text-align: right;
@@ -136,7 +140,7 @@
         input:focus {
             outline: none;
             border-color: var(--primary);
-            background: #040d21;
+            background: rgba(4, 13, 33, 0.95);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
         }
 
@@ -146,7 +150,7 @@
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #ffffff;
             border: none;
-            border-radius: 11px;
+            border-radius: 12px;
             font-size: 15px;
             font-weight: 800;
             cursor: pointer;
@@ -168,18 +172,18 @@
         #error-message {
             color: #f87171;
             text-align: center;
-            margin-top: 6px;
+            margin-top: 4px;
             font-size: 13px;
             font-weight: 700;
         }
 
         .footer-note {
             text-align: center;
-            font-size: 11px;
+            font-size: 11.5px;
             color: var(--text-muted);
-            margin-top: 24px;
+            margin-top: 22px;
             border-top: 1px solid var(--border-subtle);
-            padding-top: 14px;
+            padding-top: 16px;
             font-weight: 600;
         }
     </style>
@@ -187,14 +191,12 @@
 <body>
 
     <div class="login-container">
-        <!-- الهيدر -->
         <div class="header-section">
             <h1>نظام متابعة المعاملات</h1>
             <p>بوابة الاعتماد والدخول الإداري الآمن</p>
         </div>
 
-        <!-- بطاقات الإحصائيات -->
-        <div class="stats-row">
+        <div class="stats-column">
             <div class="stat-card warning">
                 <span class="stat-title">قريبة الاستحقاق</span>
                 <span class="stat-number" id="loginCountApproaching">0</span>
@@ -206,7 +208,6 @@
             </div>
         </div>
 
-        <!-- نموذج تسجيل الدخول -->
         <form id="login-form">
             <div class="input-group">
                 <label for="username">اسم المستخدم أو البريد الإلكتروني</label>
@@ -227,7 +228,6 @@
         </div>
     </div>
 
-    <!-- كود الربط والتحقق Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -299,7 +299,7 @@
                 document.getElementById('loginCountDelayed').innerText = delayedCount;
                 document.getElementById('loginCountApproaching').innerText = approachingCount;
             } catch (error) {
-                console.error("خطأ في جلب الإحصائيات:", error);
+                console.error(error);
             }
         }
 
@@ -327,7 +327,6 @@
                 }, 500);
 
             } catch (error) {
-                console.error("خطأ في تسجيل الدخول:", error.code);
                 errorMessage.style.color = "#f87171";
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
                     errorMessage.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة.";
