@@ -8,7 +8,7 @@
         :root {
             --font-family: 'Cairo', system-ui, -apple-system, sans-serif;
             --bg-deep: #030712;
-            --card-bg: #0b1329;
+            --card-bg: rgba(11, 19, 41, 0.75);
             --border-subtle: rgba(255, 255, 255, 0.08);
             --border-glow: rgba(59, 130, 246, 0.3);
             --text-main: #f8fafc;
@@ -24,6 +24,9 @@
 
         body {
             background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 50% -20%, rgba(37, 99, 235, 0.18) 0%, transparent 60%),
+                radial-gradient(circle at 100% 100%, rgba(15, 23, 42, 0.9) 0%, transparent 100%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -36,8 +39,10 @@
             width: 100%;
             max-width: 440px;
             background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border-subtle);
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(37, 99, 235, 0.05);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7), 0 0 35px rgba(37, 99, 235, 0.06);
             border-radius: var(--radius);
             padding: 40px 32px;
             display: flex;
@@ -69,33 +74,33 @@
         .stats-column {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 24px;
         }
 
         .stat-card {
-            background: #020617;
+            background: rgba(2, 6, 23, 0.6);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
-            padding: 14px 20px;
+            padding: 12px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
         }
 
         .stat-card:hover {
             border-color: var(--border-glow);
-            transform: translateY(-1px);
+            background: rgba(2, 6, 23, 0.85);
         }
 
         .stat-card.warning { border-right: 4px solid #f59e0b; }
         .stat-card.danger { border-right: 4px solid #ef4444; }
 
-        .stat-title { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-        .stat-number { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+        .stat-title { font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
+        .stat-number { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; }
 
         .stat-card.warning .stat-number { color: #fbbf24; }
         .stat-card.danger .stat-number { color: #f87171; }
@@ -123,7 +128,7 @@
         input {
             width: 100%;
             padding: 13px 16px;
-            background: #020617;
+            background: rgba(2, 6, 23, 0.8);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
             color: #ffffff;
@@ -135,7 +140,7 @@
         input:focus {
             outline: none;
             border-color: var(--primary);
-            background: #040d21;
+            background: rgba(4, 13, 33, 0.95);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
         }
 
@@ -280,4 +285,56 @@
                     let data = docSnap.data();
                     if (data.status === 'أنجزت') return;
                     
-                    let dueD = parseHijriTo
+                    let dueD = parseHijriToDate(data.dueDate);
+                    dueD.setHours(0,0,0,0);
+                    let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 0) {
+                        delayedCount++;
+                    } else if (diffDays <= 4) {
+                        approachingCount++;
+                    }
+                });
+
+                document.getElementById('loginCountDelayed').innerText = delayedCount;
+                document.getElementById('loginCountApproaching').innerText = approachingCount;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        fetchLoginStats();
+
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let userInput = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            const mappedEmail = userInput.includes('@') ? userInput : `${userInput}@24tm.local`;
+
+            errorMessage.style.color = "#93c5fd";
+            errorMessage.textContent = "جاري التحقق من الاعتماد...";
+
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+                await signInWithEmailAndPassword(auth, mappedEmail, password);
+                
+                setTimeout(() => {
+                    window.location.replace("index.html");
+                }, 500);
+
+            } catch (error) {
+                errorMessage.style.color = "#f87171";
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    errorMessage.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة.";
+                } else {
+                    errorMessage.textContent = "تعذر تسجيل الدخول.";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
