@@ -224,11 +224,25 @@
         </div>
 
         <div class="tab-switchers">
-            <button class="tab-btn active" onclick="switchTab('login-tab', this)">تسجيل الدخول</button>
-            <button class="tab-btn" onclick="switchTab('stats-tab', this)">المعاملات</button>
+            <button class="tab-btn active" onclick="switchTab('stats-tab', this)">المعاملات</button>
+            <button class="tab-btn" onclick="switchTab('login-tab', this)">تسجيل الدخول</button>
         </div>
 
-        <div id="login-tab" class="tab-content active">
+        <div id="stats-tab" class="tab-content active">
+            <div class="stats-column">
+                <div class="stat-card warning">
+                    <span class="stat-title">قريبة الاستحقاق</span>
+                    <span class="stat-number" id="loginCountApproaching">0</span>
+                </div>
+                
+                <div class="stat-card danger">
+                    <span class="stat-title">معاملات متأخرة</span>
+                    <span class="stat-number" id="loginCountDelayed">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="login-tab" class="tab-content">
             <form id="login-form">
                 <div class="input-group">
                     <label for="username">اسم المستخدم أو البريد الإلكتروني</label>
@@ -243,20 +257,6 @@
                 <button type="submit" class="login-action-btn">تسجيل الدخول</button>
                 <div id="error-message"></div>
             </form>
-        </div>
-
-        <div id="stats-tab" class="tab-content">
-            <div class="stats-column">
-                <div class="stat-card warning">
-                    <span class="stat-title">قريبة الاستحقاق</span>
-                    <span class="stat-number" id="loginCountApproaching">0</span>
-                </div>
-                
-                <div class="stat-card danger">
-                    <span class="stat-title">معاملات متأخرة</span>
-                    <span class="stat-number" id="loginCountDelayed">0</span>
-                </div>
-            </div>
         </div>
 
         <div class="footer-note">
