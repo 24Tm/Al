@@ -3,12 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - متابعة المعاملات اليومية</title>
-    
-    <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
+    <title>تسجيل الدخول - نظام متابعة المعاملات</title>
+    <style>
+        :root {
+            --font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+            --bg-deep: #030712;
+            --card-bg: #0b1329;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(59, 130, 246, 0.3);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --radius: 20px;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
+        * { box-sizing: border-box; font-family: var(--font-family); margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(37, 99, 235, 0.05);
+            border-radius: var(--radius);
+            padding: 36px 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header-section h1 {
+            font-size: 21px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .header-section p {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .tab-switchers {
+            display: flex;
+            background: #020617;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        .stats-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: #020617;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .stat-card.warning { border-right: 4px solid #f59e0b; }
+        .stat-card.danger { border-right: 4px solid #ef4444; }
+
+        .stat-title { font-size: 13.5px; color: var(--text-muted); font-weight: 600; }
+        .stat-number { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+
+        .stat-card.warning .stat-number { color: #fbbf24; }
+        .stat-card.danger .stat-number { color: #f87171; }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .input-group {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #cbd5e1;
+            letter-spacing: 0.2px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 16px;
+            background: #020617;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: right;
+            transition: all 0.25s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #040d21;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+        }
+
+        .login-action-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-top: 4px;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .login-action-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
+        }
+
+        .login-action-btn:active {
+            transform: translateY(0);
+        }
+
+        #error-message {
+            color: #f87171;
+            text-align: center;
+            margin-top: 4px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 22px;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 16px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="header-section">
+            <h1>نظام متابعة المعاملات</h1>
+            <p> </p>
+        </div>
+
+        <div class="tab-switchers">
+            <button class="tab-btn active" onclick="switchTab('stats-tab', this)">المعاملات</button>
+            <button class="tab-btn" onclick="switchTab('login-tab', this)">تسجيل الدخول</button>
+        </div>
+
+        <div id="stats-tab" class="tab-content active">
+            <div class="stats-column">
+                <div class="stat-card warning">
+                    <span class="stat-title">قريبة الاستحقاق</span>
+                    <span class="stat-number" id="loginCountApproaching">0</span>
+                </div>
+                
+                <div class="stat-card danger">
+                    <span class="stat-title">معاملات متأخرة</span>
+                    <span class="stat-number" id="loginCountDelayed">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="login-tab" class="tab-content">
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">اسم المستخدم أو البريد الإلكتروني</label>
+                    <input type="text" id="username" required placeholder="admin أو البريد الإلكتروني">
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">كلمة المرور</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                
+                <button type="submit" class="login-action-btn">تسجيل الدخول</button>
+                <div id="error-message"></div>
+            </form>
+        </div>
+
+        <div class="footer-note">
+              
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
@@ -21,156 +289,97 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        window.handleLogin = function(event) {
-            event.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            const errorMsg = document.getElementById('errorMessage');
-
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // تسجيل دخول ناجح والانتقال للوحة الرئيسية
-                    window.location.replace("index.html");
-                })
-                .catch((error) => {
-                    errorMsg.style.display = 'block';
-                    errorMsg.innerText = "خطأ في البريد الإلكتروني أو كلمة المرور.";
+        function getTodayHijriString() {
+            try {
+                let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
+                    year: 'numeric', month: '2-digit', day: '2-digit'
                 });
-        };
+                let parts = formatter.formatToParts(new Date());
+                let y = parts.find(p => p.type === 'year').value;
+                let m = parts.find(p => p.type === 'month').value;
+                let d = parts.find(p => p.type === 'day').value;
+                return `${y}-${m}-${d}`;
+            } catch (e) {
+                return "1447-04-01";
+            }
+        }
+
+        function parseHijriToDate(hijriStr) {
+            if (!hijriStr) return new Date();
+            let parts = hijriStr.split(/[-/]/);
+            if (parts.length !== 3) return new Date();
+            let hy = parseInt(parts[0], 10);
+            let hm = parseInt(parts[1], 10);
+            let hd = parseInt(parts[2], 10);
+            let estimatedGregorianYear = Math.round(hy * 0.9702 + 621.56);
+            return new Date(estimatedGregorianYear, hm - 1, hd);
+        }
+
+        async function fetchLoginStats() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "transactions"));
+                let todayDate = parseHijriToDate(getTodayHijriString());
+                todayDate.setHours(0,0,0,0);
+
+                let delayedCount = 0;
+                let approachingCount = 0;
+
+                querySnapshot.forEach((docSnap) => {
+                    let data = docSnap.data();
+                    if (data.status === 'أنجزت') return;
+                    
+                    let dueD = parseHijriToDate(data.dueDate);
+                    dueD.setHours(0,0,0,0);
+                    let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 0) {
+                        delayedCount++;
+                    } else if (diffDays <= 4) {
+                        approachingCount++;
+                    }
+                });
+
+                document.getElementById('loginCountDelayed').innerText = delayedCount;
+                document.getElementById('loginCountApproaching').innerText = approachingCount;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        fetchLoginStats();
+
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let userInput = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            const mappedEmail = userInput.includes('@') ? userInput : `${userInput}@24tm.local`;
+
+            errorMessage.style.color = "#93c5fd";
+            errorMessage.textContent = "جاري التحقق من الاعتماد...";
+
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+                await signInWithEmailAndPassword(auth, mappedEmail, password);
+                
+                setTimeout(() => {
+                    window.location.replace("index.html");
+                }, 500);
+
+            } catch (error) {
+                errorMessage.style.color = "#f87171";
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    errorMessage.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة.";
+                } else {
+                    errorMessage.textContent = "تعذر تسجيل الدخول.";
+                }
+            }
+        });
     </script>
-
-    <style>
-        :root {
-            --font-family: 'Cairo', system-ui, -apple-system, sans-serif;
-            --bg-deep: #030712;
-            --bg-card: rgba(17, 24, 39, 0.85);
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.4);
-            --border: rgba(55, 65, 81, 0.5);
-            --radius: 14px;
-        }
-
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
-
-        * { box-sizing: border-box; font-family: var(--font-family); }
-
-        body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            direction: rtl;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(14px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 30px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        h2 {
-            margin-top: 0;
-            text-align: center;
-            font-size: 20px;
-            font-weight: 800;
-            background: linear-gradient(to left, #60a5fa, #38bdf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-        }
-
-        .form-item {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        input {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 13px;
-            background: #030712;
-            color: var(--text-main);
-            text-align: right;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        .btn-login {
-            width: 100%;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            transition: brightness 0.2s;
-        }
-
-        .btn-login:hover {
-            filter: brightness(1.1);
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            text-align: center;
-            margin-bottom: 15px;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="login-card">
-        <h2>تسجيل الدخول</h2>
-        <div id="errorMessage" class="error-message"></div>
-        
-        <form onsubmit="handleLogin(event)">
-            <div class="form-item">
-                <label>البريد الإلكتروني:</label>
-                <input type="email" id="loginEmail" placeholder="example@domain.com" required>
-            </div>
-            <div class="form-item">
-                <label>كلمة المرور:</label>
-                <input type="password" id="loginPassword" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="btn-login">دخول للوحة التحكم</button>
-        </form>
-    </div>
-
 </body>
 </html>
