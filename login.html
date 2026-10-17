@@ -10,260 +10,62 @@
             --bg-deep: #030712;
             --card-bg: #0b1329;
             --border-subtle: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(59, 130, 246, 0.3);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary: #2563eb;
-            --primary-hover: #1d4ed8;
             --radius: 20px;
         }
-
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
-
         * { box-sizing: border-box; font-family: var(--font-family); margin: 0; padding: 0; }
-
-        body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 440px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-subtle);
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(37, 99, 235, 0.05);
-            border-radius: var(--radius);
-            padding: 36px 30px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .header-section {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .header-section h1 {
-            font-size: 21px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 6px;
-            letter-spacing: -0.3px;
-        }
-
-        .header-section p {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .tab-switchers {
-            display: flex;
-            background: #020617;
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 9px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .tab-content {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: flex;
-            flex-direction: column;
-            opacity: 1;
-        }
-
-        .stats-column {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .stat-card {
-            background: #020617;
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.25s ease;
-        }
-
+        body { background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .login-container { width: 100%; max-width: 440px; background: var(--card-bg); border: 1px solid var(--border-subtle); box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8); border-radius: var(--radius); padding: 36px 30px; display: flex; flex-direction: column; }
+        .header-section { text-align: center; margin-bottom: 20px; }
+        .header-section h1 { font-size: 21px; font-weight: 800; color: #ffffff; margin-bottom: 6px; }
+        .tab-switchers { display: flex; background: #020617; border-radius: 12px; padding: 4px; margin-bottom: 24px; border: 1px solid var(--border-subtle); }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 700; border-radius: 9px; cursor: pointer; transition: all 0.25s ease; }
+        .tab-btn.active { background: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .tab-content { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .tab-content.active { display: flex; flex-direction: column; opacity: 1; }
+        .stats-column { display: flex; flex-direction: column; gap: 12px; }
+        .stat-card { background: #020617; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
         .stat-card.warning { border-right: 4px solid #f59e0b; }
         .stat-card.danger { border-right: 4px solid #ef4444; }
-
         .stat-title { font-size: 13.5px; color: var(--text-muted); font-weight: 600; }
-        .stat-number { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
-
+        .stat-number { font-size: 22px; font-weight: 900; }
         .stat-card.warning .stat-number { color: #fbbf24; }
         .stat-card.danger .stat-number { color: #f87171; }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .input-group {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .input-group label {
-            font-size: 12.5px;
-            font-weight: 700;
-            color: #cbd5e1;
-            letter-spacing: 0.2px;
-        }
-
-        input {
-            width: 100%;
-            padding: 13px 16px;
-            background: #020617;
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            color: #ffffff;
-            font-size: 14px;
-            text-align: right;
-            transition: all 0.25s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #040d21;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
-        }
-
-        .login-action-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            margin-top: 4px;
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-        }
-
-        .login-action-btn:hover {
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
-            transform: translateY(-1px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
-        }
-
-        .login-action-btn:active {
-            transform: translateY(0);
-        }
-
-        #error-message {
-            color: #f87171;
-            text-align: center;
-            margin-top: 4px;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .footer-note {
-            text-align: center;
-            font-size: 11.5px;
-            color: var(--text-muted);
-            margin-top: 22px;
-            border-top: 1px solid var(--border-subtle);
-            padding-top: 16px;
-            font-weight: 600;
-        }
+        form { display: flex; flex-direction: column; gap: 16px; }
+        .input-group { text-align: right; display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 12.5px; font-weight: 700; color: #cbd5e1; }
+        input { width: 100%; padding: 13px 16px; background: #020617; border: 1px solid var(--border-subtle); border-radius: 12px; color: #ffffff; font-size: 14px; text-align: right; }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
+        .login-action-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.25s ease; margin-top: 4px; box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4); }
+        .login-action-btn:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); }
+        #error-message { color: #f87171; text-align: center; margin-top: 4px; font-size: 13px; font-weight: 700; }
     </style>
 </head>
 <body>
-
     <div class="login-container">
-        <div class="header-section">
-            <h1>نظام متابعة المعاملات</h1>
-            <p> </p>
-        </div>
-
+        <div class="header-section"><h1>نظام متابعة المعاملات</h1></div>
         <div class="tab-switchers">
             <button class="tab-btn active" onclick="switchTab('stats-tab', this)">المعاملات</button>
             <button class="tab-btn" onclick="switchTab('login-tab', this)">تسجيل الدخول</button>
         </div>
-
         <div id="stats-tab" class="tab-content active">
             <div class="stats-column">
-                <div class="stat-card warning">
-                    <span class="stat-title">قريبة الاستحقاق</span>
-                    <span class="stat-number" id="loginCountApproaching">0</span>
-                </div>
-                
-                <div class="stat-card danger">
-                    <span class="stat-title">معاملات متأخرة</span>
-                    <span class="stat-number" id="loginCountDelayed">0</span>
-                </div>
+                <div class="stat-card warning"><span class="stat-title">قريبة الاستحقاق</span><span class="stat-number" id="loginCountApproaching">0</span></div>
+                <div class="stat-card danger"><span class="stat-title">معاملات متأخرة</span><span class="stat-number" id="loginCountDelayed">0</span></div>
             </div>
         </div>
-
         <div id="login-tab" class="tab-content">
             <form id="login-form">
-                <div class="input-group">
-                    <label for="username">اسم المستخدم أو البريد الإلكتروني</label>
-                    <input type="text" id="username" required placeholder="admin أو البريد الإلكتروني">
-                </div>
-                
-                <div class="input-group">
-                    <label for="password">كلمة المرور</label>
-                    <input type="password" id="password" required placeholder="••••••••">
-                </div>
-                
+                <div class="input-group"><label for="username">اسم المستخدم أو البريد الإلكتروني</label><input type="text" id="username" required placeholder="admin أو البريد الإلكتروني"></div>
+                <div class="input-group"><label for="password">كلمة المرور</label><input type="password" id="password" required placeholder="••••••••"></div>
                 <button type="submit" class="login-action-btn">تسجيل الدخول</button>
                 <div id="error-message"></div>
             </form>
         </div>
-
-        <div class="footer-note">
-              
-        </div>
     </div>
-
     <script>
         function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -272,7 +74,6 @@
             btn.classList.add('active');
         }
     </script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -286,98 +87,55 @@
           messagingSenderId: "889377835896",
           appId: "1:889377835896:web:bbbb74e99b3585c9d8168d"
         };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
 
         function getTodayHijriString() {
             try {
-                let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
-                    year: 'numeric', month: '2-digit', day: '2-digit'
-                });
+                let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { year: 'numeric', month: '2-digit', day: '2-digit' });
                 let parts = formatter.formatToParts(new Date());
-                let y = parts.find(p => p.type === 'year').value;
-                let m = parts.find(p => p.type === 'month').value;
-                let d = parts.find(p => p.type === 'day').value;
-                return `${y}-${m}-${d}`;
-            } catch (e) {
-                return "1447-04-01";
-            }
+                return `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}-${parts.find(p => p.type === 'day').value}`;
+            } catch (e) { return "1447-04-01"; }
         }
 
         function parseHijriToDate(hijriStr) {
             if (!hijriStr) return new Date();
             let parts = hijriStr.split(/[-/]/);
             if (parts.length !== 3) return new Date();
-            let hy = parseInt(parts[0], 10);
-            let hm = parseInt(parts[1], 10);
-            let hd = parseInt(parts[2], 10);
-            let estimatedGregorianYear = Math.round(hy * 0.9702 + 621.56);
-            return new Date(estimatedGregorianYear, hm - 1, hd);
+            return new Date(Math.round(parseInt(parts[0], 10) * 0.9702 + 621.56), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
         }
 
         async function fetchLoginStats() {
             try {
                 const querySnapshot = await getDocs(collection(db, "transactions"));
-                let todayDate = parseHijriToDate(getTodayHijriString());
-                todayDate.setHours(0,0,0,0);
-
-                let delayedCount = 0;
-                let approachingCount = 0;
-
+                let todayDate = parseHijriToDate(getTodayHijriString()); todayDate.setHours(0,0,0,0);
+                let delayedCount = 0, approachingCount = 0;
                 querySnapshot.forEach((docSnap) => {
                     let data = docSnap.data();
                     if (data.status === 'أنجزت') return;
-                    
-                    let dueD = parseHijriToDate(data.dueDate);
-                    dueD.setHours(0,0,0,0);
+                    let dueD = parseHijriToDate(data.dueDate); dueD.setHours(0,0,0,0);
                     let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-                    
-                    if (diffDays < 0) {
-                        delayedCount++;
-                    } else if (diffDays <= 4) {
-                        approachingCount++;
-                    }
+                    if (diffDays < 0) delayedCount++;
+                    else if (diffDays <= 4) approachingCount++;
                 });
-
                 document.getElementById('loginCountDelayed').innerText = delayedCount;
                 document.getElementById('loginCountApproaching').innerText = approachingCount;
-            } catch (error) {
-                console.error(error);
-            }
+            } catch (error) { console.error(error); }
         }
-
         fetchLoginStats();
 
-        const loginForm = document.getElementById('login-form');
-        const errorMessage = document.getElementById('error-message');
-
-        loginForm.addEventListener('submit', async (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            let userInput = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            const mappedEmail = userInput.includes('@') ? userInput : `${userInput}@24tm.local`;
-
-            errorMessage.style.color = "#93c5fd";
-            errorMessage.textContent = "جاري التحقق من الاعتماد...";
-
+            let userInput = document.getElementById('username').value.trim(), password = document.getElementById('password').value.trim();
+            let mappedEmail = userInput.includes('@') ? userInput : `${userInput}@24tm.local`;
+            let errorMessage = document.getElementById('error-message');
+            errorMessage.style.color = "#93c5fd"; errorMessage.textContent = "جاري التحقق من الاعتماد...";
             try {
                 await setPersistence(auth, browserLocalPersistence);
                 await signInWithEmailAndPassword(auth, mappedEmail, password);
-                
-                setTimeout(() => {
-                    window.location.replace("index.html");
-                }, 500);
-
+                setTimeout(() => { window.location.replace("index.html"); }, 500);
             } catch (error) {
                 errorMessage.style.color = "#f87171";
-                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-                    errorMessage.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة.";
-                } else {
-                    errorMessage.textContent = "تعذر تسجيل الدخول.";
-                }
+                errorMessage.textContent = "اسم المستخدم أو كلمة المرور غير صحيحة.";
             }
         });
     </script>
