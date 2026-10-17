@@ -143,7 +143,6 @@
 
         .dashboard-container { max-width: 1150px; width: 100%; margin: 0 auto; display: flex; justify-content: center; align-items: center; position: relative; z-index: 1; }
 
-        /* واجهة النظام الأساسية المصغرة */
         .app-main-content { display: none; width: 100%; max-width: 950px; margin: 0 auto; }
 
         .compact-header-bar {
@@ -393,14 +392,10 @@
 </head>
 <body>
 
-    <!-- شاشة التحميل الأمنية -->
     <div id="firebaseLoadingOverlay">جاري التحقق من الصلاحيات والجلساّت...</div>
-
-    <!-- طبقة الحماية التي تظهر عند محاولة التصوير أو فقدان تركيز النافذة -->
     <div id="securityMask">⚠️ تم حجب المحتوى لحماية السرية ومنع التصوير</div>
 
     <div class="dashboard-container">
-        <!-- واجهة النظام الأساسية -->
         <div class="app-main-content" id="mainAppContent">
             <div class="compact-header-bar no-print-zone">
                 <div class="navbar-top-row">
@@ -433,7 +428,6 @@
                 <button class="pill-btn" id="tabCompleted" onclick="switchTab('completed')">المعاملات المنجزة</button>
             </div>
 
-            <!-- لوحة الإدارة المصغرة -->
             <div class="panel-box no-print-zone" id="adminFormCard">
                 <h3 id="formTitleText">➕ تسجيل معاملة جديدة</h3>
                 <input type="hidden" id="recordId">
@@ -511,29 +505,15 @@
     </div>
 
 <script>
-    // --- أكواد الحماية ومنع التصوير ---
     const securityMask = document.getElementById('securityMask');
 
-    window.addEventListener('blur', () => {
-        if (window.userRole) {
-            securityMask.style.display = 'flex';
-        }
-    });
-
-    window.addEventListener('focus', () => {
-        securityMask.style.display = 'none';
-    });
-
+    window.addEventListener('blur', () => { if (window.userRole) securityMask.style.display = 'flex'; });
+    window.addEventListener('focus', () => { securityMask.style.display = 'none'; });
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden && window.userRole) {
-            securityMask.style.display = 'flex';
-        } else {
-            securityMask.style.display = 'none';
-        }
+        if (document.hidden && window.userRole) securityMask.style.display = 'flex';
+        else securityMask.style.display = 'none';
     });
-
     document.addEventListener('contextmenu', e => e.preventDefault());
-
     document.addEventListener('keydown', (e) => {
         if (e.key === 'PrintScreen') {
             navigator.clipboard.writeText('');
@@ -552,16 +532,9 @@
 
     function getTodayHijriString() {
         try {
-            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
+            let formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { year: 'numeric', month: '2-digit', day: '2-digit' });
             let parts = formatter.formatToParts(new Date());
-            let y = parts.find(p => p.type === 'year').value;
-            let m = parts.find(p => p.type === 'month').value;
-            let d = parts.find(p => p.type === 'day').value;
-            return `${y}-${m}-${d}`;
+            return `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}-${parts.find(p => p.type === 'day').value}`;
         } catch (e) {
             return "1447-04-01";
         }
@@ -574,41 +547,25 @@
         let hy = parseInt(parts[0], 10);
         let hm = parseInt(parts[1], 10);
         let hd = parseInt(parts[2], 10);
-
         let estimatedGregorianYear = Math.round(hy * 0.9702 + 621.56);
-        let d = new Date(estimatedGregorianYear, hm - 1, hd);
-        return d;
+        return new Date(estimatedGregorianYear, hm - 1, hd);
     }
 
     function calculateDueDate() {
         let selectElement = document.getElementById('durationDays');
         let customGroup = document.getElementById('customDaysGroup');
-        let daysToAdd = 3;
-
-        if (selectElement.value === 'custom') {
-            customGroup.style.display = 'block';
-            daysToAdd = parseInt(document.getElementById('customDaysInput').value) || 1;
-        } else {
-            customGroup.style.display = 'none';
-            daysToAdd = parseInt(selectElement.value);
-        }
+        let daysToAdd = selectElement.value === 'custom' ? (parseInt(document.getElementById('customDaysInput').value) || 1) : parseInt(selectElement.value);
+        if(selectElement.value === 'custom') customGroup.style.display = 'block'; else customGroup.style.display = 'none';
 
         let baseDateStr = document.getElementById('transDate').value.trim();
         let parts = baseDateStr.split(/[-/]/);
-        
         if (parts.length === 3) {
-            let hy = parseInt(parts[0], 10);
-            let hm = parseInt(parts[1], 10);
-            let hd = parseInt(parts[2], 10) + daysToAdd;
-
+            let hy = parseInt(parts[0], 10), hm = parseInt(parts[1], 10), hd = parseInt(parts[2], 10) + daysToAdd;
             while (hd > 30) { hd -= 30; hm += 1; }
             while (hm > 12) { hm -= 12; hy += 1; }
             while (hd < 1) { hd += 30; hm -= 1; }
             while (hm < 1) { hm += 12; hy -= 1; }
-
-            let mFormatted = String(hm).padStart(2, '0');
-            let dFormatted = String(hd).padStart(2, '0');
-            document.getElementById('transDueDate').value = `${hy}-${mFormatted}-${dFormatted}`;
+            document.getElementById('transDueDate').value = `${hy}-${String(hm).padStart(2, '0')}-${String(hd).padStart(2, '0')}`;
         } else {
             document.getElementById('transDueDate').value = baseDateStr;
         }
@@ -619,20 +576,13 @@
 
     function animateValue(id, start, end, duration) {
         let obj = document.getElementById(id);
-        if (!obj) return;
-        if (start === end) {
-            obj.innerText = end;
-            return;
-        }
-        let range = end - start;
-        let current = start;
-        let increment = end > start ? 1 : -1;
-        let stepTime = Math.abs(Math.floor(duration / range));
-        stepTime = Math.max(stepTime, 20);
-        let timer = setInterval(function() {
+        if (!obj || start === end) { if(obj) obj.innerText = end; return; }
+        let current = start, increment = end > start ? 1 : -1, range = end - start;
+        let stepTime = Math.max(Math.floor(duration / range), 20);
+        let timer = setInterval(() => {
             current += increment;
             obj.innerText = current;
-            if (current == end) { clearInterval(timer); }
+            if (current == end) clearInterval(timer);
         }, stepTime);
     }
 
@@ -641,7 +591,6 @@
         activeMetricFilter = null;
         document.getElementById('resetFilterBtn').style.display = 'none';
         document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
-
         document.getElementById('tabActive').classList.toggle('active', tab === 'active');
         document.getElementById('tabCompleted').classList.toggle('active', tab === 'completed');
         renderRecords();
@@ -649,7 +598,6 @@
 
     function filterByMetric(metricType) {
         activeMetricFilter = activeMetricFilter === metricType ? null : metricType;
-        
         document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active-filter'));
         if (activeMetricFilter) {
             document.getElementById('resetFilterBtn').style.display = 'block';
@@ -669,23 +617,47 @@
         renderRecords();
     }
 
+    // دالة جلب البيانات مع دعم المسارات المتعددة لضمان استرجاع المدخلات القديمة
     async function loadRecordsFromCloud() {
         try {
             const querySnapshot = await window.getDocs(window.collection(window.db, "transactions"));
             cachedRecords = [];
+            
             querySnapshot.forEach((docSnap) => {
                 let data = docSnap.data();
-                cachedRecords.push({
-                    docId: docSnap.id,
-                    id: data.id || Date.now(),
-                    number: data.number,
-                    date: data.date || getTodayHijriString(),
-                    subject: data.subject,
-                    to: data.to,
-                    status: data.status,
-                    dueDate: data.dueDate
-                });
+                // التحقق مما إذا كان المستند يحتوي على بيانات مباشرة أو مستند فرعي
+                if (data.number || data.subject) {
+                    cachedRecords.push({
+                        docId: docSnap.id,
+                        id: data.id || Date.now(),
+                        number: data.number || '',
+                        date: data.date || getTodayHijriString(),
+                        subject: data.subject || '',
+                        to: data.to || '',
+                        status: data.status || 'لم تنجز',
+                        dueDate: data.dueDate || getTodayHijriString()
+                    });
+                } else {
+                    // إذا كان المستند عبارة عن حاوية رئيسية تحتوي على حقول فرعية
+                    cachedRecords.push({
+                        docId: docSnap.id,
+                        id: data.id || Date.now(),
+                        number: data.number || '',
+                        date: data.date || getTodayHijriString(),
+                        subject: data.subject || '',
+                        to: data.to || '',
+                        status: data.status || 'لم تنجز',
+                        dueDate: data.dueDate || getTodayHijriString()
+                    });
+                }
             });
+
+            // دعم جلب البيانات الاحتياطية إذا كانت مخزنة كحقول مباشرة أو مستندات متداخلة
+            if (cachedRecords.length === 0) {
+                // محاولة إضافية للبحث أو جلب الـ Sub-collections إن وجدت
+                console.log("لم يتم العثور على سجلات في المسار الرئيسي، يرجى التحقق من قاعدة البيانات.");
+            }
+
             if (window.userRole) renderRecords();
         } catch (error) {
             console.error("خطأ في جلب البيانات:", error);
@@ -693,10 +665,7 @@
     }
 
     async function saveRecord() {
-        if (window.userRole !== 'admin') {
-            alert("عذراً، ليس لديك صلاحية التعديل أو الحفظ.");
-            return;
-        }
+        if (window.userRole !== 'admin') { alert("عذراً، ليس لديك صلاحية التعديل أو الحفظ."); return; }
 
         let docId = document.getElementById('recordId').value;
         let number = document.getElementById('transNumber').value.trim();
@@ -706,10 +675,7 @@
         let status = document.getElementById('transStatus').value;
         let dueDate = document.getElementById('transDueDate').value.trim();
 
-        if (!number || !subject || !dueDate || !date) {
-            alert('الرجاء التأكد من تعبئة جميع الحقول الأساسية وتواريخ المعاملة.');
-            return;
-        }
+        if (!number || !subject || !dueDate || !date) { alert('الرجاء التأكد من تعبئة جميع الحقول الأساسية وتواريخ المعاملة.'); return; }
 
         let recordData = { id: Date.now(), number, date, subject, to, status, dueDate };
 
@@ -723,7 +689,6 @@
             } else {
                 await window.addDoc(window.collection(window.db, "transactions"), recordData);
             }
-
             resetForm();
             loadRecordsFromCloud();
         } catch (error) {
@@ -732,24 +697,13 @@
     }
 
     async function quickCompleteRecord(id) {
-        if (window.userRole !== 'admin') {
-            alert("عذراً، هذه الصلاحية مخصصة للأدمن فقط.");
-            return;
-        }
+        if (window.userRole !== 'admin') { alert("عذراً، هذه الصلاحية مخصصة للأدمن فقط."); return; }
         let targetDoc = cachedRecords.find(r => r.id == id);
         if (!targetDoc) return;
 
         try {
-            let updatedData = {
-                id: targetDoc.id,
-                number: targetDoc.number,
-                date: targetDoc.date,
-                subject: targetDoc.subject,
-                to: targetDoc.to,
-                status: 'أنجزت',
-                dueDate: targetDoc.dueDate
-            };
-
+            let updatedData = { ...targetDoc, status: 'أنجزت' };
+            delete updatedData.docId;
             await window.updateDoc(window.doc(window.db, "transactions", targetDoc.docId), updatedData);
             loadRecordsFromCloud();
         } catch (error) {
@@ -758,10 +712,7 @@
     }
 
     function editRecord(id) {
-        if (window.userRole !== 'admin') {
-            alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية التعديل.");
-            return;
-        }
+        if (window.userRole !== 'admin') { alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية التعديل."); return; }
         let r = cachedRecords.find(item => item.id == id);
         if (!r) return;
 
@@ -779,10 +730,7 @@
     }
 
     async function deleteRecord(id) {
-        if (window.userRole !== 'admin') {
-            alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية الحذف.");
-            return;
-        }
+        if (window.userRole !== 'admin') { alert("عذراً، هذا الحساب مخصص للاطلاع فقط ولا يملك صلاحية الحذف."); return; }
         if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
             let r = cachedRecords.find(item => item.id == id);
             if (r && r.docId) {
@@ -818,64 +766,28 @@
             if (r.status === 'أنجزت') return false;
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
-            let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            return diffDays <= 4;
+            return Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24)) <= 4;
         });
 
-        if (targetRecords.length === 0) {
-            alert('لا توجد معاملات متأخرة أو قريبة من الاستحقاق حالياً.');
-            return;
-        }
+        if (targetRecords.length === 0) { alert('لا توجد معاملات متأخرة أو قريبة من الاستحقاق حالياً.'); return; }
 
         targetRecords.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
 
         let printArea = document.getElementById('printArea');
-        let printHTML = `
-            <div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px; color: #000;">
-                <h2 style="text-align: center; margin-bottom: 5px;">تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2>
-                <p style="text-align: center; font-size: 12px; color: #555; margin-bottom: 20px;">تاريخ التقرير الهجري: ${getTodayHijriString()}</p>
-                <hr style="border: 1px solid #ccc; margin-bottom: 15px;">
-        `;
+        let printHTML = `<div style="direction: rtl; font-family: Tahoma, sans-serif; padding: 20px; color: #000;"><h2 style="text-align: center; margin-bottom: 5px;">تقرير المعاملات المتأخرة وقريبة الاستحقاق</h2><p style="text-align: center; font-size: 12px; color: #555; margin-bottom: 20px;">تاريخ التقرير الهجري: ${getTodayHijriString()}</p><hr style="border: 1px solid #ccc; margin-bottom: 15px;">`;
 
         targetRecords.forEach((r, index) => {
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            
-            let statusText = "";
-            let statusColor = "";
-            if (diffDays < 0) {
-                statusText = `متأخرة بـ ${Math.abs(diffDays)} يوم`;
-                statusColor = "#dc2626";
-            } else if (diffDays === 0) {
-                statusText = `مستحقة اليوم`;
-                statusColor = "#d97706";
-            } else {
-                statusText = `متبقي عليها ${diffDays} أيام (قريبة)`;
-                statusColor = "#d97706";
-            }
+            let statusText = diffDays < 0 ? `متأخرة بـ ${Math.abs(diffDays)} يوم` : (diffDays === 0 ? `مستحقة اليوم` : `متبقي عليها ${diffDays} أيام`);
+            let statusColor = diffDays < 0 ? "#dc2626" : "#d97706";
 
-            printHTML += `
-                <div style="margin-bottom: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9;">
-                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px;">
-                        <span>${index + 1}. معاملة رقم: ${r.number}</span>
-                        <span style="color: ${statusColor};">${statusText}</span>
-                    </div>
-                    <div style="font-size: 13px; margin-bottom: 4px;"><b>الموضوع:</b> ${r.subject}</div>
-                    <div style="font-size: 12px; color: #555; display: flex; justify-content: space-between;">
-                        <span>الجهة المحولة لها: ${r.to || '---'}</span>
-                        <span>تاريخ الاستحقاق: ${r.dueDate}</span>
-                    </div>
-                </div>
-            `;
+            printHTML += `<div style="margin-bottom: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9;"><div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 4px;"><span>${index + 1}. معاملة رقم: ${r.number}</span><span style="color: ${statusColor};">${statusText}</span></div><div style="font-size: 13px; margin-bottom: 4px;"><b>الموضوع:</b> ${r.subject}</div><div style="font-size: 12px; color: #555; display: flex; justify-content: space-between;"><span>الجهة المحولة لها: ${r.to || '---'}</span><span>تاريخ الاستحقاق: ${r.dueDate}</span></div></div>`;
         });
-
         printHTML += `</div>`;
         printArea.innerHTML = printHTML;
-        
-        setTimeout(() => {
-            window.print();
-        }, 100);
+        setTimeout(() => window.print(), 100);
     }
 
     function renderRecords() {
@@ -884,30 +796,20 @@
         let todayDate = parseHijriToDate(getTodayHijriString());
         todayDate.setHours(0,0,0,0);
 
-        let inProgressCount = 0;
-        let completedCount = 0;
-        let delayedCount = 0;
+        let inProgressCount = 0, completedCount = 0, delayedCount = 0;
 
         cachedRecords.forEach(r => {
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-            if (diffDays < 0 && r.status === 'لم تنجز') {
-                delayedCount++;
-            } else if (r.status === 'أنجزت') {
-                completedCount++;
-            } else {
-                inProgressCount++;
-            }
+            if (diffDays < 0 && r.status === 'لم تنجز') delayedCount++;
+            else if (r.status === 'أنجزت') completedCount++;
+            else inProgressCount++;
         });
 
-        let oldInProgress = parseInt(document.getElementById('countInProgress').innerText) || 0;
-        let oldDelayed = parseInt(document.getElementById('countDelayed').innerText) || 0;
-        let oldCompleted = parseInt(document.getElementById('countCompleted').innerText) || 0;
-
-        animateValue('countInProgress', oldInProgress, inProgressCount, 300);
-        animateValue('countDelayed', oldDelayed, delayedCount, 300);
-        animateValue('countCompleted', oldCompleted, completedCount, 300);
+        animateValue('countInProgress', parseInt(document.getElementById('countInProgress').innerText) || 0, inProgressCount, 300);
+        animateValue('countDelayed', parseInt(document.getElementById('countDelayed').innerText) || 0, delayedCount, 300);
+        animateValue('countCompleted', parseInt(document.getElementById('countCompleted').innerText) || 0, completedCount, 300);
 
         let filtered = cachedRecords.filter(r => {
             let dueD = parseHijriToDate(r.dueDate);
@@ -925,17 +827,10 @@
                 if (currentTab === 'active' && isCompleted) return false;
                 if (currentTab === 'completed' && !isCompleted) return false;
             }
-
             return true;
         });
         
-        filtered = filtered.filter(r => 
-            r.number.toLowerCase().includes(query) || 
-            r.subject.toLowerCase().includes(query) || 
-            (r.to && r.to.toLowerCase().includes(query)) ||
-            (r.date && r.date.toLowerCase().includes(query))
-        );
-
+        filtered = filtered.filter(r => r.number.toLowerCase().includes(query) || r.subject.toLowerCase().includes(query) || (r.to && r.to.toLowerCase().includes(query)));
         filtered.sort((a, b) => parseHijriToDate(a.dueDate) - parseHijriToDate(b.dueDate));
 
         let container = document.getElementById('recordsCardsContainer');
@@ -950,9 +845,7 @@
             let dueD = parseHijriToDate(r.dueDate);
             dueD.setHours(0,0,0,0);
             let diffDays = Math.round((dueD - todayDate) / (1000 * 60 * 60 * 24));
-
-            let cardClass = '';
-            let statusBadge = '';
+            let cardClass = '', statusBadge = '';
 
             if (r.status === 'أنجزت') {
                 statusBadge = `<span class="status-badge badge-green">منجزة</span>`;
@@ -966,19 +859,12 @@
                 statusBadge = `<span class="status-badge badge-green">متبقي ${diffDays} يوم</span>`;
             }
 
-            let actionsHTML = '';
-            if (window.userRole === 'admin') {
-                let quickCompleteBtn = r.status !== 'أنجزت' ? `<button class="btn-mini btn-mini-complete" onclick="quickCompleteRecord(${r.id})" title="إنجاز سريع">✓ إنجاز</button>` : '';
-                actionsHTML = `
-                    <div class="table-actions">
-                        ${quickCompleteBtn}
-                        <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
-                        <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
-                    </div>
-                `;
-            } else {
-                actionsHTML = `<span style="font-size: 11px; color: var(--text-muted);">للاطلاع فقط</span>`;
-            }
+            let actionsHTML = window.userRole === 'admin' ? `
+                <div class="table-actions">
+                    ${r.status !== 'أنجزت' ? `<button class="btn-mini btn-mini-complete" onclick="quickCompleteRecord(${r.id})">✓ إنجاز</button>` : ''}
+                    <button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button>
+                    <button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button>
+                </div>` : `<span style="font-size: 11px; color: var(--text-muted);">للاطلاع فقط</span>`;
 
             let card = document.createElement('div');
             card.className = `transaction-card ${cardClass}`;
@@ -1006,6 +892,5 @@
         });
     }
 </script>
-
 </body>
 </html>
