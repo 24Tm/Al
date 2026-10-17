@@ -34,23 +34,27 @@
         window.deleteDoc = deleteDoc;
         window.doc = doc;
 
-        // دالة طلب إذن وتفعيل إشعارات الجوال
-        async function initPushNotifications() {
+        // دالة تفعيل الإشعارات بضغط زر الموظف
+        window.requestNotificationPermission = async function() {
             try {
                 if ('Notification' in window && 'serviceWorker' in navigator) {
                     const permission = await Notification.requestPermission();
                     if (permission === 'granted') {
                         const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
                         const token = await getToken(messaging, { serviceWorkerRegistration: registration });
-                        if (token) {
-                            console.log("تم تفعيل إشعارات الجوال بنجاح. الرمز:", token);
-                        }
+                        alert("✅ تم تفعيل إشعارات الجوال بنجاح!");
+                        console.log("FCM Token:", token);
+                    } else if (permission === 'denied') {
+                        alert("❌ تم رفض الإشعارات! يُرجى تفعيل الإشعارات من إعدادات المتصفح.");
                     }
+                } else {
+                    alert("⚠️ المتصفح لا يدعم الإشعارات الفورية.");
                 }
             } catch (err) {
                 console.error("خطأ في تفعيل إشعارات الجوال:", err);
+                alert("حدث خطأ أثناء تفعيل الإشعارات: " + err.message);
             }
-        }
+        };
 
         // دالة إطلاق إشعار مباشر على شاشة الجوال
         window.triggerPushNotification = function(title, body) {
@@ -65,7 +69,7 @@
             }
         };
 
-        // استقبال الإشعارات في الخلفية والموقع مفتوح
+        // استقبال الإشعارات والموقع مفتوح
         onMessage(messaging, (payload) => {
             if (payload && payload.notification) {
                 window.triggerPushNotification(payload.notification.title, payload.notification.body);
@@ -85,9 +89,6 @@
                     window.userRole = 'view';
                     document.getElementById('adminFormCard').style.display = 'none';
                 }
-
-                // طلب إذن إشعارات الجوال عند تسجيل الدخول الناجح
-                initPushNotifications();
 
                 if (typeof loadRecordsFromCloud === 'function') {
                     loadRecordsFromCloud();
@@ -292,7 +293,10 @@
                         </div>
                         <h1 class="brand-title">متابعة المعاملات اليومية</h1>
                     </div>
-                    <button class="btn-mini btn-mini-del" onclick="handleLogout()" style="padding: 5px 10px;">تسجيل الخروج 🚪</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-mini btn-mini-complete" onclick="requestNotificationPermission()" style="padding: 5px 10px;">تفعيل الإشعارات 🔔</button>
+                        <button class="btn-mini btn-mini-del" onclick="handleLogout()" style="padding: 5px 10px;">تسجيل الخروج 🚪</button>
+                    </div>
                 </div>
                 <div class="metrics-inline">
                     <div class="metric-card in-progress" id="cardInProgress" onclick="filterByMetric('in-progress')">
@@ -555,7 +559,7 @@
         if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
             let r = cachedRecords.find(item => item.id == id);
             if (r && r.docId) {
-                try { await window.deleteDoc(window.doc(window.db, "transactions", r.docId)); loadRecordsFromCloud(); }
+                try { await window.deleteDoc(window.doc(window.doc, "transactions", r.docId)); loadRecordsFromCloud(); }
                 catch (error) { alert("تعذر الحذف: " + error.message); }
             }
         }
@@ -610,8 +614,8 @@
             else inProgressCount++;
         });
 
-        // إطلاق إشعار جوال في حال وجود معاملات متأخرة عند تحميل البيانات
-        if (delayedCount > 0) {
+        // إشعار الجوال للمتأخرات
+        if (delayedCount > 0 && typeof window.triggerPushNotification === 'function') {
             window.triggerPushNotification("⚠️ تنبيه المعاملات اليومية", `يوجد لديك ${delayedCount} معاملة متأخرة تتطلب تدخلك الفوري.`);
         }
 
