@@ -10,6 +10,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyC4tcL7HF_eWO2r7JH3D8ptnyTuwk0vSlw",
@@ -23,6 +24,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const messaging = getMessaging(app);
 
         window.db = db;
         window.collection = collection;
@@ -31,6 +33,44 @@
         window.updateDoc = updateDoc;
         window.deleteDoc = deleteDoc;
         window.doc = doc;
+
+        // دالة طلب إذن وتفعيل إشعارات الجوال
+        async function initPushNotifications() {
+            try {
+                if ('Notification' in window && 'serviceWorker' in navigator) {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                        const token = await getToken(messaging, { serviceWorkerRegistration: registration });
+                        if (token) {
+                            console.log("تم تفعيل إشعارات الجوال بنجاح. الرمز:", token);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("خطأ في تفعيل إشعارات الجوال:", err);
+            }
+        }
+
+        // دالة إطلاق إشعار مباشر على شاشة الجوال
+        window.triggerPushNotification = function(title, body) {
+            if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then((registration) => {
+                    registration.showNotification(title, {
+                        body: body,
+                        icon: '/icon.png',
+                        vibrate: [200, 100, 200]
+                    });
+                });
+            }
+        };
+
+        // استقبال الإشعارات في الخلفية والموقع مفتوح
+        onMessage(messaging, (payload) => {
+            if (payload && payload.notification) {
+                window.triggerPushNotification(payload.notification.title, payload.notification.body);
+            }
+        });
 
         // التحقق من جلسة Firebase عند فتح الصفحة
         onAuthStateChanged(auth, (user) => {
@@ -45,6 +85,9 @@
                     window.userRole = 'view';
                     document.getElementById('adminFormCard').style.display = 'none';
                 }
+
+                // طلب إذن إشعارات الجوال عند تسجيل الدخول الناجح
+                initPushNotifications();
 
                 if (typeof loadRecordsFromCloud === 'function') {
                     loadRecordsFromCloud();
@@ -566,6 +609,11 @@
             else if (r.status === 'أنجزت') completedCount++;
             else inProgressCount++;
         });
+
+        // إطلاق إشعار جوال في حال وجود معاملات متأخرة عند تحميل البيانات
+        if (delayedCount > 0) {
+            window.triggerPushNotification("⚠️ تنبيه المعاملات اليومية", `يوجد لديك ${delayedCount} معاملة متأخرة تتطلب تدخلك الفوري.`);
+        }
 
         animateValue('countInProgress', parseInt(document.getElementById('countInProgress').innerText) || 0, inProgressCount, 300);
         animateValue('countDelayed', parseInt(document.getElementById('countDelayed').innerText) || 0, delayedCount, 300);
