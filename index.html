@@ -32,8 +32,16 @@
         window.deleteDoc = deleteDoc;
         window.doc = doc;
 
+        // مهلة أمان زمنية (ثانيتان ونصف) لمنع تعليق الشاشة نهائياً
+        let authTimeout = setTimeout(() => {
+            if (document.getElementById('firebaseLoadingOverlay').style.display !== 'none') {
+                window.location.replace("login.html");
+            }
+        }, 2500);
+
         // التحقق من جلسة Firebase عند فتح الصفحة
         onAuthStateChanged(auth, (user) => {
+            clearTimeout(authTimeout);
             if (user) {
                 document.getElementById('firebaseLoadingOverlay').style.display = 'none';
                 document.getElementById('mainAppContent').style.display = 'block';
@@ -602,6 +610,7 @@
             let actionsHTML = window.userRole === 'admin' ? `<div class="table-actions">${r.status !== 'أنجزت' ? `<button class="btn-mini btn-mini-complete" onclick="quickCompleteRecord(${r.id})">✓ إنجاز</button>` : ''}<button class="btn-mini btn-mini-edit" onclick="editRecord(${r.id})">تعديل</button><button class="btn-mini btn-mini-del" onclick="deleteRecord(${r.id})">حذف</button></div>` : `<span style="font-size: 11px; color: var(--text-muted);">للاطلاع فقط</span>`;
 
             let card = document.createElement('div');
+            card.className = `transaction-card ${cardCard ? '' : cardClass}`; // تأمين الصنف
             card.className = `transaction-card ${cardClass}`;
             card.innerHTML = `<div class="card-header"><div class="trans-number-date-group"><span class="trans-number"># ${r.number}</span><span class="trans-date">📅 ${r.date || 'غير محددة'}</span></div>${statusBadge}</div><div class="card-body"><div class="card-subject">${r.subject}</div><div class="card-meta"><span>الجهة: <b>${r.to || '---'}</b></span><span>الإنجاز: ${r.dueDate}</span></div></div><div class="card-footer"><span style="font-size: 10.5px; color: var(--text-muted);">إدارة المعاملة</span>${actionsHTML}</div>`;
             container.appendChild(card);
