@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متابعة المعاملات اليومية - لوحة الإدارة المتكاملة</title>
     
+    <!-- استيراد مكتبة SheetJS لتصدير ملفات Excel الحقيقية -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
     <!-- استيراد مكتبات Firebase (SDK الإصدار 10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -177,14 +180,16 @@
         }
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: inset 0 2px 3px rgba(0,0,0,0.3), 0 0 10px var(--primary-glow); }
 
-        .actions-group { display: flex; gap: 10px; margin-top: 14px; }
+        .actions-group { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
         .btn {
             background: var(--primary); color: #fff; border: none; padding: 10px 18px;
             border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; flex: 1; transition: all 0.2s ease; box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4);
+            min-width: 130px; text-align: center;
         }
         .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
         .btn-alt { background: #374151; box-shadow: none; }
         .btn-pdf { background: #0284c7; }
+        .btn-export { background: #059669; }
 
         .search-box-wrapper { margin-bottom: 12px; display: flex; gap: 10px; align-items: center; }
         .search-box-wrapper input { padding: 11px 14px; border-radius: 11px; border: 1px solid var(--border); font-size: 13px; background: var(--bg-card); }
@@ -272,6 +277,7 @@
                 <button class="pill-btn" id="tabCompleted" onclick="switchTab('completed')">المعاملات المنجزة</button>
             </div>
 
+            <!-- لوحة التحكم الخاصة بالأدمن فقط -->
             <div class="panel-box no-print-zone" id="adminFormCard">
                 <h3 id="formTitleText">➕ تسجيل معاملة جديدة</h3>
                 <input type="hidden" id="recordId">
@@ -334,6 +340,7 @@
                     <button class="btn" onclick="saveRecord()" id="saveBtnText">حفظ المعاملة</button>
                     <button class="btn btn-alt" onclick="resetForm()">إلغاء</button>
                     <button class="btn btn-pdf" onclick="exportDelayedAndApproachingPDF()">📄 تقرير المتأخرات PDF</button>
+                    <button class="btn btn-export" onclick="showExportOptions()">📥 تصدير البيانات</button>
                 </div>
             </div>
 
@@ -530,6 +537,68 @@
         calculateDueDate();
         document.getElementById('formTitleText').innerText = "➕ تسجيل معاملة جديدة";
         document.getElementById('saveBtnText').innerText = "حفظ المعاملة";
+    }
+
+    // دوال تصدير البيانات (مخصصة للأدمن فقط)
+    function showExportOptions() {
+        if (window.userRole !== 'admin') { alert("عذراً، هذه الصلاحية مخصصة للأدمن فقط."); return; }
+        if (cachedRecords.length === 0) { alert('لا توجد معاملات لتصديرها.'); return; }
+        
+        let choice = prompt("اختر صيغة التصدير:\n1 - Excel (.xlsx)\n2 - CSV (.csv)\n3 - JSON (.json)\n\nالرجاء كتابة رقم الصيغة (1 أو 2 أو 3):");
+        
+        if (choice === '1') {
+            exportToExcel();
+        } else if (choice === '2') {
+            exportToCSV();
+        } else if (choice === '3') {
+            exportToJSON();
+        } else if (choice !== null) {
+            alert("صيغة غير صحيحة.");
+        }
+    }
+
+    function exportToExcel() {
+        let dataList = cachedRecords.map(r => ({
+            "رقم المعاملة": r.number,
+            "تاريخ المعاملة": r.date || '',
+            "الموضوع": r.subject,
+            "الجهة المحولة لها": r.to || '',
+            "الحالة": r.status,
+            "تاريخ الاستحقاق": r.dueDate
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(dataList);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "المعاملات");
+        XLSX.writeFile(workbook, `Transactions_Report_${getTodayHijriString()}.xlsx`);
+    }
+
+    function exportToCSV() {
+        let csvContent = "\uFEFFرقم المعاملة,تاريخ المعاملة,الموضوع,الجهة,الحالة,تاريخ الاستحقاق\n";
+        cachedRecords.forEach(r => {
+            let subj = (r.subject || '').replace(/"/g, '""');
+            let toAddr = (r.to || '').replace(/"/g, '""');
+            csvContent += `"${r.number}","${r.date || ''}","${subj}","${toAddr}","${r.status}","${r.dueDate}"\n`;
+        });
+        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Transactions_Report_${getTodayHijriString()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function exportToJSON() {
+        let jsonStr = JSON.stringify(cachedRecords, null, 2);
+        let blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Transactions_Report_${getTodayHijriString()}.json`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     function exportDelayedAndApproachingPDF() {
